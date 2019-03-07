@@ -16,12 +16,15 @@ const mix = require('laravel-mix');
 
 
 mix.styles([
-    'public/css/app.css'
-	// 'public/css/argon.css'
+    'public/css/style.css',
+    'public/css/app.css',
+    'public/css/argon.min.css'
 	
 ], 'public/css/all.css')
 .js([
-	'resources/js/app.js',
+    'public/js/script.js',
+    'public/js/app.js',
+    // 'public/js/argon.min.js'
     // 'node_modules/popper.js/dist/popper.js',
     // 'node_modules/bootstrap/dist/js/bootstrap.min.js',
     // 'public/vendor/chart.js/dist/Chart.min.js',
