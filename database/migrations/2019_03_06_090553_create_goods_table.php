@@ -14,8 +14,9 @@ class CreateGoodsTable extends Migration
     public function up()
     {
         Schema::create('goods', function (Blueprint $table) {
-            $table->string('id',191)->primary();
-            $table->string('description',255);
+            $table->bigIncrements('id');
+            $table->string('code')->unique();
+            $table->string('description');
             $table->timestamps();
         });
     }

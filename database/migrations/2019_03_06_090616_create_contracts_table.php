@@ -14,9 +14,10 @@ class CreateContractsTable extends Migration
     public function up()
     {
         Schema::create('contracts', function (Blueprint $table) {
-            $table->string('id',191)->primary();
-            $table->string('description',255);
-            $table->string('reference',255);
+            $table->bigIncrements('id');
+            $table->string('code')->unique();
+            $table->string('description');
+            $table->string('reference');
             $table->timestamps();
         });
     }

@@ -15,7 +15,7 @@ class CreateIndicatorsTable extends Migration
     {
         Schema::create('indicators', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('description',255);
+            $table->string('description');
             $table->timestamps();
         });
     }

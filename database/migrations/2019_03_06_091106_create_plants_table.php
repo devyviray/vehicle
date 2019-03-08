@@ -15,9 +15,9 @@ class CreatePlantsTable extends Migration
     {
         Schema::create('plants', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('plant_code', 255);
-            $table->string('plant_name', 255);
-            $table->string('company_server', 255);
+            $table->string('code');
+            $table->string('name');
+            $table->string('company_server');
             $table->timestamps();
         });
     }
