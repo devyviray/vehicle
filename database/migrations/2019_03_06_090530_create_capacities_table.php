@@ -15,8 +15,8 @@ class CreateCapacitiesTable extends Migration
     {
         Schema::create('capacities', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('description',255);
-            $table->string('type',255);
+            $table->string('description');
+            $table->string('type');
             $table->timestamps();
         });
     }

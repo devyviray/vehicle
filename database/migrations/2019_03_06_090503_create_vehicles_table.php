@@ -15,19 +15,21 @@ class CreateVehiclesTable extends Migration
     {
         Schema::create('vehicles', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('plate_number', 255);
+            $table->string('plate_number');
             $table->bigInteger('category_id');
             $table->bigInteger('capacity_id');
             $table->bigInteger('indicator_id');
-            $table->string('good_id',191);
+            $table->bigInteger('good_id');
             $table->bigInteger('allowed_total_weight');
-            $table->string('remarks',255);
+            $table->string('remarks');
             $table->bigInteger('based_truck_id');
-            $table->string('contract_id',191);
+            $table->bigInteger('contract_id');
             $table->bigInteger('document_id');
             $table->bigInteger('user_id');
             $table->dateTime('validity_start_date');
             $table->dateTime('validity_end_date');
+            $table->date('date');
+            $table->time('time');
             $table->timestamps();
         });
     }
