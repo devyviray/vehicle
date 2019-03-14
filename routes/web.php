@@ -27,3 +27,5 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 Route::get('/vehicle', 'VehicleController@index');
 Route::post('/vehicle', 'VehicleController@store');
+Route::patch('/vehicle/{vehicle}', 'VehicleController@update');
+Route::delete('/vehicle/{vehicle}', 'VehicleController@destroy');

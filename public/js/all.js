@@ -2049,18 +2049,211 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       vehicles: [],
       vehicle: [],
-      errors: []
+      vehicle_copied: [],
+      vehicle_id: '',
+      errors: [],
+      currentPage: 0,
+      itemsPerPage: 10,
+      keywords: ''
     };
   },
   created: function created() {
     this.fetchVehicles();
   },
   methods: {
+    getVehicleId: function getVehicleId(id) {
+      this.vehicle_id = id;
+    },
+    copyObject: function copyObject(vehicle) {
+      this.vehicle_copied = Object.assign({}, vehicle);
+    },
     fetchVehicles: function fetchVehicles() {
       var _this = this;
 
@@ -2090,10 +2283,98 @@ __webpack_require__.r(__webpack_exports__);
         date: vehicle.date,
         time: vehicle.time
       }).then(function (response) {
-        _this2.vehicles[0].push = response.data;
+        $('#addVehicleModal').modal('hide');
+        alert('Vehicle successfully added');
+
+        _this2.vehicles.unshift(response.data);
       }).catch(function (error) {
         _this2.errors = error.response.errors;
       });
+    },
+    editVehicle: function editVehicle(vehicle) {
+      var _this3 = this;
+
+      var index = this.vehicles.findIndex(function (item) {
+        return item.id == vehicle.id;
+      });
+      axios.patch("/vehicle/".concat(vehicle.id), {
+        plate_number: vehicle.plate_number,
+        category_id: vehicle.category_id,
+        capacity_id: vehicle.capacity_id,
+        indicator_id: vehicle.indicator_id,
+        good_id: vehicle.good_id,
+        allowed_total_weight: vehicle.allowed_total_weight,
+        remarks: vehicle.remarks,
+        based_truck_id: vehicle.based_truck_id,
+        contract_id: vehicle.contract_id,
+        document_id: vehicle.document_id,
+        user_id: vehicle.user_id,
+        validity_start_date: vehicle.validity_start_date,
+        validity_end_date: vehicle.validity_end_date,
+        date: vehicle.date,
+        time: vehicle.time
+      }).then(function (response) {
+        $('#editVehicleModal').modal('hide');
+        alert('Vehicle successfully updated');
+
+        _this3.vehicles.splice(index, 1, response.data);
+      }).catch(function (error) {
+        _this3.errors = error.response.data.errors;
+      });
+    },
+    deleteVehicle: function deleteVehicle() {
+      var _this4 = this;
+
+      var index = this.vehicles.findIndex(function (item) {
+        return item.id == _this4.vehicle_id;
+      });
+      axios.delete("/vehicle/".concat(this.vehicle_id)).then(function (response) {
+        $('#deleteVehicleModal').modal('hide');
+        alert('Vehicle successfully deleted');
+
+        _this4.vehicles.splice(index, 1);
+      }).catch(function (error) {
+        _this4.errors = error.response.data.errors;
+      });
+    },
+    setPage: function setPage(pageNumber) {
+      this.currentPage = pageNumber;
+    },
+    resetStartRow: function resetStartRow() {
+      this.currentPage = 0;
+    },
+    showPreviousLink: function showPreviousLink() {
+      return this.currentPage == 0 ? false : true;
+    },
+    showNextLink: function showNextLink() {
+      return this.currentPage == this.totalPages - 1 ? false : true;
+    }
+  },
+  computed: {
+    filteredVehicles: function filteredVehicles() {
+      var _this5 = this;
+
+      var self = this;
+      return Object.values(self.vehicles).filter(function (vehicle) {
+        return vehicle.plate_number.toLowerCase().includes(_this5.keywords.toLowerCase());
+      });
+    },
+    totalPages: function totalPages() {
+      return Math.ceil(Object.values(this.vehicles).length / this.itemsPerPage);
+    },
+    filteredQueues: function filteredQueues() {
+      var index = this.currentPage * this.itemsPerPage;
+      var queues_array = this.filteredVehicles.slice(index, index + this.itemsPerPage);
+
+      if (this.currentPage >= this.totalPages) {
+        this.currentPage = this.totalPages - 1;
+      }
+
+      if (this.currentPage == -1) {
+        this.currentPage = 0;
+      }
+
+      return queues_array;
     }
   }
 });
@@ -37182,7 +37463,35 @@ var render = function() {
       _c("div", { staticClass: "row mt-5" }, [
         _c("div", { staticClass: "col-xl-12 mb-5 mb-xl-0" }, [
           _c("div", { staticClass: "card shadow" }, [
-            _vm._m(1),
+            _c("div", { staticClass: "card-header border-0" }, [
+              _vm._m(1),
+              _vm._v(" "),
+              _c("div", { staticClass: "row align-items-center" }, [
+                _c("div", { staticClass: "col-xl-4 mb-2 mt-3 float-right" }, [
+                  _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.keywords,
+                        expression: "keywords"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: { type: "text", placeholder: "Search", id: "name" },
+                    domProps: { value: _vm.keywords },
+                    on: {
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.keywords = $event.target.value
+                      }
+                    }
+                  })
+                ])
+              ])
+            ]),
             _vm._v(" "),
             _c("div", { staticClass: "table-responsive" }, [
               _c(
@@ -37193,8 +37502,59 @@ var render = function() {
                   _vm._v(" "),
                   _c(
                     "tbody",
-                    _vm._l(_vm.vehicles, function(vehicle, v) {
+                    _vm._l(_vm.filteredQueues, function(vehicle, v) {
                       return _c("tr", { key: v }, [
+                        _c("td", { staticClass: "text-right" }, [
+                          _c("div", { staticClass: "dropdown" }, [
+                            _vm._m(3, true),
+                            _vm._v(" "),
+                            _c(
+                              "div",
+                              {
+                                staticClass:
+                                  "dropdown-menu dropdown-menu-right dropdown-menu-arrow"
+                              },
+                              [
+                                _c(
+                                  "a",
+                                  {
+                                    staticClass: "dropdown-item",
+                                    attrs: {
+                                      href: "javascript.void(0)",
+                                      "data-toggle": "modal",
+                                      "data-target": "#editVehicleModal"
+                                    },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.copyObject(vehicle)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Edit")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "a",
+                                  {
+                                    staticClass: "dropdown-item",
+                                    attrs: {
+                                      href: "javascript.void(0)",
+                                      "data-toggle": "modal",
+                                      "data-target": "#deleteVehicleModal"
+                                    },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.getVehicleId(vehicle.id)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("Delete")]
+                                )
+                              ]
+                            )
+                          ])
+                        ]),
+                        _vm._v(" "),
                         _c("th", { attrs: { scope: "row" } }, [
                           _vm._v(_vm._s(vehicle.id))
                         ]),
@@ -37236,6 +37596,53 @@ var render = function() {
                   )
                 ]
               )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "row mb-3 mt-3 ml-1" }, [
+              _c("div", { staticClass: "col-6" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-default btn-sm btn-fill",
+                    attrs: { disabled: !_vm.showPreviousLink() },
+                    on: {
+                      click: function($event) {
+                        return _vm.setPage(_vm.currentPage - 1)
+                      }
+                    }
+                  },
+                  [_vm._v(" Previous ")]
+                ),
+                _vm._v(" "),
+                _c("span", { staticClass: "text-dark" }, [
+                  _vm._v(
+                    "Page " +
+                      _vm._s(_vm.currentPage + 1) +
+                      " of " +
+                      _vm._s(_vm.totalPages)
+                  )
+                ]),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-default btn-sm btn-fill",
+                    attrs: { disabled: !_vm.showNextLink() },
+                    on: {
+                      click: function($event) {
+                        return _vm.setPage(_vm.currentPage + 1)
+                      }
+                    }
+                  },
+                  [_vm._v(" Next ")]
+                )
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "col-6 text-right" }, [
+                _c("span", [
+                  _vm._v(_vm._s(_vm.filteredQueues.length) + " Tsr(s)")
+                ])
+              ])
             ])
           ])
         ])
@@ -37269,7 +37676,7 @@ var render = function() {
           },
           [
             _c("div", { staticClass: "modal-content" }, [
-              _vm._m(3),
+              _vm._m(4),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
                 _c("div", { staticClass: "row" }, [
@@ -37804,6 +38211,640 @@ var render = function() {
           ]
         )
       ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "editVehicleModal",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "exampleModalLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "span",
+          { staticClass: "closed", attrs: { "data-dismiss": "modal" } },
+          [_vm._v("×")]
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-dialog-centered modal-lg",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(5),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Plate number")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.plate_number,
+                            expression: "vehicle_copied.plate_number"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "plate_number" },
+                        domProps: { value: _vm.vehicle_copied.plate_number },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "plate_number",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Category")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.category_id,
+                            expression: "vehicle_copied.category_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "category" },
+                        domProps: { value: _vm.vehicle_copied.category_id },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "category_id",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Capacity")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.capacity_id,
+                            expression: "vehicle_copied.capacity_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "capacity" },
+                        domProps: { value: _vm.vehicle_copied.capacity_id },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "capacity_id",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Indicator")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.indicator_id,
+                            expression: "vehicle_copied.indicator_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "indicator" },
+                        domProps: { value: _vm.vehicle_copied.indicator_id },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "indicator_id",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Goods")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.good_id,
+                            expression: "vehicle_copied.good_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "goods" },
+                        domProps: { value: _vm.vehicle_copied.good_id },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "good_id",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Allowed total weight")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.allowed_total_weight,
+                            expression: "vehicle_copied.allowed_total_weight"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "allowed_total_weight" },
+                        domProps: {
+                          value: _vm.vehicle_copied.allowed_total_weight
+                        },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "allowed_total_weight",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Remarks")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.remarks,
+                            expression: "vehicle_copied.remarks"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "remarks" },
+                        domProps: { value: _vm.vehicle_copied.remarks },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "remarks",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Based trucks")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.based_truck_id,
+                            expression: "vehicle_copied.based_truck_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "based_trucks" },
+                        domProps: { value: _vm.vehicle_copied.based_truck_id },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "based_truck_id",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Contract")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.contract_id,
+                            expression: "vehicle_copied.contract_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "contract" },
+                        domProps: { value: _vm.vehicle_copied.contract_id },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "contract_id",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Document")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.document_id,
+                            expression: "vehicle_copied.document_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "document" },
+                        domProps: { value: _vm.vehicle_copied.document_id },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "document_id",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [_vm._v("User")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.user_id,
+                            expression: "vehicle_copied.user_id"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "user" },
+                        domProps: { value: _vm.vehicle_copied.user_id },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "user_id",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Validity start date")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.validity_start_date,
+                            expression: "vehicle_copied.validity_start_date"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "validity_start_date" },
+                        domProps: {
+                          value: _vm.vehicle_copied.validity_start_date
+                        },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "validity_start_date",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [
+                        _vm._v("Validity end date")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.validity_end_date,
+                            expression: "vehicle_copied.validity_end_date"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "validity_end_date" },
+                        domProps: {
+                          value: _vm.vehicle_copied.validity_end_date
+                        },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "validity_end_date",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [_vm._v("Date")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.date,
+                            expression: "vehicle_copied.date"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "date" },
+                        domProps: { value: _vm.vehicle_copied.date },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "date",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "row" }, [
+                  _c("div", { staticClass: "col-md-6" }, [
+                    _c("div", { staticClass: "form-group" }, [
+                      _c("label", { attrs: { for: "role" } }, [_vm._v("Time")]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.vehicle_copied.time,
+                            expression: "vehicle_copied.time"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: { type: "text", id: "time" },
+                        domProps: { value: _vm.vehicle_copied.time },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.vehicle_copied,
+                              "time",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ])
+                  ])
+                ])
+              ]),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-primary btn-round btn-fill",
+                    attrs: { id: "check_btn", type: "button" },
+                    on: {
+                      click: function($event) {
+                        return _vm.editVehicle(_vm.vehicle_copied)
+                      }
+                    }
+                  },
+                  [_vm._v("Save")]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "deleteVehicleModal",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "exampleModalLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "span",
+          { staticClass: "closed", attrs: { "data-dismiss": "modal" } },
+          [_vm._v("×")]
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-dialog-centered modal-lg",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(6),
+              _vm._v(" "),
+              _vm._m(7),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-footer" }, [
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-secondary",
+                    attrs: { "data-dismiss": "modal" }
+                  },
+                  [_vm._v("Close")]
+                ),
+                _vm._v(" "),
+                _c(
+                  "button",
+                  {
+                    staticClass: "btn btn-warning",
+                    on: { click: _vm.deleteVehicle }
+                  },
+                  [_vm._v("Delete")]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
     )
   ])
 }
@@ -38019,25 +39060,20 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "card-header border-0" }, [
-      _c("div", { staticClass: "row align-items-center" }, [
-        _c("div", { staticClass: "col" }, [
-          _c("h3", { staticClass: "mb-0" }, [_vm._v("Vehicle List")])
-        ]),
-        _vm._v(" "),
-        _c("div", { staticClass: "col text-right" }, [
-          _c(
-            "button",
-            {
-              staticClass: "btn btn-sm btn-primary",
-              attrs: {
-                "data-toggle": "modal",
-                "data-target": "#addVehicleModal"
-              }
-            },
-            [_vm._v("Add Vehicle")]
-          )
-        ])
+    return _c("div", { staticClass: "row align-items-center" }, [
+      _c("div", { staticClass: "col" }, [
+        _c("h3", { staticClass: "mb-0" }, [_vm._v("Vehicle List")])
+      ]),
+      _vm._v(" "),
+      _c("div", { staticClass: "col text-right" }, [
+        _c(
+          "button",
+          {
+            staticClass: "btn btn-sm btn-primary",
+            attrs: { "data-toggle": "modal", "data-target": "#addVehicleModal" }
+          },
+          [_vm._v("Add Vehicle")]
+        )
       ])
     ])
   },
@@ -38047,6 +39083,8 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", { staticClass: "thead-light" }, [
       _c("tr", [
+        _c("th"),
+        _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("ID")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Plate number")]),
@@ -38085,6 +39123,25 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c(
+      "a",
+      {
+        staticClass: "btn btn-sm btn-icon-only text-light",
+        attrs: {
+          href: "#",
+          role: "button",
+          "data-toggle": "dropdown",
+          "aria-haspopup": "true",
+          "aria-expanded": "false"
+        }
+      },
+      [_c("i", { staticClass: "fas fa-ellipsis-v" })]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("div", { staticClass: "modal-header" }, [
       _c(
         "h5",
@@ -38104,6 +39161,72 @@ var staticRenderFns = [
         },
         [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
       )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "addCompanyLabel" } },
+        [_vm._v("Edit Vehicle")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "addCompanyLabel" } },
+        [_vm._v("Delete Vehicle")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-body" }, [
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-md-12" }, [
+          _c("div", { staticClass: "form-group" }, [
+            _vm._v(
+              "\n                            Are you sure you want to delete this Vehicle?\n                        "
+            )
+          ])
+        ])
+      ])
     ])
   }
 ]

@@ -31,6 +31,7 @@ class CreateVehiclesTable extends Migration
             $table->date('date');
             $table->time('time');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

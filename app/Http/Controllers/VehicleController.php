@@ -16,7 +16,7 @@ class VehicleController extends Controller
      */
     public function index()
     {
-        return Vehicle::all();
+        return Vehicle::orderBy('id', 'desc')->get();
     }
 
     /**
@@ -54,10 +54,6 @@ class VehicleController extends Controller
             // 'date' => 'required',
             // 'time' => 'required'
         ]);
-        $array = [
-            
-        ];
-        
         return Vehicle::create($request->all());
     }
 
@@ -90,9 +86,29 @@ class VehicleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Vehicle $vehicle)
     {
-        //
+        $request->validate([
+            'plate_number' => 'required',
+            'category_id' => 'required',
+            'capacity_id' => 'required',
+            'indicator_id' => 'required',
+            'good_id' => 'required',
+            'allowed_total_weight' => 'required',
+            'remarks' => 'required',
+            'based_truck_id' => 'required',
+            'contract_id' => 'required',
+            'document_id' => 'required',
+            'user_id' => 'required',
+            // 'validity_start_date' => 'required',
+            // 'validity_end_date' => 'required',
+            // 'date' => 'required',
+            // 'time' => 'required'
+        ]);
+
+        if($vehicle->update($request->all())){
+            return $vehicle;
+        }
     }
 
     /**
@@ -101,8 +117,10 @@ class VehicleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Vehicle $vehicle)
     {
-        //
+        if($vehicle->delete()){
+            return $vehicle;
+        }
     }
 }

@@ -18,7 +18,8 @@ const mix = require('laravel-mix');
 mix.styles([
     'public/css/style.css',
     'public/css/app.css',
-    'public/css/argon.min.css'
+    'public/css/argon.min.css',
+    // 'public/css/all.min.css'
 	
 ], 'public/css/all.css')
 .js([
