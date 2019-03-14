@@ -15,7 +15,7 @@
                     </div>
                     <div class="card-body px-lg-5 py-lg-5">
                         <div class="text-center text-dark mb-4">
-                            <medium><strong>Registration</strong></medium>
+                            <h2><strong>Registration</strong></h2>
                         </div>
                         <form role="form" method="POST" action="{{ route('register') }}">
                             @csrf

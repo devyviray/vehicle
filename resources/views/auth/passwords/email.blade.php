@@ -9,7 +9,7 @@
                 <div class="card bg-secondary shadow border-0">
                     <div class="card-body px-lg-5 py-lg-5">
                         <div class="text-center text-dark mb-4">
-                            <medium>{{ __('Reset password') }}</medium>
+                            <h2>{{ __('Reset password') }}</h2>
                         </div>
 
                         @if (session('status'))

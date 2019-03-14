@@ -23,7 +23,8 @@ mix.styles([
 ], 'public/css/all.css')
 .js([
     'public/js/script.js',
-    'public/js/app.js',
+    'resources/js/app.js',
+    // 'public/js/app.js',
     // 'public/js/argon.min.js'
     // 'node_modules/popper.js/dist/popper.js',
     // 'node_modules/bootstrap/dist/js/bootstrap.min.js',

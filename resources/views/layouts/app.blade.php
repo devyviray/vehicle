@@ -19,20 +19,22 @@
         <link type="text/css" href="{{ asset('css/argon.min.css?v=1.0.0') }}" rel="stylesheet">
     </head>
     <body class="{{ $class ?? '' }}">
-        @auth()
-            <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                @csrf
-            </form>
-        @endauth
+        <div id="app">
+            @auth()
+                <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+                    @csrf
+                </form>
+            @endauth
         
-        <div class="main-content">
-            @include('layouts.navbars.navbar')
-            @yield('content')
-        </div>
+            <div class="main-content">
+                @include('layouts.navbars.navbar')
+                @yield('content')
+            </div>
 
-        @guest()
-        
-        @endguest
+            @guest()
+            
+            @endguest
+        </div>
         
         @stack('js')
         
