@@ -103,7 +103,7 @@
                                     <h3 class="mb-0">Vehicle List</h3>
                                 </div> 
                                 <div class="col text-right">
-                                    <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" >Add Vehicle</button>
+                                    <a href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" @click="resetData()">Add Vehicle</a>
                                 </div>
                             </div>
                             <div class="row align-items-center">
@@ -132,8 +132,6 @@
                                         <th scope="col">User</th>
                                         <th scope="col">Validity start date</th>
                                         <th scope="col">Validity end date</th>
-                                        <th scope="col">Date</th>
-                                        <th scope="col">Time</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -152,20 +150,18 @@
                                         </td>
                                         <th scope="row">{{ vehicle.id }}</th>
                                         <td>{{ vehicle.plate_number }}</td>
-                                        <td>{{ vehicle.category_id }}</td>
-                                        <td>{{ vehicle.capacity_id }}</td>
-                                        <td>{{ vehicle.indicator_id }}</td>
-                                        <td>{{ vehicle.good_id }}</td>
+                                        <td>{{ vehicle.category.description }}</td>
+                                        <td>{{ vehicle.capacity.description }}</td>
+                                        <td>{{ vehicle.indicator.description }}</td>
+                                        <td>{{ vehicle.good.description }}</td>
                                         <td>{{ vehicle.allowed_total_weight }}</td>
                                         <td>{{ vehicle.remarks }}</td>
-                                        <td>{{ vehicle.based_truck_id }}</td>
-                                        <td>{{ vehicle.contract_id }}</td>
-                                        <td>{{ vehicle.document_id }}</td>
-                                        <td>{{ vehicle.user_id }}</td>
+                                        <td>{{ vehicle.based_truck.description }}</td>
+                                        <td>{{ vehicle.contract.code }}</td>
+                                        <td>{{ vehicle.document }}</td>
+                                        <td>{{ vehicle.user.name }}</td>
                                         <td>{{ vehicle.validity_start_date }}</td>
                                         <td>{{ vehicle.validity_end_date }}</td>
-                                        <td>{{ vehicle.date }}</td>
-                                        <td>{{ vehicle.time }}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -184,256 +180,291 @@
                 </div>
             </div>
         </div>
-        <!-- View Simulate Modal -->
+        <!-- Add Vehicle Modal -->
         <div class="modal fade" id="addVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <span class="closed" data-dismiss="modal">&times;</span>
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCompanyLabel">Add Vehicle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <div>
+                        <button type="button" class="close mt-2 mr-2" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-header">
+                        <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Add Vehicle</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Category</label> 
+                                    <select class="form-control" v-model="vehicle.category_id">
+                                        <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.category_id">The category field is required.</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Plate number</label> 
+                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle.plate_number">
+                                    <span class="text-danger" v-if="errors.plate_number">The plate number field is required.</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Plant indicator</label> 
+                                    <select class="form-control" v-model="vehicle.indicator_id">
+                                        <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.indicator_id">The indicator field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                PLANT
+                            </div>
+                        </div> 
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="role">Vendor</label> 
+                                <v-select
+                                    style="width: 100%" 
+                                    v-model="vehicle.vendor"
+                                    label="vendor_description_lfug"
+                                    :options="truckers"
+                                    track-by="id"
+                                >      
+                                </v-select>
+                                <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
+                             </div>
+                            <div class="col-md-4">
+                                <label for="role">Subcon vendor</label> 
+                                <v-select 
+                                    style="width: 100%"
+                                    v-model="vehicle.subcon_vendor"
+                                    label="vendor_description_lfug"
+                                    :options="truckers"
+                                    track-by="id"
+                                >
+                                </v-select>
+                                <span class="text-danger" v-if="errors.subcon_vendor_id">The Subcon vendor field is required</span>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Capacity</label>
+                                    <select class="form-control" v-model="vehicle.capacity_id">
+                                        <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.category_id">The capacity field is required.</span>
+                                </div>
+                            </div>
+                        </div> 
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Goods</label> 
+                                    <select class="form-control" v-model="vehicle.good_id">
+                                        <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Allowed total weight</label> 
+                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle.allowed_total_weight">
+                                    <span class="text-danger" v-if="errors.good_id">The allowed total weight field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Based trucks</label> 
+                                    <select class="form-control" v-model="vehicle.based_truck_id">
+                                        <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.based_truck_id">The based truck is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Contract</label> 
+                                    <select class="form-control" v-model="vehicle.contract_id">
+                                        <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Remarks</label> 
+                                    <input type="text" id="remarks" class="form-control" v-model="vehicle.remarks">
+                                    <span class="text-danger" v-if="errors.good_id">The remark field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Document</label>
+                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
+                                    <span class="text-danger" v-if="errors.attachments">The attachment is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Validity start date</label> 
+                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle.validity_start_date">
+                                    <span class="text-danger" v-if="errors.validity_start_date">The validity start date is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Validity end date</label> 
+                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle.validity_end_date">
+                                    <span class="text-danger" v-if="errors.validity_end_date">The validity end date field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="check_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="addVehicle(vehicle)">Save</button>
+                    </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Plate number</label> 
-                                <input type="text" id="plate_number" class="form-control" v-model="vehicle.plate_number">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Category</label> 
-                                <input type="text" id="category" class="form-control" v-model="vehicle.category_id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Capacity</label> 
-                                <input type="text" id="capacity" class="form-control" v-model="vehicle.capacity_id">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Indicator</label> 
-                                <input type="text" id="indicator" class="form-control" v-model="vehicle.indicator_id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Goods</label> 
-                                <input type="text" id="goods" class="form-control" v-model="vehicle.good_id">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Allowed total weight</label> 
-                                <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle.allowed_total_weight">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Remarks</label> 
-                                <input type="text" id="remarks" class="form-control" v-model="vehicle.remarks">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Based trucks</label> 
-                                <input type="text" id="based_trucks" class="form-control" v-model="vehicle.based_truck_id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Contract</label> 
-                                <input type="text" id="contract" class="form-control" v-model="vehicle.contract_id">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Document</label> 
-                                <input type="text" id="document" class="form-control" v-model="vehicle.document_id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">User</label> 
-                                <input type="text" id="user" class="form-control" v-model="vehicle.user_id">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Validity start date</label> 
-                                <input type="text" id="validity_start_date" class="form-control" v-model="vehicle.validity_start_date">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Validity end date</label> 
-                                <input type="text" id="validity_end_date" class="form-control" v-model="vehicle.validity_end_date">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Date</label> 
-                                <input type="text" id="date" class="form-control" v-model="vehicle.date">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Time</label> 
-                                <input type="text" id="time" class="form-control" v-model="vehicle.time">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="check_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="addVehicle(vehicle)">Save</button>
-                </div>
-                </div>
-            </div>
         </div>
 
         <!-- Edit Vehicle Modal -->
         <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <span class="closed" data-dismiss="modal">&times;</span>
-            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCompanyLabel">Edit Vehicle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
+                    <div>
+                        <button type="button" class="close mt-2 mr-2" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div> 
+                    <div class="modal-header">
+                        <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Edit Vehicle</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Plate number</label> 
+                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_copied.plate_number">
+                                    <span class="text-danger" v-if="errors.plate_number">The plate number field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Category</label> 
+                                    <select class="form-control" v-model="vehicle_copied.category_id">
+                                        <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.category_id">The category field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Capacity</label> 
+                                    <select class="form-control" v-model="vehicle_copied.capacity_id">
+                                        <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.capacity_id">The capacity field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Indicator</label> 
+                                    <select class="form-control" v-model="vehicle_copied.indicator_id">
+                                        <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.indicator_id">The indicator field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Goods</label> 
+                                    <select class="form-control" v-model="vehicle_copied.good_id">
+                                        <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Allowed total weight</label> 
+                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight">
+                                    <span class="text-danger" v-if="errors.good_id">The allowed total weight field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Remarks</label> 
+                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_copied.remarks">
+                                    <span class="text-danger" v-if="errors.good_id">The remarks field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Based trucks</label> 
+                                    <select class="form-control" v-model="vehicle_copied.based_truck_id">
+                                        <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.based_truck_id">The based truck field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Contract</label> 
+                                    <select class="form-control" v-model="vehicle_copied.contract_id">
+                                        <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Document</label> 
+                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
+                                    <span class="text-danger" v-if="errors.attachments">The attachment field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Validity start date</label> 
+                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle_copied.validity_start_date">
+                                    <span class="text-danger" v-if="errors.validity_start_date">The validity start date field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Validity end date</label> 
+                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle_copied.validity_end_date">
+                                    <span class="text-danger" v-if="errors.validity_end_date">The validity end date field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="check_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="editVehicle(vehicle_copied)">Save</button>
+                    </div>
+                    </div>
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Plate number</label> 
-                                <input type="text" id="plate_number" class="form-control" v-model="vehicle_copied.plate_number">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Category</label> 
-                                <input type="text" id="category" class="form-control" v-model="vehicle_copied.category_id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Capacity</label> 
-                                <input type="text" id="capacity" class="form-control" v-model="vehicle_copied.capacity_id">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Indicator</label> 
-                                <input type="text" id="indicator" class="form-control" v-model="vehicle_copied.indicator_id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Goods</label> 
-                                <input type="text" id="goods" class="form-control" v-model="vehicle_copied.good_id">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Allowed total weight</label> 
-                                <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Remarks</label> 
-                                <input type="text" id="remarks" class="form-control" v-model="vehicle_copied.remarks">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Based trucks</label> 
-                                <input type="text" id="based_trucks" class="form-control" v-model="vehicle_copied.based_truck_id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Contract</label> 
-                                <input type="text" id="contract" class="form-control" v-model="vehicle_copied.contract_id">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Document</label> 
-                                <input type="text" id="document" class="form-control" v-model="vehicle_copied.document_id">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">User</label> 
-                                <input type="text" id="user" class="form-control" v-model="vehicle_copied.user_id">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Validity start date</label> 
-                                <input type="text" id="validity_start_date" class="form-control" v-model="vehicle_copied.validity_start_date">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Validity end date</label> 
-                                <input type="text" id="validity_end_date" class="form-control" v-model="vehicle_copied.validity_end_date">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Date</label> 
-                                <input type="text" id="date" class="form-control" v-model="vehicle_copied.date">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="role">Time</label> 
-                                <input type="text" id="time" class="form-control" v-model="vehicle_copied.time">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button id="check_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="editVehicle(vehicle_copied)">Save</button>
-                </div>
-                </div>
-            </div>
         </div>
 
         <!-- Delete Vehicle Modal -->
@@ -467,13 +498,29 @@
 </template>
 
 <script>
+import vSelect from 'vue-select'
 export default {
+    components: {
+        vSelect
+    },
     data(){
         return {
             vehicles: [],
             vehicle: [],
             vehicle_copied: [],
             vehicle_id: '',
+            categories: [],
+            indicators: [],
+            goods: [],
+            based_trucks: [],
+            contracts: [],
+            documents: [],
+            capacities:[],
+            attachments: [],
+            truckers: [],
+            selected: null,
+            formData: new FormData(),
+            fileSize: 0,
             errors: [],
             currentPage: 0,
             itemsPerPage: 10,
@@ -482,12 +529,22 @@ export default {
     },
     created(){
         this.fetchVehicles();
+        this.fetchCategories();
+        this.fetchCapacities();
+        this.fetchIndicators();
+        this.fetchGoods();
+        this.fetchBasedTrucks();
+        this.fetchContracts();
+        this.fetchDocuments();
+        this.fetchTruckers();
     },
     methods:{
         getVehicleId(id){
+            this.errors = [];
             this.vehicle_id = id;
         },
         copyObject(vehicle){
+            this.errors = [];
             this.vehicle_copied = Object.assign({}, vehicle)
         },
         fetchVehicles(){
@@ -499,52 +556,158 @@ export default {
                 this.errors = error.response.data.error;
             })
         },
-        addVehicle(vehicle){
-            axios.post('/vehicle',{
-                plate_number: vehicle.plate_number,
-                category_id: vehicle.category_id,
-                capacity_id: vehicle.capacity_id,
-                indicator_id: vehicle.indicator_id,
-                good_id: vehicle.good_id,
-                allowed_total_weight: vehicle.allowed_total_weight,
-                remarks: vehicle.remarks,
-                based_truck_id: vehicle.based_truck_id,
-                contract_id: vehicle.contract_id,
-                document_id: vehicle.document_id,
-                user_id: vehicle.user_id,
-                validity_start_date: vehicle.validity_start_date,
-                validity_end_date: vehicle.validity_end_date,
-                date: vehicle.date,
-                time: vehicle.time
+        fetchCategories(){
+            axios.get('/categories')
+            .then(response => { 
+                this.categories = response.data;
             })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        fetchCapacities(){
+             axios.get('/capacities')
+            .then(response => { 
+                this.capacities = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        fetchIndicators(){
+            axios.get('/indicators')
+            .then(response => { 
+                this.indicators = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        fetchGoods(){
+            axios.get('/goods')
+            .then(response => { 
+                this.goods = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        fetchBasedTrucks(){
+            axios.get('/based-trucks')
+            .then(response => { 
+                this.based_trucks = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        fetchContracts(){
+            axios.get('/contracts')
+            .then(response => { 
+                this.contracts = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        fetchDocuments(){
+            axios.get('/documents')
+            .then(response => { 
+                this.documents = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        fetchTruckers(){
+            axios.get('/truckers')
+            .then(response => { 
+                this.truckers = response.data
+            })
+            .catch(error => {
+                this.errors = error.response.data.errors;
+            })
+        },
+        prepareFields(){
+            if(this.attachments.length > 0){
+                for(var i = 0; i < this.attachments.length; i++){
+                    let attachment = this.attachments[i];
+                    this.formData.append('attachments[]', attachment);
+                }
+            } 
+        },
+        uploadFileChange(e){
+            var files = e.target.files || e.dataTransfer.files;
+
+            if(!files.length)
+                return;
+            
+            for (var i = files.length - 1; i >= 0; i--){
+                this.attachments.push(files[i]);
+                this.fileSize = this.fileSize+files[i].size / 1024 / 1024;
+            }
+            if(this.fileSize > 5){
+                alert('File size exceeds 5 MB');
+                document.getElementById('attachments').value = "";
+                this.attachments = [];
+                this.fileSize = 0;
+            }
+
+        },
+        resetData(){
+            this.formData = new FormData();
+            this.attachments = [];
+            this.errors = [];
+            document.getElementById('attachments').value = "";
+            
+        },
+        addVehicle(vehicle){
+            this.errors = [];
+            this.prepareFields();
+            this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number : '');
+            this.formData.append('category_id', vehicle.category_id ? vehicle.category_id : '');
+            this.formData.append('capacity_id', vehicle.capacity_id ? vehicle.capacity_id : '');
+            this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
+            this.formData.append('subcon_vendor_id', vehicle.subcon_vendor ? vehicle.subcon_vendor.id : '');
+            this.formData.append('indicator_id', vehicle.indicator_id ? vehicle.indicator_id : '');
+            this.formData.append('good_id', vehicle.good_id ? vehicle.good_id : '');
+            this.formData.append('allowed_total_weight', vehicle.allowed_total_weight ? vehicle.allowed_total_weight : '');
+            this.formData.append('remarks', vehicle.remarks ? vehicle.remarks : '');
+            this.formData.append('based_truck_id', vehicle.based_truck_id ? vehicle.based_truck_id : '');         
+            this.formData.append('contract_id', vehicle.contract_id ? vehicle.contract_id : '');   
+            this.formData.append('validity_start_date', vehicle.validity_start_date ? vehicle.validity_start_date : '');
+            this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
+
+            axios.post('/vehicle', this.formData)
             .then(response =>{
                 $('#addVehicleModal').modal('hide');
                 alert('Vehicle successfully added');
                 this.vehicles.unshift(response.data);
+                this.resetData();
             })
             .catch(error => {   
-                this.errors = error.response.errors;
+                this.errors = error.response.data.errors;
             })
         },
         editVehicle(vehicle){
             var index = this.vehicles.findIndex(item => item.id == vehicle.id);
-            axios.patch(`/vehicle/${vehicle.id}`,{
-                plate_number: vehicle.plate_number,
-                category_id: vehicle.category_id,
-                capacity_id: vehicle.capacity_id,
-                indicator_id: vehicle.indicator_id,
-                good_id: vehicle.good_id,
-                allowed_total_weight: vehicle.allowed_total_weight,
-                remarks: vehicle.remarks,
-                based_truck_id: vehicle.based_truck_id,
-                contract_id: vehicle.contract_id,
-                document_id: vehicle.document_id,
-                user_id: vehicle.user_id,
-                validity_start_date: vehicle.validity_start_date,
-                validity_end_date: vehicle.validity_end_date,
-                date: vehicle.date,
-                time: vehicle.time
-            })
+
+            this.errors = [];
+            this.prepareFields();
+            this.formData.append('plate_number', vehicle.plate_number);
+            this.formData.append('category_id', vehicle.category_id);
+            this.formData.append('capacity_id', vehicle.capacity_id);
+            this.formData.append('indicator_id', vehicle.indicator_id);
+            this.formData.append('good_id', vehicle.good_id);
+            this.formData.append('allowed_total_weight', vehicle.allowed_total_weight);
+            this.formData.append('remarks', vehicle.remarks);
+            this.formData.append('based_truck_id', vehicle.based_truck_id);         
+            this.formData.append('contract_id', vehicle.contract_id);   
+            this.formData.append('validity_start_date', vehicle.validity_start_date);
+            this.formData.append('validity_end_date', vehicle.validity_end_date);
+            this.formData.append('_method', 'PATCH');
+
+            axios.post(`/vehicle/${vehicle.id}`, this.formData)
             .then(response => {
                 $('#editVehicleModal').modal('hide');
                 alert('Vehicle successfully updated');
