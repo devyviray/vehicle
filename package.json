@@ -30,6 +30,7 @@
         "npm": "^6.9.0",
         "to": "^0.2.9",
         "update": "^0.7.4",
+        "vue-multiselect": "^2.1.4",
         "vue-select": "^2.6.0"
     }
 }

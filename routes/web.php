@@ -83,3 +83,7 @@ Route::delete('/user/{user}', 'UserController@destroy');
 // Truckers
 Route::get('/truckers', 'TruckerController@index');
 
+// Plants
+Route::get('/plants', 'PlantController@index');
+
+

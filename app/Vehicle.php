@@ -13,6 +13,8 @@ class Vehicle extends Model
         'plate_number',
         'category_id',
         'capacity_id',
+        'vendor_id',
+        'subcon_vendor_id',
         'indicator_id',
         'good_id',
         'allowed_total_weight',
@@ -57,5 +59,17 @@ class Vehicle extends Model
 
     public function user(){
         return $this->belongsTo(User::Class);
+    }
+
+    public function vendor(){
+        return $this->belongsTo(Trucker::Class, 'vendor_id');
+    }
+
+    public function subconVendor(){
+        return $this->belongsTo(Trucker::Class, 'subcon_vendor_id');
+    }
+
+    public function plants() {
+        return $this->belongsToMany(Plant::Class);
     }
 }
