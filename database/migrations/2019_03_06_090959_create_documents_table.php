@@ -17,6 +17,7 @@ class CreateDocumentsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('vehicle_id');
             $table->string('path');
+            $table->string('file_name');
             $table->timestamps();
         });
     }

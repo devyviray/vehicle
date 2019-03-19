@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\{
-    Vehicle
+    Vehicle,
+    Document
 };
+use Carbon;
+use Auth;
 
 class VehicleController extends Controller
 {
@@ -16,17 +19,7 @@ class VehicleController extends Controller
      */
     public function index()
     {
-        return Vehicle::orderBy('id', 'desc')->get();
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user')->orderBy('id', 'desc')->get();
     }
 
     /**
@@ -41,20 +34,45 @@ class VehicleController extends Controller
             'plate_number' => 'required',
             'category_id' => 'required',
             'capacity_id' => 'required',
+            'vendor_id' => 'required',
+            'subcon_vendor_id' => 'required',
             'indicator_id' => 'required',
             'good_id' => 'required',
             'allowed_total_weight' => 'required',
             'remarks' => 'required',
             'based_truck_id' => 'required',
             'contract_id' => 'required',
-            'document_id' => 'required',
-            'user_id' => 'required',
-            // 'validity_start_date' => 'required',
-            // 'validity_end_date' => 'required',
+            'validity_start_date' => 'required',
+            'validity_end_date' => 'required',
             // 'date' => 'required',
-            // 'time' => 'required'
+            // 'time' => 'required',
+            'attachments' => 'required',
         ]);
-        return Vehicle::create($request->all());
+        if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
+            $attachments = $request->file('attachments');   
+            foreach($attachments as $attachment){
+                $filename = $attachment->getClientOriginalName();
+                $path = $attachment->store('document');
+
+                $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+            }
+                
+            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user')->where('id', $vehicle->id)->first();
+        }
+    }
+
+    /**
+     * Uploading files for ccir
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function uploadFiles($vehicleId,$path, $filename)
+    {
+        $document = new Document;
+        $document->vehicle_id = $vehicleId;
+        $document->path = $path;
+        $document->file_name = $filename;
+        $document->save();
     }
 
     /**
@@ -64,17 +82,6 @@ class VehicleController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
     {
         //
     }
@@ -92,22 +99,30 @@ class VehicleController extends Controller
             'plate_number' => 'required',
             'category_id' => 'required',
             'capacity_id' => 'required',
+            'vendor_id' => 'required',
+            'subcon_vendor_id' => 'required',
             'indicator_id' => 'required',
             'good_id' => 'required',
             'allowed_total_weight' => 'required',
             'remarks' => 'required',
             'based_truck_id' => 'required',
             'contract_id' => 'required',
-            'document_id' => 'required',
-            'user_id' => 'required',
-            // 'validity_start_date' => 'required',
-            // 'validity_end_date' => 'required',
+            'validity_start_date' => 'required',
+            'validity_end_date' => 'required',
             // 'date' => 'required',
             // 'time' => 'required'
         ]);
-
-        if($vehicle->update($request->all())){
-            return $vehicle;
+        if($vehicle->update(['user_id' => Auth::user()->id] + $request->all())){
+            if($request->has('attachments')){
+                $attachments = $request->file('attachments');   
+                foreach($attachments as $attachment){
+                    $filename = $attachment->getClientOriginalName();
+                    $path = $attachment->store('document');
+    
+                    $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+                }
+            }
+            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user')->where('id', $vehicle->id)->first();
         }
     }
 

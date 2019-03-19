@@ -14,13 +14,12 @@
         <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
 
         <!-- Icons -->
-        <link href="{{ asset('css/all.min.css') }}" rel="stylesheet">
-
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
         <!-- Styles -->
         <link href="{{ asset('css/all.css') }}" rel="stylesheet">
         <!-- Argon CSS -->
-        <link type="text/css" href="{{ asset('css/argon.min.css?v=1.0.0') }}" rel="stylesheet">
+        {{-- <link type="text/css" href="{{ asset('css/argon.min.css?v=1.0.0') }}" rel="stylesheet"> --}}
     </head>
     <body class="{{ $class ?? '' }}">
         <div id="app">
