@@ -19,7 +19,7 @@ class VehicleController extends Controller
      */
     public function index()
     {
-        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user')->orderBy('id', 'desc')->get();
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user','vendor', 'subconVendor')->orderBy('id', 'desc')->get();
     }
 
     /**
@@ -47,6 +47,7 @@ class VehicleController extends Controller
             // 'date' => 'required',
             // 'time' => 'required',
             'attachments' => 'required',
+            'plants' => 'required',
         ]);
         if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
             $attachments = $request->file('attachments');   
@@ -56,8 +57,10 @@ class VehicleController extends Controller
 
                 $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
             }
-                
-            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user')->where('id', $vehicle->id)->first();
+             
+            // $vehicle->plants()->sync( (array) $request->plants);
+
+            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user', 'vendor', 'subconVendor')->where('id', $vehicle->id)->first();
         }
     }
 

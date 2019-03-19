@@ -10,8 +10,8 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">Traffic</h5>
-                                            <span class="h2 font-weight-bold mb-0">350,897</span>
+                                            <!-- <h5 class="card-title text-uppercase text-muted mb-0">Traffic</h5>
+                                            <span class="h2 font-weight-bold mb-0">350,897</span> -->
                                         </div>
                                         <div class="col-auto">
                                             <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
@@ -20,8 +20,8 @@
                                         </div>
                                     </div>
                                     <p class="mt-3 mb-0 text-muted text-sm">
-                                        <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                                        <span class="text-nowrap">Since last month</span>
+                                        <!-- <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
+                                        <span class="text-nowrap">Since last month</span> -->
                                     </p>
                                 </div>
                             </div>
@@ -31,8 +31,8 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">New users</h5>
-                                            <span class="h2 font-weight-bold mb-0">2,356</span>
+                                            <!-- <h5 class="card-title text-uppercase text-muted mb-0">New users</h5>
+                                            <span class="h2 font-weight-bold mb-0">2,356</span> -->
                                         </div>
                                         <div class="col-auto">
                                             <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
@@ -41,8 +41,8 @@
                                         </div>
                                     </div>
                                     <p class="mt-3 mb-0 text-muted text-sm">
-                                        <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> 3.48%</span>
-                                        <span class="text-nowrap">Since last week</span>
+                                        <!-- <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> 3.48%</span>
+                                        <span class="text-nowrap">Since last week</span> -->
                                     </p>
                                 </div>
                             </div>
@@ -52,8 +52,8 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">Sales</h5>
-                                            <span class="h2 font-weight-bold mb-0">924</span>
+                                            <!-- <h5 class="card-title text-uppercase text-muted mb-0">Sales</h5>
+                                            <span class="h2 font-weight-bold mb-0">924</span> -->
                                         </div>
                                         <div class="col-auto">
                                             <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
@@ -62,8 +62,8 @@
                                         </div>
                                     </div>
                                     <p class="mt-3 mb-0 text-muted text-sm">
-                                        <span class="text-warning mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span>
-                                        <span class="text-nowrap">Since yesterday</span>
+                                        <!-- <span class="text-warning mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span>
+                                        <span class="text-nowrap">Since yesterday</span> -->
                                     </p>
                                 </div>
                             </div>
@@ -73,8 +73,8 @@
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">Performance</h5>
-                                            <span class="h2 font-weight-bold mb-0">49,65%</span>
+                                            <!-- <h5 class="card-title text-uppercase text-muted mb-0">Performance</h5>
+                                            <span class="h2 font-weight-bold mb-0">49,65%</span> -->
                                         </div>
                                         <div class="col-auto">
                                             <div class="icon icon-shape bg-info text-white rounded-circle shadow">
@@ -83,8 +83,8 @@
                                         </div>
                                     </div>
                                     <p class="mt-3 mb-0 text-muted text-sm">
-                                        <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span>
-                                        <span class="text-nowrap">Since last month</span>
+                                        <!-- <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span>
+                                        <span class="text-nowrap">Since last month</span> -->
                                     </p>
                                 </div>
                             </div>
@@ -122,6 +122,8 @@
                                         <th scope="col">Plate number</th>
                                         <th scope="col">Category</th>
                                         <th scope="col">Capacity</th>
+                                        <th scope="col">Vendor</th>
+                                        <th scope="col">Subcon vendor</th>
                                         <th scope="col">Indicator</th>
                                         <th scope="col">Goods</th>
                                         <th scope="col">Allowed total weight</th>
@@ -152,6 +154,9 @@
                                         <td>{{ vehicle.plate_number }}</td>
                                         <td>{{ vehicle.category.description }}</td>
                                         <td>{{ vehicle.capacity.description }}</td>
+                                        <td>{{ vehicle.vendor.vendor_description_lfug }}</td>
+                                        <td v-if="vehicle.subcon_vendor">{{ vehicle.subcon_vendor.vendor_description_lfug }}</td>
+                                        <td v-else></td>
                                         <td>{{ vehicle.indicator.description }}</td>
                                         <td>{{ vehicle.good.description }}</td>
                                         <td>{{ vehicle.allowed_total_weight }}</td>
@@ -223,7 +228,19 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12">
-                                PLANT
+                                <div class="form-group">
+                                    <label for="role">Plant</label> 
+                                    <multiselect
+                                        v-model="vehicle.plant"
+                                        :options="plants"
+                                        :multiple="true"
+                                        track-by="id"
+                                        :custom-label="customLabelPlant"
+                                        placeholder="Select Plant"
+                                        id="selected_plant"
+                                    >
+                                    </multiselect>
+                                </div>  
                             </div>
                         </div> 
                         <div class="row">
@@ -238,7 +255,7 @@
                                 >      
                                 </v-select>
                                 <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
-                             </div>
+                            </div>
                             <div class="col-md-4">
                                 <label for="role">Subcon vendor</label> 
                                 <v-select 
@@ -293,7 +310,7 @@
                                 <div class="form-group">
                                     <label for="role">Contract</label> 
                                     <select class="form-control" v-model="vehicle.contract_id">
-                                        <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
+                                        <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.code + ' - ' + contract.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
                                 </div>
@@ -352,37 +369,26 @@
                     </div>
                     <div class="modal-body">
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Category</label> 
+                                    <select class="form-control" v-model="vehicle_copied.category_id" disabled>
+                                        <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.category_id">The category field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Plate number</label> 
                                     <input type="text" id="plate_number" class="form-control" v-model="vehicle_copied.plate_number">
                                     <span class="text-danger" v-if="errors.plate_number">The plate number field is required</span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Category</label> 
-                                    <select class="form-control" v-model="vehicle_copied.category_id">
-                                        <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.category_id">The category field is required</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="role">Capacity</label> 
-                                    <select class="form-control" v-model="vehicle_copied.capacity_id">
-                                        <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.capacity_id">The capacity field is required</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="role">Indicator</label> 
-                                    <select class="form-control" v-model="vehicle_copied.indicator_id">
+                                    <label for="role">Plant indicator</label> 
+                                    <select class="form-control" v-model="vehicle_copied.indicator_id" disabled>
                                         <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.indicator_id">The indicator field is required</span>
@@ -390,35 +396,79 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="role">Plant</label> 
+                                    <multiselect
+                                        v-model="vehicle.plant"
+                                        :options="plants"
+                                        :multiple="true"
+                                        track-by="id"
+                                        :custom-label="customLabelPlant"
+                                        placeholder="Select Plant"
+                                        id="selected_plant"
+                                        disabled
+                                    >
+                                    </multiselect>
+                                </div>  
+                            </div>
+                        </div> 
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="role">Vendor</label> 
+                                <v-select
+                                    style="width: 100%" 
+                                    v-model="vehicle_copied.vendor"
+                                    label="vendor_description_lfug"
+                                    :options="truckers"
+                                    track-by="id"
+                                >      
+                                </v-select>
+                                <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="role">Subcon vendor</label> 
+                                <v-select 
+                                    style="width: 100%"
+                                    v-model="vehicle_copied.subcon_vendor"
+                                    label="vendor_description_lfug"
+                                    :options="truckers"
+                                    track-by="id"
+                                >
+                                </v-select>
+                                <span class="text-danger" v-if="errors.subcon_vendor_id">The Subcon vendor field is required</span>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Capacity</label> 
+                                    <select class="form-control" v-model="vehicle_copied.capacity_id" disabled>
+                                        <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.capacity_id">The capacity field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Goods</label> 
-                                    <select class="form-control" v-model="vehicle_copied.good_id">
+                                    <select class="form-control" v-model="vehicle_copied.good_id" disabled>
                                         <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Allowed total weight</label> 
-                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight">
+                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight" readonly>
                                     <span class="text-danger" v-if="errors.good_id">The allowed total weight field is required</span>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="form-group">
-                                    <label for="role">Remarks</label> 
-                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_copied.remarks">
-                                    <span class="text-danger" v-if="errors.good_id">The remarks field is required</span>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Based trucks</label> 
-                                    <select class="form-control" v-model="vehicle_copied.based_truck_id">
+                                    <select class="form-control" v-model="vehicle_copied.based_truck_id" disabled>
                                         <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.based_truck_id">The based truck field is required</span>
@@ -426,35 +476,42 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Contract</label> 
-                                    <select class="form-control" v-model="vehicle_copied.contract_id">
+                                    <select class="form-control" v-model="vehicle_copied.contract_id" disabled>
                                         <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Remarks</label> 
+                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_copied.remarks" readonly>
+                                    <span class="text-danger" v-if="errors.good_id">The remarks field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Document</label> 
-                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
+                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange" disabled><br>
                                     <span class="text-danger" v-if="errors.attachments">The attachment field is required</span>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Validity start date</label> 
-                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle_copied.validity_start_date">
+                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle_copied.validity_start_date" readonly>
                                     <span class="text-danger" v-if="errors.validity_start_date">The validity start date field is required</span>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Validity end date</label> 
-                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle_copied.validity_end_date">
+                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle_copied.validity_end_date" readonly>
                                     <span class="text-danger" v-if="errors.validity_end_date">The validity end date field is required</span>
                                 </div>
                             </div>
@@ -463,8 +520,8 @@
                     <div class="modal-footer">
                         <button id="check_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="editVehicle(vehicle_copied)">Save</button>
                     </div>
-                    </div>
                 </div>
+            </div>
         </div>
 
         <!-- Delete Vehicle Modal -->
@@ -496,12 +553,15 @@
         </div>
     </div>
 </template>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <script>
 import vSelect from 'vue-select'
+import Multiselect from 'vue-multiselect';
 export default {
     components: {
-        vSelect
+        vSelect,
+        Multiselect
     },
     data(){
         return {
@@ -518,6 +578,7 @@ export default {
             capacities:[],
             attachments: [],
             truckers: [],
+            plants: [],
             selected: null,
             formData: new FormData(),
             fileSize: 0,
@@ -537,13 +598,18 @@ export default {
         this.fetchContracts();
         this.fetchDocuments();
         this.fetchTruckers();
+        this.fetchPlants();
     },
     methods:{
+        customLabelPlant (plant) {
+            return `${plant.name }`
+        },
         getVehicleId(id){
             this.errors = [];
             this.vehicle_id = id;
         },
         copyObject(vehicle){
+            console.log(vehicle);
             this.errors = [];
             this.vehicle_copied = Object.assign({}, vehicle)
         },
@@ -628,6 +694,15 @@ export default {
                 this.errors = error.response.data.errors;
             })
         },
+        fetchPlants(){
+            axios.get('/plants')
+            .then(response => { 
+                this.plants = response.data
+            })
+            .catch(error => {
+                this.errors = error.response.data.errors;
+            })
+        },
         prepareFields(){
             if(this.attachments.length > 0){
                 for(var i = 0; i < this.attachments.length; i++){
@@ -662,6 +737,12 @@ export default {
             
         },
         addVehicle(vehicle){
+            var plantIds = [];
+            if(vehicle.plant){
+               vehicle.plant.forEach((plant) => {
+                    plantIds.push(plant.id);
+                });
+            }
             this.errors = [];
             this.prepareFields();
             this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number : '');
@@ -677,6 +758,7 @@ export default {
             this.formData.append('contract_id', vehicle.contract_id ? vehicle.contract_id : '');   
             this.formData.append('validity_start_date', vehicle.validity_start_date ? vehicle.validity_start_date : '');
             this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
+            this.formData.append('plants', plantIds ? plantIds : '');
 
             axios.post('/vehicle', this.formData)
             .then(response =>{
