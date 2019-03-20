@@ -307,7 +307,7 @@
                                 <div class="form-group">
                                     <label for="role">Allowed Total Weight</label> 
                                     <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle.allowed_total_weight">
-                                    <span class="text-danger" v-if="errors.good_id">The allowed total weight field is required</span>
+                                    <span class="text-danger" v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -479,7 +479,7 @@
                                 <div class="form-group">
                                     <label for="role">Allowed Total Weight</label> 
                                     <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight">
-                                    <span class="text-danger" v-if="errors.good_id">The allowed total weight field is required</span>
+                                    <span class="text-danger" v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">

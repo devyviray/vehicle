@@ -9,14 +9,16 @@ use App\{
 
 class ValidityRule implements Rule
 {
+
+    protected $validityStartDate;
     /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($validityStartDate)
     {
-        //
+        $this->validityStartDate = $validityStartDate;
     }
 
     /**
@@ -26,12 +28,18 @@ class ValidityRule implements Rule
      * @param  mixed  $value
      * @return bool
      */
-    public function passes($attribute, $value, $parameters = [])
+    public function passes($attribute, $value)
     {
-        // $vehicle = Vehicle::where('plate_number', $value)->first();
-        print '<prev>';
-            print_r( $parameters);
-        print '</prev>';
+        $vehicle = Vehicle::where('plate_number', $value)->first();
+
+        if($vehicle && $this->validityStartDate){
+            if($vehicle->validity_end_date >=  $this->validityStartDate){
+                return false;
+            }else{
+                return true;
+            }
+        }
+        return true;
     }
 
     /**
@@ -41,6 +49,6 @@ class ValidityRule implements Rule
      */
     public function message()
     {
-        return 'The validation error message.';
+        return 'Cannot add  the same truck with the early start date';
     }
 }

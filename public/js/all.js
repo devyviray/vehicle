@@ -39100,9 +39100,9 @@ var render = function() {
                         }
                       }),
                       _vm._v(" "),
-                      _vm.errors.good_id
+                      _vm.errors.allowed_total_weight
                         ? _c("span", { staticClass: "text-danger" }, [
-                            _vm._v("The allowed total weight field is required")
+                            _vm._v(_vm._s(_vm.errors.allowed_total_weight[0]))
                           ])
                         : _vm._e()
                     ])
@@ -39853,9 +39853,9 @@ var render = function() {
                         }
                       }),
                       _vm._v(" "),
-                      _vm.errors.good_id
+                      _vm.errors.allowed_total_weight
                         ? _c("span", { staticClass: "text-danger" }, [
-                            _vm._v("The allowed total weight field is required")
+                            _vm._v(_vm._s(_vm.errors.allowed_total_weight[0]))
                           ])
                         : _vm._e()
                     ])
