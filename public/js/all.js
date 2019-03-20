@@ -2390,6 +2390,15 @@ __webpack_require__.r(__webpack_exports__);
     this.fetchPlants();
   },
   methods: {
+    onlyNumber: function onlyNumber($event) {
+      //console.log($event.keyCode); //keyCodes value
+      var keyCode = $event.keyCode ? $event.keyCode : $event.which;
+
+      if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
+        // 46 is dot
+        $event.preventDefault();
+      }
+    },
     plantChange: function plantChange() {
       this.vehicle.indicator_id == 2 ? this.show_plant_add = false : this.show_plant_add = true;
       this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
@@ -38693,7 +38702,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Category")
+                        _vm._v("Category*")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -38749,7 +38758,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Plate Number")
+                        _vm._v("Plate Number*")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -38762,6 +38771,7 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
+                        staticStyle: { "text-transform": "uppercase" },
                         attrs: { type: "text", id: "plate_number" },
                         domProps: { value: _vm.vehicle.plate_number },
                         on: {
@@ -38789,7 +38799,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Plant indicator")
+                        _vm._v("Plant Indicator*")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -38893,7 +38903,7 @@ var render = function() {
                     { staticClass: "col-md-4" },
                     [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Vendor")
+                        _vm._v("Vendor*")
                       ]),
                       _vm._v(" "),
                       _c("v-select", {
@@ -38957,7 +38967,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Capacity")
+                        _vm._v("Capacity*")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -39087,6 +39097,7 @@ var render = function() {
                         attrs: { type: "text", id: "allowed_total_weight" },
                         domProps: { value: _vm.vehicle.allowed_total_weight },
                         on: {
+                          keypress: _vm.onlyNumber,
                           input: function($event) {
                             if ($event.target.composing) {
                               return
@@ -39111,7 +39122,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Based Trucks")
+                        _vm._v("Based Trucks*")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -39272,7 +39283,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Document")
+                        _vm._v("Document*")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39299,7 +39310,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Validity Start Date")
+                        _vm._v("Validity Start Date*")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39339,7 +39350,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Validity End Date")
+                        _vm._v("Validity End Date*")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39445,7 +39456,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Category")
+                        _vm._v("Category*")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -39502,7 +39513,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Plate Number")
+                        _vm._v("Plate Number*")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39546,7 +39557,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Plant Indicator")
+                        _vm._v("Plant Indicator*")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -39644,7 +39655,7 @@ var render = function() {
                     { staticClass: "col-md-4" },
                     [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Vendor")
+                        _vm._v("Vendor*")
                       ]),
                       _vm._v(" "),
                       _c("v-select", {
@@ -39708,7 +39719,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Capacity")
+                        _vm._v("Capacity*")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -39840,6 +39851,7 @@ var render = function() {
                           value: _vm.vehicle_copied.allowed_total_weight
                         },
                         on: {
+                          keypress: _vm.onlyNumber,
                           input: function($event) {
                             if ($event.target.composing) {
                               return
@@ -39864,7 +39876,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Based Trucks")
+                        _vm._v("Based Trucks*")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -40018,7 +40030,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Document")
+                        _vm._v("Document*")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -40045,7 +40057,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Validity Start Date")
+                        _vm._v("Validity Start Date*")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -40087,7 +40099,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Validity End Date")
+                        _vm._v("Validity End Date*")
                       ]),
                       _vm._v(" "),
                       _c("input", {
