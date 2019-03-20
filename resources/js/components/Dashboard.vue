@@ -225,7 +225,7 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Plate number</label> 
+                                    <label for="role">Plate Number</label> 
                                     <input type="text" id="plate_number" class="form-control" v-model="vehicle.plate_number">
                                     <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
                                 </div>
@@ -272,7 +272,7 @@
                                 <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
                             </div>
                             <div class="col-md-4">
-                                <label for="role">Subcon vendor</label> 
+                                <label for="role">Subcon Vendor</label> 
                                 <v-select 
                                     style="width: 100%"
                                     v-model="vehicle.subcon_vendor"
@@ -305,14 +305,14 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Allowed total weight</label> 
+                                    <label for="role">Allowed Total Weight</label> 
                                     <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle.allowed_total_weight">
                                     <span class="text-danger" v-if="errors.good_id">The allowed total weight field is required</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Based trucks</label> 
+                                    <label for="role">Based Trucks</label> 
                                     <select class="form-control" v-model="vehicle.based_truck_id">
                                         <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
                                     </select>
@@ -348,14 +348,14 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Validity start date</label> 
+                                    <label for="role">Validity Start Date</label> 
                                     <input type="date" id="validity_start_date" class="form-control" v-model="vehicle.validity_start_date">
                                     <span class="text-danger" v-if="errors.validity_start_date">The validity start date is required</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Validity end date</label> 
+                                    <label for="role">Validity End Date</label> 
                                     <input type="date" id="validity_end_date" class="form-control" v-model="vehicle.validity_end_date">
                                     <span class="text-danger" v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
                                 </div>
@@ -398,22 +398,22 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Plate number</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_copied.plate_number">
+                                    <label for="role">Plate Number</label> 
+                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_copied.plate_number" disabled>
                                     <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Plant indicator</label> 
-                                    <select class="form-control" v-model="vehicle_copied.indicator_id" disabled>
+                                    <label for="role">Plant Indicator</label> 
+                                    <select class="form-control" v-model="vehicle_copied.indicator_id" @change="plantChange">
                                         <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.indicator_id">The indicator field is required</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" v-if="show_plant">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="role">Plant</label> 
@@ -425,7 +425,6 @@
                                         :custom-label="customLabelPlant"
                                         placeholder="Select Plant"
                                         id="selected_plant"
-                                        disabled
                                     >
                                     </multiselect>
                                 </div>  
@@ -445,7 +444,7 @@
                                 <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
                             </div>
                             <div class="col-md-4">
-                                <label for="role">Subcon vendor</label> 
+                                <label for="role">Subcon Vendor</label> 
                                 <v-select 
                                     style="width: 100%"
                                     v-model="vehicle_copied.subcon_vendor"
@@ -459,7 +458,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Capacity</label> 
-                                    <select class="form-control" v-model="vehicle_copied.capacity_id" disabled>
+                                    <select class="form-control" v-model="vehicle_copied.capacity_id">
                                         <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.capacity_id">The capacity field is required</span>
@@ -470,7 +469,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Goods</label> 
-                                    <select class="form-control" v-model="vehicle_copied.good_id" disabled>
+                                    <select class="form-control" v-model="vehicle_copied.good_id">
                                         <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
@@ -478,15 +477,15 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Allowed total weight</label> 
-                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight" readonly>
+                                    <label for="role">Allowed Total Weight</label> 
+                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight">
                                     <span class="text-danger" v-if="errors.good_id">The allowed total weight field is required</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Based trucks</label> 
-                                    <select class="form-control" v-model="vehicle_copied.based_truck_id" disabled>
+                                    <label for="role">Based Trucks</label> 
+                                    <select class="form-control" v-model="vehicle_copied.based_truck_id">
                                         <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.based_truck_id">The based truck field is required</span>
@@ -497,7 +496,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Contract</label> 
-                                    <select class="form-control" v-model="vehicle_copied.contract_id" disabled>
+                                    <select class="form-control" v-model="vehicle_copied.contract_id">
                                         <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
@@ -506,14 +505,14 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Remarks</label> 
-                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_copied.remarks" readonly>
+                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_copied.remarks">
                                     <span class="text-danger" v-if="errors.good_id">The remarks field is required</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Document</label> 
-                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange" disabled><br>
+                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
                                     <span class="text-danger" v-if="errors.attachments">The attachment field is required</span>
                                 </div>
                             </div>
@@ -521,15 +520,15 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Validity start date</label> 
-                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle_copied.validity_start_date" readonly>
+                                    <label for="role">Validity Start Date</label> 
+                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle_copied.validity_start_date">
                                     <span class="text-danger" v-if="errors.validity_start_date">The validity start date field is required</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Validity end date</label> 
-                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle_copied.validity_end_date" readonly>
+                                    <label for="role">Validity End Date</label> 
+                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle_copied.validity_end_date">
                                     <span class="text-danger" v-if="errors.validity_end_date">The validity end date field is required</span>
                                 </div>
                             </div>
@@ -624,6 +623,7 @@ export default {
     methods:{
         plantChange(){
             this.vehicle.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+            this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
         customLabelPlant (plant) {
             return `${plant.name }`
@@ -636,6 +636,7 @@ export default {
             this.errors = [];
             this.vehicle_updated = false;
             this.vehicle_copied = Object.assign({}, vehicle)
+            this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
         fetchVehicles(){
             axios.get('/vehicle')

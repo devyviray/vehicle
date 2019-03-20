@@ -2341,7 +2341,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2392,6 +2391,7 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     plantChange: function plantChange() {
       this.vehicle.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+      this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
     },
     customLabelPlant: function customLabelPlant(plant) {
       return "".concat(plant.name);
@@ -2404,6 +2404,7 @@ __webpack_require__.r(__webpack_exports__);
       this.errors = [];
       this.vehicle_updated = false;
       this.vehicle_copied = Object.assign({}, vehicle);
+      this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
     },
     fetchVehicles: function fetchVehicles() {
       var _this = this;
@@ -38747,7 +38748,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Plate number")
+                        _vm._v("Plate Number")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -38924,7 +38925,7 @@ var render = function() {
                     { staticClass: "col-md-4" },
                     [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Subcon vendor")
+                        _vm._v("Subcon Vendor")
                       ]),
                       _vm._v(" "),
                       _c("v-select", {
@@ -39069,7 +39070,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Allowed total weight")
+                        _vm._v("Allowed Total Weight")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39109,7 +39110,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Based trucks")
+                        _vm._v("Based Trucks")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -39297,7 +39298,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Validity start date")
+                        _vm._v("Validity Start Date")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39337,7 +39338,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Validity end date")
+                        _vm._v("Validity End Date")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39500,7 +39501,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Plate number")
+                        _vm._v("Plate Number")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39513,7 +39514,11 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: { type: "text", id: "plate_number" },
+                        attrs: {
+                          type: "text",
+                          id: "plate_number",
+                          disabled: ""
+                        },
                         domProps: { value: _vm.vehicle_copied.plate_number },
                         on: {
                           input: function($event) {
@@ -39540,7 +39545,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Plant indicator")
+                        _vm._v("Plant Indicator")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -39555,25 +39560,27 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { disabled: "" },
                           on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.$set(
-                                _vm.vehicle_copied,
-                                "indicator_id",
-                                $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              )
-                            }
+                            change: [
+                              function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.vehicle_copied,
+                                  "indicator_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              },
+                              _vm.plantChange
+                            ]
                           }
                         },
                         _vm._l(_vm.indicators, function(indicator, i) {
@@ -39595,39 +39602,40 @@ var render = function() {
                   ])
                 ]),
                 _vm._v(" "),
-                _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col-md-12" }, [
-                    _c(
-                      "div",
-                      { staticClass: "form-group" },
-                      [
-                        _c("label", { attrs: { for: "role" } }, [
-                          _vm._v("Plant")
-                        ]),
-                        _vm._v(" "),
-                        _c("multiselect", {
-                          attrs: {
-                            options: _vm.plants,
-                            multiple: true,
-                            "track-by": "id",
-                            "custom-label": _vm.customLabelPlant,
-                            placeholder: "Select Plant",
-                            id: "selected_plant",
-                            disabled: ""
-                          },
-                          model: {
-                            value: _vm.vehicle_copied.plants,
-                            callback: function($$v) {
-                              _vm.$set(_vm.vehicle_copied, "plants", $$v)
-                            },
-                            expression: "vehicle_copied.plants"
-                          }
-                        })
-                      ],
-                      1
-                    )
-                  ])
-                ]),
+                _vm.show_plant
+                  ? _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "col-md-12" }, [
+                        _c(
+                          "div",
+                          { staticClass: "form-group" },
+                          [
+                            _c("label", { attrs: { for: "role" } }, [
+                              _vm._v("Plant")
+                            ]),
+                            _vm._v(" "),
+                            _c("multiselect", {
+                              attrs: {
+                                options: _vm.plants,
+                                multiple: true,
+                                "track-by": "id",
+                                "custom-label": _vm.customLabelPlant,
+                                placeholder: "Select Plant",
+                                id: "selected_plant"
+                              },
+                              model: {
+                                value: _vm.vehicle_copied.plants,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.vehicle_copied, "plants", $$v)
+                                },
+                                expression: "vehicle_copied.plants"
+                              }
+                            })
+                          ],
+                          1
+                        )
+                      ])
+                    ])
+                  : _vm._e(),
                 _vm._v(" "),
                 _c("div", { staticClass: "row" }, [
                   _c(
@@ -39668,7 +39676,7 @@ var render = function() {
                     { staticClass: "col-md-4" },
                     [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Subcon vendor")
+                        _vm._v("Subcon Vendor")
                       ]),
                       _vm._v(" "),
                       _c("v-select", {
@@ -39714,7 +39722,6 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { disabled: "" },
                           on: {
                             change: function($event) {
                               var $$selectedVal = Array.prototype.filter
@@ -39773,7 +39780,6 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { disabled: "" },
                           on: {
                             change: function($event) {
                               var $$selectedVal = Array.prototype.filter
@@ -39815,7 +39821,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Allowed total weight")
+                        _vm._v("Allowed Total Weight")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39828,11 +39834,7 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: {
-                          type: "text",
-                          id: "allowed_total_weight",
-                          readonly: ""
-                        },
+                        attrs: { type: "text", id: "allowed_total_weight" },
                         domProps: {
                           value: _vm.vehicle_copied.allowed_total_weight
                         },
@@ -39861,7 +39863,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Based trucks")
+                        _vm._v("Based Trucks")
                       ]),
                       _vm._v(" "),
                       _c(
@@ -39876,7 +39878,6 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { disabled: "" },
                           on: {
                             change: function($event) {
                               var $$selectedVal = Array.prototype.filter
@@ -39935,7 +39936,6 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { disabled: "" },
                           on: {
                             change: function($event) {
                               var $$selectedVal = Array.prototype.filter
@@ -39990,7 +39990,7 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: { type: "text", id: "remarks", readonly: "" },
+                        attrs: { type: "text", id: "remarks" },
                         domProps: { value: _vm.vehicle_copied.remarks },
                         on: {
                           input: function($event) {
@@ -40025,8 +40025,7 @@ var render = function() {
                           type: "file",
                           multiple: "multiple",
                           id: "attachments",
-                          placeholder: "Attach file",
-                          disabled: ""
+                          placeholder: "Attach file"
                         },
                         on: { change: _vm.uploadFileChange }
                       }),
@@ -40045,7 +40044,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Validity start date")
+                        _vm._v("Validity Start Date")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -40058,11 +40057,7 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: {
-                          type: "date",
-                          id: "validity_start_date",
-                          readonly: ""
-                        },
+                        attrs: { type: "date", id: "validity_start_date" },
                         domProps: {
                           value: _vm.vehicle_copied.validity_start_date
                         },
@@ -40091,7 +40086,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Validity end date")
+                        _vm._v("Validity End Date")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -40104,11 +40099,7 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: {
-                          type: "date",
-                          id: "validity_end_date",
-                          readonly: ""
-                        },
+                        attrs: { type: "date", id: "validity_end_date" },
                         domProps: {
                           value: _vm.vehicle_copied.validity_end_date
                         },
