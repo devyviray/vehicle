@@ -21,11 +21,11 @@ class CreateVehiclesTable extends Migration
             $table->bigInteger('vendor_id');
             $table->bigInteger('subcon_vendor_id')->nullable();
             $table->bigInteger('indicator_id');
-            $table->bigInteger('good_id');
-            $table->bigInteger('allowed_total_weight');
-            $table->string('remarks');
+            $table->bigInteger('good_id')->nullable();
+            $table->bigInteger('allowed_total_weight')->nullable();
+            $table->string('remarks')->nullable();
             $table->bigInteger('based_truck_id');
-            $table->bigInteger('contract_id');
+            $table->bigInteger('contract_id')->nullable();
             $table->bigInteger('user_id');
             $table->dateTime('validity_start_date');
             $table->dateTime('validity_end_date');
