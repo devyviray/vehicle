@@ -2324,6 +2324,24 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2353,7 +2371,10 @@ __webpack_require__.r(__webpack_exports__);
       errors: [],
       currentPage: 0,
       itemsPerPage: 10,
-      keywords: ''
+      keywords: '',
+      show_plant: false,
+      vehicle_added: false,
+      vehicle_updated: false
     };
   },
   created: function created() {
@@ -2369,6 +2390,9 @@ __webpack_require__.r(__webpack_exports__);
     this.fetchPlants();
   },
   methods: {
+    plantChange: function plantChange() {
+      this.vehicle.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+    },
     customLabelPlant: function customLabelPlant(plant) {
       return "".concat(plant.name);
     },
@@ -2377,8 +2401,8 @@ __webpack_require__.r(__webpack_exports__);
       this.vehicle_id = id;
     },
     copyObject: function copyObject(vehicle) {
-      console.log(vehicle);
       this.errors = [];
+      this.vehicle_updated = false;
       this.vehicle_copied = Object.assign({}, vehicle);
     },
     fetchVehicles: function fetchVehicles() {
@@ -2499,22 +2523,37 @@ __webpack_require__.r(__webpack_exports__);
       this.formData = new FormData();
       this.attachments = [];
       this.errors = [];
+      this.vehicle = [];
+      this.show_plant = false;
+      document.getElementById('attachments').value = "";
+      this.vehicle_added = false;
+    },
+    resetForm: function resetForm() {
+      this.formData = new FormData();
+      this.attachments = [];
+      this.errors = [];
+      this.vehicle = [];
+      this.show_plant = false;
       document.getElementById('attachments').value = "";
     },
     addVehicle: function addVehicle(vehicle) {
       var _this11 = this;
 
+      this.vehicle_added = false;
+      document.getElementById('check_btn').disabled = true;
+      var final_plant = [];
+      vehicle.indicator_id == 2 ? final_plant = this.plants : final_plant = vehicle.plant;
       var plantIds = [];
 
-      if (vehicle.plant) {
-        vehicle.plant.forEach(function (plant) {
+      if (final_plant) {
+        final_plant.forEach(function (plant) {
           plantIds.push(plant.id);
         });
       }
 
       this.errors = [];
       this.prepareFields();
-      this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number : '');
+      this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number.toUpperCase() : '');
       this.formData.append('category_id', vehicle.category_id ? vehicle.category_id : '');
       this.formData.append('capacity_id', vehicle.capacity_id ? vehicle.capacity_id : '');
       this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
@@ -2529,27 +2568,43 @@ __webpack_require__.r(__webpack_exports__);
       this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
       this.formData.append('plants', plantIds ? plantIds : '');
       axios.post('/vehicle', this.formData).then(function (response) {
-        $('#addVehicleModal').modal('hide');
-        alert('Vehicle successfully added');
+        _this11.vehicle_added = true;
 
         _this11.vehicles.unshift(response.data);
 
-        _this11.resetData();
+        _this11.resetForm();
+
+        document.getElementById('check_btn').disabled = false;
       }).catch(function (error) {
         _this11.errors = error.response.data.errors;
+        document.getElementById('check_btn').disabled = false;
       });
     },
     editVehicle: function editVehicle(vehicle) {
       var _this12 = this;
+
+      this.vehicle_updated = false;
+      document.getElementById('edit_btn').disabled = true;
+      var final_plant = [];
+      vehicle.indicator_id == 2 ? final_plant = this.plants : final_plant = vehicle.plants;
+      var plantIds = [];
+
+      if (final_plant) {
+        final_plant.forEach(function (plant) {
+          plantIds.push(plant.id);
+        });
+      }
 
       var index = this.vehicles.findIndex(function (item) {
         return item.id == vehicle.id;
       });
       this.errors = [];
       this.prepareFields();
-      this.formData.append('plate_number', vehicle.plate_number);
+      this.formData.append('plate_number', vehicle.plate_number.toUpperCase());
       this.formData.append('category_id', vehicle.category_id);
       this.formData.append('capacity_id', vehicle.capacity_id);
+      this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
+      this.formData.append('subcon_vendor_id', vehicle.subcon_vendor ? vehicle.subcon_vendor.id : '');
       this.formData.append('indicator_id', vehicle.indicator_id);
       this.formData.append('good_id', vehicle.good_id);
       this.formData.append('allowed_total_weight', vehicle.allowed_total_weight);
@@ -2558,14 +2613,18 @@ __webpack_require__.r(__webpack_exports__);
       this.formData.append('contract_id', vehicle.contract_id);
       this.formData.append('validity_start_date', vehicle.validity_start_date);
       this.formData.append('validity_end_date', vehicle.validity_end_date);
+      this.formData.append('plants', plantIds ? plantIds : '');
       this.formData.append('_method', 'PATCH');
       axios.post("/vehicle/".concat(vehicle.id), this.formData).then(function (response) {
-        $('#editVehicleModal').modal('hide');
-        alert('Vehicle successfully updated');
+        _this12.vehicle_updated = true;
 
         _this12.vehicles.splice(index, 1, response.data);
+
+        document.getElementById('edit_btn').disabled = false;
       }).catch(function (error) {
+        _this12.vehicle_updated = false;
         _this12.errors = error.response.data.errors;
+        document.getElementById('edit_btn').disabled = false;
       });
     },
     deleteVehicle: function deleteVehicle() {
@@ -38363,6 +38422,7 @@ var render = function() {
                     "a",
                     {
                       staticClass: "btn btn-sm btn-primary",
+                      staticStyle: { "background-color": "rgb(4, 112, 62)" },
                       attrs: {
                         href: "javascript.void(0)",
                         "data-toggle": "modal",
@@ -38444,43 +38504,42 @@ var render = function() {
                                     }
                                   },
                                   [_vm._v("Edit")]
-                                ),
-                                _vm._v(" "),
-                                _c(
-                                  "a",
-                                  {
-                                    staticClass: "dropdown-item",
-                                    attrs: {
-                                      href: "javascript.void(0)",
-                                      "data-toggle": "modal",
-                                      "data-target": "#deleteVehicleModal"
-                                    },
-                                    on: {
-                                      click: function($event) {
-                                        return _vm.getVehicleId(vehicle.id)
-                                      }
-                                    }
-                                  },
-                                  [_vm._v("Delete")]
                                 )
                               ]
                             )
                           ])
                         ]),
                         _vm._v(" "),
-                        _c("th", { attrs: { scope: "row" } }, [
+                        _c("td", { attrs: { scope: "row" } }, [
                           _vm._v(_vm._s(vehicle.id))
                         ]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(vehicle.plate_number))]),
                         _vm._v(" "),
                         _c("td", [
                           _vm._v(_vm._s(vehicle.category.description))
                         ]),
                         _vm._v(" "),
+                        _c("td", [_vm._v(_vm._s(vehicle.plate_number))]),
+                        _vm._v(" "),
                         _c("td", [
-                          _vm._v(_vm._s(vehicle.capacity.description))
+                          _vm._v(_vm._s(vehicle.indicator.description))
                         ]),
+                        _vm._v(" "),
+                        vehicle.indicator_id == 2
+                          ? _c("td", [_vm._v(" ALL PLANT")])
+                          : _c(
+                              "td",
+                              _vm._l(vehicle.plants, function(plant, p) {
+                                return _c("span", { key: p }, [
+                                  _vm._v(
+                                    "\n                                            " +
+                                      _vm._s(plant.name) +
+                                      " "
+                                  ),
+                                  _c("br")
+                                ])
+                              }),
+                              0
+                            ),
                         _vm._v(" "),
                         _c("td", [
                           _vm._v(_vm._s(vehicle.vendor.vendor_description_lfug))
@@ -38497,22 +38556,30 @@ var render = function() {
                           : _c("td"),
                         _vm._v(" "),
                         _c("td", [
-                          _vm._v(_vm._s(vehicle.indicator.description))
+                          _vm._v(_vm._s(vehicle.capacity.description))
                         ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(vehicle.good.description))]),
+                        vehicle.good
+                          ? _c("td", [_vm._v(_vm._s(vehicle.good.description))])
+                          : _c("td"),
                         _vm._v(" "),
-                        _c("td", [
-                          _vm._v(_vm._s(vehicle.allowed_total_weight))
-                        ]),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(vehicle.remarks))]),
+                        vehicle.allowed_total_weight
+                          ? _c("td", [
+                              _vm._v(_vm._s(vehicle.allowed_total_weight))
+                            ])
+                          : _c("td"),
                         _vm._v(" "),
                         _c("td", [
                           _vm._v(_vm._s(vehicle.based_truck.description))
                         ]),
                         _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(vehicle.contract.code))]),
+                        vehicle.remarks
+                          ? _c("td", [_vm._v(_vm._s(vehicle.remarks))])
+                          : _c("td"),
+                        _vm._v(" "),
+                        vehicle.contract
+                          ? _c("td", [_vm._v(_vm._s(vehicle.contract.code))])
+                          : _c("td"),
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(vehicle.document))]),
                         _vm._v(" "),
@@ -38613,6 +38680,13 @@ var render = function() {
               _vm._m(5),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
+                _vm.vehicle_added
+                  ? _c("div", { staticClass: "alert alert-success" }, [
+                      _c("strong", [_vm._v("Success!")]),
+                      _vm._v(" Vehicle succesfully added\n                    ")
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _c("div", { staticClass: "row" }, [
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
@@ -38704,7 +38778,7 @@ var render = function() {
                       _vm._v(" "),
                       _vm.errors.plate_number
                         ? _c("span", { staticClass: "text-danger" }, [
-                            _vm._v("The plate number field is required.")
+                            _vm._v(_vm._s(_vm.errors.plate_number[0]))
                           ])
                         : _vm._e()
                     ])
@@ -38729,23 +38803,26 @@ var render = function() {
                           ],
                           staticClass: "form-control",
                           on: {
-                            change: function($event) {
-                              var $$selectedVal = Array.prototype.filter
-                                .call($event.target.options, function(o) {
-                                  return o.selected
-                                })
-                                .map(function(o) {
-                                  var val = "_value" in o ? o._value : o.value
-                                  return val
-                                })
-                              _vm.$set(
-                                _vm.vehicle,
-                                "indicator_id",
-                                $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              )
-                            }
+                            change: [
+                              function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.vehicle,
+                                  "indicator_id",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              },
+                              _vm.plantChange
+                            ]
                           }
                         },
                         _vm._l(_vm.indicators, function(indicator, i) {
@@ -38767,38 +38844,46 @@ var render = function() {
                   ])
                 ]),
                 _vm._v(" "),
-                _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "col-md-12" }, [
-                    _c(
-                      "div",
-                      { staticClass: "form-group" },
-                      [
-                        _c("label", { attrs: { for: "role" } }, [
-                          _vm._v("Plant")
-                        ]),
-                        _vm._v(" "),
-                        _c("multiselect", {
-                          attrs: {
-                            options: _vm.plants,
-                            multiple: true,
-                            "track-by": "id",
-                            "custom-label": _vm.customLabelPlant,
-                            placeholder: "Select Plant",
-                            id: "selected_plant"
-                          },
-                          model: {
-                            value: _vm.vehicle.plant,
-                            callback: function($$v) {
-                              _vm.$set(_vm.vehicle, "plant", $$v)
-                            },
-                            expression: "vehicle.plant"
-                          }
-                        })
-                      ],
-                      1
-                    )
-                  ])
-                ]),
+                _vm.show_plant
+                  ? _c("div", { staticClass: "row" }, [
+                      _c("div", { staticClass: "col-md-12" }, [
+                        _c(
+                          "div",
+                          { staticClass: "form-group" },
+                          [
+                            _c("label", { attrs: { for: "role" } }, [
+                              _vm._v("Plant")
+                            ]),
+                            _vm._v(" "),
+                            _c("multiselect", {
+                              attrs: {
+                                options: _vm.plants,
+                                multiple: true,
+                                "track-by": "id",
+                                "custom-label": _vm.customLabelPlant,
+                                placeholder: "Select Plant",
+                                id: "selected_plant"
+                              },
+                              model: {
+                                value: _vm.vehicle.plant,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.vehicle, "plant", $$v)
+                                },
+                                expression: "vehicle.plant"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _vm.errors.plants
+                              ? _c("span", { staticClass: "text-danger" }, [
+                                  _vm._v("The plant field is required")
+                                ])
+                              : _vm._e()
+                          ],
+                          1
+                        )
+                      ])
+                    ])
+                  : _vm._e(),
                 _vm._v(" "),
                 _c("div", { staticClass: "row" }, [
                   _c(
@@ -39174,9 +39259,9 @@ var render = function() {
                         }
                       }),
                       _vm._v(" "),
-                      _vm.errors.good_id
+                      _vm.errors.remarks
                         ? _c("span", { staticClass: "text-danger" }, [
-                            _vm._v("The remark field is required")
+                            _vm._v(_vm._s(_vm.errors.remarks[0]))
                           ])
                         : _vm._e()
                     ])
@@ -39283,7 +39368,7 @@ var render = function() {
                       _vm._v(" "),
                       _vm.errors.validity_end_date
                         ? _c("span", { staticClass: "text-danger" }, [
-                            _vm._v("The validity end date field is required")
+                            _vm._v(_vm._s(_vm.errors.validity_end_date[0]))
                           ])
                         : _vm._e()
                     ])
@@ -39345,6 +39430,15 @@ var render = function() {
               _vm._m(7),
               _vm._v(" "),
               _c("div", { staticClass: "modal-body" }, [
+                _vm.vehicle_updated
+                  ? _c("div", { staticClass: "alert alert-success" }, [
+                      _c("strong", [_vm._v("Success!")]),
+                      _vm._v(
+                        " Vehicle succesfully updated\n                    "
+                      )
+                    ])
+                  : _vm._e(),
+                _vm._v(" "),
                 _c("div", { staticClass: "row" }, [
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
@@ -39437,7 +39531,7 @@ var render = function() {
                       _vm._v(" "),
                       _vm.errors.plate_number
                         ? _c("span", { staticClass: "text-danger" }, [
-                            _vm._v("The plate number field is required")
+                            _vm._v(_vm._s(_vm.errors.plate_number[0]))
                           ])
                         : _vm._e()
                     ])
@@ -39522,11 +39616,11 @@ var render = function() {
                             disabled: ""
                           },
                           model: {
-                            value: _vm.vehicle.plant,
+                            value: _vm.vehicle_copied.plants,
                             callback: function($$v) {
-                              _vm.$set(_vm.vehicle, "plant", $$v)
+                              _vm.$set(_vm.vehicle_copied, "plants", $$v)
                             },
-                            expression: "vehicle.plant"
+                            expression: "vehicle_copied.plants"
                           }
                         })
                       ],
@@ -40047,7 +40141,7 @@ var render = function() {
                   "button",
                   {
                     staticClass: "btn btn-primary btn-round btn-fill",
-                    attrs: { id: "check_btn", type: "button" },
+                    attrs: { id: "edit_btn", type: "button" },
                     on: {
                       click: function($event) {
                         return _vm.editVehicle(_vm.vehicle_copied)
@@ -40250,25 +40344,27 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("ID")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Plate number")]),
-        _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Category")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Capacity")]),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Plate number")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Plant Indicator")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Plant")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Vendor")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Subcon vendor")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Indicator")]),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Capacity")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Goods")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Allowed total weight")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Remarks")]),
-        _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Based trucks")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Remarks")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Contract")]),
         _vm._v(" "),

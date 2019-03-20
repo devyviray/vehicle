@@ -103,7 +103,7 @@
                                     <h3 class="mb-0">Vehicle List</h3>
                                 </div> 
                                 <div class="col text-right">
-                                    <a href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" @click="resetData()">Add Vehicle</a>
+                                    <a href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
                                 </div>
                             </div>
                             <div class="row align-items-center">
@@ -119,16 +119,17 @@
                                     <tr>
                                         <th></th>
                                         <th scope="col">ID</th>
-                                        <th scope="col">Plate number</th>
                                         <th scope="col">Category</th>
-                                        <th scope="col">Capacity</th>
+                                        <th scope="col">Plate number</th>
+                                        <th scope="col">Plant Indicator</th>
+                                        <th scope="col">Plant</th>
                                         <th scope="col">Vendor</th>
                                         <th scope="col">Subcon vendor</th>
-                                        <th scope="col">Indicator</th>
+                                        <th scope="col">Capacity</th>
                                         <th scope="col">Goods</th>
                                         <th scope="col">Allowed total weight</th>
-                                        <th scope="col">Remarks</th>
                                         <th scope="col">Based trucks</th>
+                                        <th scope="col">Remarks</th>
                                         <th scope="col">Contract</th>
                                         <th scope="col">Document</th>
                                         <th scope="col">User</th>
@@ -146,23 +147,33 @@
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                                     <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#editVehicleModal" @click="copyObject(vehicle)">Edit</a>
-                                                    <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#deleteVehicleModal" @click="getVehicleId(vehicle.id)">Delete</a>
+                                                    <!-- <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#deleteVehicleModal" @click="getVehicleId(vehicle.id)">Delete</a> -->
                                                 </div>
                                             </div>
                                         </td>
-                                        <th scope="row">{{ vehicle.id }}</th>
-                                        <td>{{ vehicle.plate_number }}</td>
+                                        <td scope="row">{{ vehicle.id }}</td>
                                         <td>{{ vehicle.category.description }}</td>
-                                        <td>{{ vehicle.capacity.description }}</td>
+                                        <td>{{ vehicle.plate_number }}</td>
+                                        <td>{{ vehicle.indicator.description }}</td>
+                                        <td v-if="vehicle.indicator_id == 2"> ALL PLANT</td>
+                                        <td v-else>
+                                            <span v-for="(plant, p) in vehicle.plants" :key="p">
+                                                {{ plant.name }} <br/>
+                                            </span>
+                                        </td>
                                         <td>{{ vehicle.vendor.vendor_description_lfug }}</td>
                                         <td v-if="vehicle.subcon_vendor">{{ vehicle.subcon_vendor.vendor_description_lfug }}</td>
                                         <td v-else></td>
-                                        <td>{{ vehicle.indicator.description }}</td>
-                                        <td>{{ vehicle.good.description }}</td>
-                                        <td>{{ vehicle.allowed_total_weight }}</td>
-                                        <td>{{ vehicle.remarks }}</td>
+                                        <td>{{ vehicle.capacity.description }}</td>
+                                        <td v-if="vehicle.good">{{ vehicle.good.description }}</td>
+                                        <td v-else></td>
+                                        <td v-if="vehicle.allowed_total_weight">{{ vehicle.allowed_total_weight }}</td>
+                                        <td v-else></td>
                                         <td>{{ vehicle.based_truck.description }}</td>
-                                        <td>{{ vehicle.contract.code }}</td>
+                                        <td v-if="vehicle.remarks">{{ vehicle.remarks }}</td>
+                                        <td v-else></td>
+                                        <td v-if="vehicle.contract">{{ vehicle.contract.code }}</td>
+                                        <td v-else></td>
                                         <td>{{ vehicle.document }}</td>
                                         <td>{{ vehicle.user.name }}</td>
                                         <td>{{ vehicle.validity_start_date }}</td>
@@ -199,6 +210,9 @@
                         <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Add Vehicle</h2>
                     </div>
                     <div class="modal-body">
+                        <div class="alert alert-success" v-if="vehicle_added">
+                            <strong>Success!</strong> Vehicle succesfully added
+                        </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -213,20 +227,20 @@
                                 <div class="form-group">
                                     <label for="role">Plate number</label> 
                                     <input type="text" id="plate_number" class="form-control" v-model="vehicle.plate_number">
-                                    <span class="text-danger" v-if="errors.plate_number">The plate number field is required.</span>
+                                    <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Plant indicator</label> 
-                                    <select class="form-control" v-model="vehicle.indicator_id">
+                                    <select class="form-control" v-model="vehicle.indicator_id" @change="plantChange">
                                         <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.indicator_id">The indicator field is required</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" v-if="show_plant">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="role">Plant</label> 
@@ -240,6 +254,7 @@
                                         id="selected_plant"
                                     >
                                     </multiselect>
+                                    <span class="text-danger" v-if="errors.plants">The plant field is required</span>
                                 </div>  
                             </div>
                         </div> 
@@ -319,7 +334,7 @@
                                 <div class="form-group">
                                     <label for="role">Remarks</label> 
                                     <input type="text" id="remarks" class="form-control" v-model="vehicle.remarks">
-                                    <span class="text-danger" v-if="errors.good_id">The remark field is required</span>
+                                    <span class="text-danger" v-if="errors.remarks">{{ errors.remarks[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -342,7 +357,7 @@
                                 <div class="form-group">
                                     <label for="role">Validity end date</label> 
                                     <input type="date" id="validity_end_date" class="form-control" v-model="vehicle.validity_end_date">
-                                    <span class="text-danger" v-if="errors.validity_end_date">The validity end date field is required</span>
+                                    <span class="text-danger" v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -368,6 +383,9 @@
                         <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Edit Vehicle</h2>
                     </div>
                     <div class="modal-body">
+                        <div class="alert alert-success" v-if="vehicle_updated">
+                            <strong>Success!</strong> Vehicle succesfully updated
+                        </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -382,7 +400,7 @@
                                 <div class="form-group">
                                     <label for="role">Plate number</label> 
                                     <input type="text" id="plate_number" class="form-control" v-model="vehicle_copied.plate_number">
-                                    <span class="text-danger" v-if="errors.plate_number">The plate number field is required</span>
+                                    <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -400,7 +418,7 @@
                                 <div class="form-group">
                                     <label for="role">Plant</label> 
                                     <multiselect
-                                        v-model="vehicle.plant"
+                                        v-model="vehicle_copied.plants"
                                         :options="plants"
                                         :multiple="true"
                                         track-by="id"
@@ -518,7 +536,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="check_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="editVehicle(vehicle_copied)">Save</button>
+                        <button id="edit_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="editVehicle(vehicle_copied)">Save</button>
                     </div>
                 </div>
             </div>
@@ -586,6 +604,9 @@ export default {
             currentPage: 0,
             itemsPerPage: 10,
             keywords: '',
+            show_plant: false,
+            vehicle_added: false,
+            vehicle_updated: false
         }
     },
     created(){
@@ -601,6 +622,9 @@ export default {
         this.fetchPlants();
     },
     methods:{
+        plantChange(){
+            this.vehicle.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+        },
         customLabelPlant (plant) {
             return `${plant.name }`
         },
@@ -609,8 +633,8 @@ export default {
             this.vehicle_id = id;
         },
         copyObject(vehicle){
-            console.log(vehicle);
             this.errors = [];
+            this.vehicle_updated = false;
             this.vehicle_copied = Object.assign({}, vehicle)
         },
         fetchVehicles(){
@@ -733,19 +757,34 @@ export default {
             this.formData = new FormData();
             this.attachments = [];
             this.errors = [];
+            this.vehicle = [];
+            this.show_plant = false;
             document.getElementById('attachments').value = "";
+            this.vehicle_added = false;
             
         },
+        resetForm(){
+            this.formData = new FormData();
+            this.attachments = [];
+            this.errors = [];
+            this.vehicle = [];
+            this.show_plant = false;
+            document.getElementById('attachments').value = "";
+        },
         addVehicle(vehicle){
+            this.vehicle_added = false;
+            document.getElementById('check_btn').disabled = true;
+            var final_plant = [];
+            vehicle.indicator_id == 2 ? final_plant = this.plants : final_plant = vehicle.plant;
             var plantIds = [];
-            if(vehicle.plant){
-               vehicle.plant.forEach((plant) => {
+            if(final_plant){
+               final_plant.forEach((plant) => {
                     plantIds.push(plant.id);
                 });
             }
             this.errors = [];
             this.prepareFields();
-            this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number : '');
+            this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number.toUpperCase() : '');
             this.formData.append('category_id', vehicle.category_id ? vehicle.category_id : '');
             this.formData.append('capacity_id', vehicle.capacity_id ? vehicle.capacity_id : '');
             this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
@@ -762,23 +801,35 @@ export default {
 
             axios.post('/vehicle', this.formData)
             .then(response =>{
-                $('#addVehicleModal').modal('hide');
-                alert('Vehicle successfully added');
+                this.vehicle_added = true;
                 this.vehicles.unshift(response.data);
-                this.resetData();
+                this.resetForm();
+                document.getElementById('check_btn').disabled = false;
             })
             .catch(error => {   
                 this.errors = error.response.data.errors;
+                document.getElementById('check_btn').disabled = false;
             })
         },
         editVehicle(vehicle){
+            this.vehicle_updated = false;
+            document.getElementById('edit_btn').disabled = true;
+            var final_plant = [];
+            vehicle.indicator_id == 2 ? final_plant = this.plants : final_plant = vehicle.plants;
+            var plantIds = [];
+            if(final_plant){
+               final_plant.forEach((plant) => {
+                    plantIds.push(plant.id);
+                });
+            }
             var index = this.vehicles.findIndex(item => item.id == vehicle.id);
-
             this.errors = [];
             this.prepareFields();
-            this.formData.append('plate_number', vehicle.plate_number);
+            this.formData.append('plate_number', vehicle.plate_number.toUpperCase());
             this.formData.append('category_id', vehicle.category_id);
             this.formData.append('capacity_id', vehicle.capacity_id);
+            this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
+            this.formData.append('subcon_vendor_id', vehicle.subcon_vendor ? vehicle.subcon_vendor.id : '');
             this.formData.append('indicator_id', vehicle.indicator_id);
             this.formData.append('good_id', vehicle.good_id);
             this.formData.append('allowed_total_weight', vehicle.allowed_total_weight);
@@ -787,16 +838,19 @@ export default {
             this.formData.append('contract_id', vehicle.contract_id);   
             this.formData.append('validity_start_date', vehicle.validity_start_date);
             this.formData.append('validity_end_date', vehicle.validity_end_date);
+            this.formData.append('plants', plantIds ? plantIds : '');
             this.formData.append('_method', 'PATCH');
 
             axios.post(`/vehicle/${vehicle.id}`, this.formData)
             .then(response => {
-                $('#editVehicleModal').modal('hide');
-                alert('Vehicle successfully updated');
+                this.vehicle_updated = true;
                 this.vehicles.splice(index,1,response.data);
+                document.getElementById('edit_btn').disabled = false;
             })
             .catch(error => {
+                this.vehicle_updated = false;
                 this.errors = error.response.data.errors;
+                document.getElementById('edit_btn').disabled = false;
             })
         },
         deleteVehicle(){

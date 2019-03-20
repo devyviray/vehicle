@@ -19,7 +19,7 @@ class VehicleController extends Controller
      */
     public function index()
     {
-        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user','vendor', 'subconVendor')->orderBy('id', 'desc')->get();
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user','vendor', 'subconVendor','plants')->orderBy('id', 'desc')->get();
     }
 
     /**
@@ -30,25 +30,39 @@ class VehicleController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'plate_number' => 'required',
-            'category_id' => 'required',
-            'capacity_id' => 'required',
-            'vendor_id' => 'required',
-            'subcon_vendor_id' => 'required',
-            'indicator_id' => 'required',
-            'good_id' => 'required',
-            'allowed_total_weight' => 'required',
-            'remarks' => 'required',
-            'based_truck_id' => 'required',
-            'contract_id' => 'required',
-            'validity_start_date' => 'required',
-            'validity_end_date' => 'required',
-            // 'date' => 'required',
-            // 'time' => 'required',
-            'attachments' => 'required',
-            'plants' => 'required',
-        ]);
+        if($request->category_id == 2){
+            $request->validate([
+                'plate_number' => 'required|max:20|alpha_num',
+                'category_id' => 'required',
+                'capacity_id' => 'required',
+                'vendor_id' => 'required',
+                'subcon_vendor_id' => 'required_if:vendor_id,==,26',
+                'contract_id' => 'required_if:vendor_id,==,26',
+                'indicator_id' => 'required',
+                'remarks' => 'max:40',
+                'based_truck_id' => 'required',
+                'validity_start_date' => 'required',
+                'validity_end_date' => 'required|after_or_equal:validity_start_date',
+                'attachments' => 'required',
+                'plants' => 'required',
+            ]);
+        }else{
+            $request->validate([
+                'plate_number' => 'required|max:8|alpha_num',
+                'category_id' => 'required',
+                'capacity_id' => 'required',
+                'vendor_id' => 'required',
+                'subcon_vendor_id' => 'required_if:vendor_id,==,26',
+                'contract_id' => 'required_if:vendor_id,==,26',
+                'indicator_id' => 'required',
+                'remarks' => 'max:40',
+                'based_truck_id' => 'required',
+                'validity_start_date' => 'required',
+                'validity_end_date' => 'required|after_or_equal:validity_start_date',
+                'attachments' => 'required',
+                'plants' => 'required',
+            ]);
+        }
         if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
             $attachments = $request->file('attachments');   
             foreach($attachments as $attachment){
@@ -60,7 +74,7 @@ class VehicleController extends Controller
              
             $vehicle->plants()->sync(explode(",",$request->plants));
 
-            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user', 'vendor', 'subconVendor')->where('id', $vehicle->id)->first();
+            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
         }
     }
 
@@ -98,23 +112,37 @@ class VehicleController extends Controller
      */
     public function update(Request $request, Vehicle $vehicle)
     {
-        $request->validate([
-            'plate_number' => 'required',
-            'category_id' => 'required',
-            'capacity_id' => 'required',
-            'vendor_id' => 'required',
-            'subcon_vendor_id' => 'required',
-            'indicator_id' => 'required',
-            'good_id' => 'required',
-            'allowed_total_weight' => 'required',
-            'remarks' => 'required',
-            'based_truck_id' => 'required',
-            'contract_id' => 'required',
-            'validity_start_date' => 'required',
-            'validity_end_date' => 'required',
-            // 'date' => 'required',
-            // 'time' => 'required'
-        ]);
+        if($request->category_id == 2){
+            $request->validate([
+                'plate_number' => 'required|max:20|alpha_num',
+                'category_id' => 'required',
+                'capacity_id' => 'required',
+                'vendor_id' => 'required',
+                'subcon_vendor_id' => 'required_if:vendor_id,==,26',
+                'contract_id' => 'required_if:vendor_id,==,26',
+                'indicator_id' => 'required',
+                'remarks' => 'max:40',
+                'based_truck_id' => 'required',
+                'validity_start_date' => 'required',
+                'validity_end_date' => 'required|after_or_equal:validity_start_date',
+                'plants' => 'required',
+            ]);
+        }else{
+            $request->validate([
+                'plate_number' => 'required|max:8|alpha_num',
+                'category_id' => 'required',
+                'capacity_id' => 'required',
+                'vendor_id' => 'required',
+                'subcon_vendor_id' => 'required_if:vendor_id,==,26',
+                'contract_id' => 'required_if:vendor_id,==,26',
+                'indicator_id' => 'required',
+                'remarks' => 'max:40',
+                'based_truck_id' => 'required',
+                'validity_start_date' => 'required',
+                'validity_end_date' => 'required|after_or_equal:validity_start_date',
+                'plants' => 'required',
+            ]);
+        }
         if($vehicle->update(['user_id' => Auth::user()->id] + $request->all())){
             if($request->has('attachments')){
                 $attachments = $request->file('attachments');   
@@ -125,7 +153,10 @@ class VehicleController extends Controller
                     $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
                 }
             }
-            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user')->where('id', $vehicle->id)->first();
+
+            $vehicle->plants()->sync(explode(",",$request->plants));
+
+            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
         }
     }
 
