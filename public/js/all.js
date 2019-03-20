@@ -38571,7 +38571,7 @@ var render = function() {
               _vm._v(" "),
               _c("div", { staticClass: "col-6 text-right" }, [
                 _c("span", [
-                  _vm._v(_vm._s(_vm.filteredQueues.length) + " Tsr(s)")
+                  _vm._v(_vm._s(_vm.filteredQueues.length) + " Vehicle(s)")
                 ])
               ])
             ])

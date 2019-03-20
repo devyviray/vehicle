@@ -29,8 +29,6 @@ class CreateVehiclesTable extends Migration
             $table->bigInteger('user_id');
             $table->dateTime('validity_start_date');
             $table->dateTime('validity_end_date');
-            $table->date('date');
-            $table->time('time');
             $table->timestamps();
             $table->softDeletes();
         });
