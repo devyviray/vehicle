@@ -27,8 +27,8 @@ class CreateVehiclesTable extends Migration
             $table->bigInteger('based_truck_id');
             $table->bigInteger('contract_id')->nullable();
             $table->bigInteger('user_id');
-            $table->dateTime('validity_start_date');
-            $table->dateTime('validity_end_date');
+            $table->date('validity_start_date');
+            $table->date('validity_end_date');
             $table->timestamps();
             $table->softDeletes();
         });
