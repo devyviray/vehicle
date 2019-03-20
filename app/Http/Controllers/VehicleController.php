@@ -58,7 +58,7 @@ class VehicleController extends Controller
                 $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
             }
              
-            // $vehicle->plants()->sync( (array) $request->plants);
+            $vehicle->plants()->sync(explode(",",$request->plants));
 
             return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user', 'vendor', 'subconVendor')->where('id', $vehicle->id)->first();
         }
