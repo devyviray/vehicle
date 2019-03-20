@@ -240,7 +240,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row" v-if="show_plant">
+                        <div class="row" v-if="show_plant_add">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="role">Plant</label> 
@@ -604,6 +604,7 @@ export default {
             itemsPerPage: 10,
             keywords: '',
             show_plant: false,
+            show_plant_add: false,
             vehicle_added: false,
             vehicle_updated: false
         }
@@ -622,7 +623,7 @@ export default {
     },
     methods:{
         plantChange(){
-            this.vehicle.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+            this.vehicle.indicator_id == 2 ? this.show_plant_add = false : this.show_plant_add = true;
             this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
         customLabelPlant (plant) {

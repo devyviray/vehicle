@@ -7,6 +7,7 @@ use App\{
     Vehicle,
     Document
 };
+use App\Rules\ValidityRule;
 use Carbon;
 use Auth;
 
@@ -32,7 +33,7 @@ class VehicleController extends Controller
     {
         if($request->category_id == 2){
             $request->validate([
-                'plate_number' => 'required|max:20|alpha_num',
+                'plate_number' => ['required', 'max:20','alpha_num', new ValidityRule($request->validity_start_date, $request->validity_end_date)],
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
@@ -48,7 +49,7 @@ class VehicleController extends Controller
             ]);
         }else{
             $request->validate([
-                'plate_number' => 'required|max:8|alpha_num',
+                'plate_number' => ['required','max:8','alpha_num', new ValidityRule($request->validity_start_date, $request->validity_end_date)],
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
@@ -63,19 +64,19 @@ class VehicleController extends Controller
                 'plants' => 'required',
             ]);
         }
-        if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
-            $attachments = $request->file('attachments');   
-            foreach($attachments as $attachment){
-                $filename = $attachment->getClientOriginalName();
-                $path = $attachment->store('document');
+        // if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
+        //     $attachments = $request->file('attachments');   
+        //     foreach($attachments as $attachment){
+        //         $filename = $attachment->getClientOriginalName();
+        //         $path = $attachment->store('document');
 
-                $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
-            }
+        //         $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+        //     }
              
-            $vehicle->plants()->sync(explode(",",$request->plants));
+        //     $vehicle->plants()->sync(explode(",",$request->plants));
 
-            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
-        }
+        //     return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
+        // }
     }
 
     /**

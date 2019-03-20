@@ -2372,6 +2372,7 @@ __webpack_require__.r(__webpack_exports__);
       itemsPerPage: 10,
       keywords: '',
       show_plant: false,
+      show_plant_add: false,
       vehicle_added: false,
       vehicle_updated: false
     };
@@ -2390,7 +2391,7 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     plantChange: function plantChange() {
-      this.vehicle.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+      this.vehicle.indicator_id == 2 ? this.show_plant_add = false : this.show_plant_add = true;
       this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
     },
     customLabelPlant: function customLabelPlant(plant) {
@@ -38845,7 +38846,7 @@ var render = function() {
                   ])
                 ]),
                 _vm._v(" "),
-                _vm.show_plant
+                _vm.show_plant_add
                   ? _c("div", { staticClass: "row" }, [
                       _c("div", { staticClass: "col-md-12" }, [
                         _c(
