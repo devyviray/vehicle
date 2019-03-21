@@ -49,6 +49,6 @@ class ValidityRule implements Rule
      */
     public function message()
     {
-        return 'Cannot add  the same truck with the early start date';
+        return 'Previous plate number is not yet ended';
     }
 }
