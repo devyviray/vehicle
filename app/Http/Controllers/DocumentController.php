@@ -18,69 +18,16 @@ class DocumentController extends Controller
         return Document::orderBy('id','desc')->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
+     /**
+     * Download upload files/attachments of ncn 
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function downloadAttachment($fileId)
     {
-        //
-    }
+        $documentFile = Document::findOrfail($fileId);
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        ob_end_clean();
+        return response()->download(storage_path("app/public/".$documentFile->path), $documentFile->file_name);
     }
 }

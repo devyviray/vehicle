@@ -53,8 +53,8 @@ class Vehicle extends Model
         return $this->belongsTo(Contract::Class);
     }
 
-    public function document(){
-        return $this->belongsTo(Document::Class);
+    public function documents(){
+        return $this->hasMany(Document::Class);
     }
 
     public function user(){

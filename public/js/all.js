@@ -2341,6 +2341,38 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2390,6 +2422,10 @@ __webpack_require__.r(__webpack_exports__);
     this.fetchPlants();
   },
   methods: {
+    downloadAttachment: function downloadAttachment(id) {
+      var base_url = window.location.origin;
+      window.location = base_url + "/download-attachment/".concat(id);
+    },
     onlyNumber: function onlyNumber($event) {
       //console.log($event.keyCode); //keyCodes value
       var keyCode = $event.keyCode ? $event.keyCode : $event.which;
@@ -2611,19 +2647,19 @@ __webpack_require__.r(__webpack_exports__);
       });
       this.errors = [];
       this.prepareFields();
-      this.formData.append('plate_number', vehicle.plate_number.toUpperCase());
-      this.formData.append('category_id', vehicle.category_id);
-      this.formData.append('capacity_id', vehicle.capacity_id);
+      this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number.toUpperCase() : '');
+      this.formData.append('category_id', vehicle.category_id ? vehicle.category_id : '');
+      this.formData.append('capacity_id', vehicle.capacity_id ? vehicle.capacity_id : '');
       this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
       this.formData.append('subcon_vendor_id', vehicle.subcon_vendor ? vehicle.subcon_vendor.id : '');
-      this.formData.append('indicator_id', vehicle.indicator_id);
-      this.formData.append('good_id', vehicle.good_id);
-      this.formData.append('allowed_total_weight', vehicle.allowed_total_weight);
-      this.formData.append('remarks', vehicle.remarks);
-      this.formData.append('based_truck_id', vehicle.based_truck_id);
-      this.formData.append('contract_id', vehicle.contract_id);
-      this.formData.append('validity_start_date', vehicle.validity_start_date);
-      this.formData.append('validity_end_date', vehicle.validity_end_date);
+      this.formData.append('indicator_id', vehicle.indicator_id ? vehicle.indicator_id : '');
+      this.formData.append('good_id', vehicle.good_id ? vehicle.good_id : '');
+      this.formData.append('allowed_total_weight', vehicle.allowed_total_weight ? vehicle.allowed_total_weight : '');
+      this.formData.append('remarks', vehicle.remarks ? vehicle.remarks : '');
+      this.formData.append('based_truck_id', vehicle.based_truck_id ? vehicle.based_truck_id : '');
+      this.formData.append('contract_id', vehicle.contract_id ? vehicle.contract_id : '');
+      this.formData.append('validity_start_date', vehicle.validity_start_date ? vehicle.validity_start_date : '');
+      this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
       this.formData.append('plants', plantIds ? plantIds : '');
       this.formData.append('_method', 'PATCH');
       axios.post("/vehicle/".concat(vehicle.id), this.formData).then(function (response) {
@@ -38515,6 +38551,24 @@ var render = function() {
                                     }
                                   },
                                   [_vm._v("Edit")]
+                                ),
+                                _vm._v(" "),
+                                _c(
+                                  "a",
+                                  {
+                                    staticClass: "dropdown-item",
+                                    attrs: {
+                                      href: "javascript.void(0)",
+                                      "data-toggle": "modal",
+                                      "data-target": "#viewDocumentsModal"
+                                    },
+                                    on: {
+                                      click: function($event) {
+                                        return _vm.copyObject(vehicle)
+                                      }
+                                    }
+                                  },
+                                  [_vm._v("View Document")]
                                 )
                               ]
                             )
@@ -38591,8 +38645,6 @@ var render = function() {
                         vehicle.contract
                           ? _c("td", [_vm._v(_vm._s(vehicle.contract.code))])
                           : _c("td"),
-                        _vm._v(" "),
-                        _c("td", [_vm._v(_vm._s(vehicle.document))]),
                         _vm._v(" "),
                         _c("td", [_vm._v(_vm._s(vehicle.user.name))]),
                         _vm._v(" "),
@@ -39081,7 +39133,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Allowed Total Weight")
+                        _vm._v("Allowed Total Weight (KG)")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39094,7 +39146,11 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: { type: "text", id: "allowed_total_weight" },
+                        attrs: {
+                          type: "text",
+                          id: "allowed_total_weight",
+                          maxlength: "20"
+                        },
                         domProps: { value: _vm.vehicle.allowed_total_weight },
                         on: {
                           keypress: _vm.onlyNumber,
@@ -39256,7 +39312,7 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: { type: "text", id: "remarks" },
+                        attrs: { type: "text", id: "remarks", maxlength: "40" },
                         domProps: { value: _vm.vehicle.remarks },
                         on: {
                           input: function($event) {
@@ -39833,7 +39889,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Allowed Total Weight")
+                        _vm._v("Allowed Total Weight (KG)")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -39846,7 +39902,11 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: { type: "text", id: "allowed_total_weight" },
+                        attrs: {
+                          type: "text",
+                          id: "allowed_total_weight",
+                          maxlength: "20"
+                        },
                         domProps: {
                           value: _vm.vehicle_copied.allowed_total_weight
                         },
@@ -40003,7 +40063,7 @@ var render = function() {
                           }
                         ],
                         staticClass: "form-control",
-                        attrs: { type: "text", id: "remarks" },
+                        attrs: { type: "text", id: "remarks", maxlength: "40" },
                         domProps: { value: _vm.vehicle_copied.remarks },
                         on: {
                           input: function($event) {
@@ -40030,7 +40090,7 @@ var render = function() {
                   _c("div", { staticClass: "col-md-4" }, [
                     _c("div", { staticClass: "form-group" }, [
                       _c("label", { attrs: { for: "role" } }, [
-                        _vm._v("Document*")
+                        _vm._v("Document")
                       ]),
                       _vm._v(" "),
                       _c("input", {
@@ -40215,6 +40275,85 @@ var render = function() {
           ]
         )
       ]
+    ),
+    _vm._v(" "),
+    _c(
+      "div",
+      {
+        staticClass: "modal fade",
+        attrs: {
+          id: "viewDocumentsModal",
+          tabindex: "-1",
+          role: "dialog",
+          "aria-labelledby": "exampleModalLabel",
+          "aria-hidden": "true"
+        }
+      },
+      [
+        _c(
+          "span",
+          { staticClass: "closed", attrs: { "data-dismiss": "modal" } },
+          [_vm._v("×")]
+        ),
+        _vm._v(" "),
+        _c(
+          "div",
+          {
+            staticClass: "modal-dialog modal-dialog-centered modal-lg",
+            attrs: { role: "document" }
+          },
+          [
+            _c("div", { staticClass: "modal-content" }, [
+              _vm._m(10),
+              _vm._v(" "),
+              _c("div", { staticClass: "modal-body" }, [
+                _c(
+                  "table",
+                  { staticClass: "table align-items-center table-flush" },
+                  [
+                    _vm._m(11),
+                    _vm._v(" "),
+                    _c(
+                      "tbody",
+                      _vm._l(this.vehicle_copied.documents, function(
+                        document,
+                        d
+                      ) {
+                        return _c("tr", { key: d }, [
+                          _c("td", [_vm._v(_vm._s(d + 1))]),
+                          _vm._v(" "),
+                          _c("td", [_vm._v(_vm._s(document.file_name))]),
+                          _vm._v(" "),
+                          _c("td", [
+                            _c(
+                              "span",
+                              {
+                                staticStyle: {
+                                  "text-decoration": "none",
+                                  color: "#5e72e4",
+                                  "background-color": "transparent",
+                                  cursor: "pointer"
+                                },
+                                on: {
+                                  click: function($event) {
+                                    return _vm.downloadAttachment(document.id)
+                                  }
+                                }
+                              },
+                              [_vm._v("Download Document")]
+                            )
+                          ])
+                        ])
+                      }),
+                      0
+                    )
+                  ]
+                )
+              ])
+            ])
+          ]
+        )
+      ]
     )
   ])
 }
@@ -40364,15 +40503,15 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Goods")]),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Allowed total weight")]),
+        _c("th", { attrs: { scope: "col" } }, [
+          _vm._v("Allowed total weight (KG)")
+        ]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Based trucks")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Remarks")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Contract")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Document")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("User")]),
         _vm._v(" "),
@@ -40507,6 +40646,45 @@ var staticRenderFns = [
             )
           ])
         ])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "addCompanyLabel" } },
+        [_vm._v("Documents")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", { staticClass: "thead-light" }, [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("#")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("File name")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Action")])
       ])
     ])
   }

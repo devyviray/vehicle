@@ -70,9 +70,8 @@ Route::delete('/contract/{contract}', 'ContractController@destroy');
 
 // Documents
 Route::get('/documents', 'DocumentController@index');
-Route::post('/document', 'DocumentController@store');
-Route::patch('/document/{document}', 'DocumentController@update');
-Route::delete('/document/{document}', 'DocumentController@destroy');
+// Download files upload
+Route::get('/download-attachment/{fileId}', 'DocumentController@downloadAttachment');
 
 // Users
 Route::get('/users', 'UserController@index');

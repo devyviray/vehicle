@@ -10,6 +10,7 @@ use App\{
 use App\Rules\ValidityRule;
 use Carbon;
 use Auth;
+use Storage;
 
 class VehicleController extends Controller
 {
@@ -20,7 +21,7 @@ class VehicleController extends Controller
      */
     public function index()
     {
-        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user','vendor', 'subconVendor','plants')->orderBy('id', 'desc')->get();
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','plants')->orderBy('id', 'desc')->get();
     }
 
     /**
@@ -70,14 +71,15 @@ class VehicleController extends Controller
             $attachments = $request->file('attachments');   
             foreach($attachments as $attachment){
                 $filename = $attachment->getClientOriginalName();
-                $path = $attachment->store('document');
+                $path = Storage::disk('public')->put('document', $attachment);
+                // $path = $attachment->store('document');
 
                 $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
             }
              
             $vehicle->plants()->sync(explode(",",$request->plants));
 
-            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
+            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
         }
     }
 
@@ -117,7 +119,7 @@ class VehicleController extends Controller
     {
         if($request->category_id == 2){
             $request->validate([
-                'plate_number' => 'required|max:20|alpha_num',
+                'plate_number' => 'required|max:20',
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
@@ -133,7 +135,7 @@ class VehicleController extends Controller
             ]);
         }else{
             $request->validate([
-                'plate_number' => 'required|max:8|alpha_num',
+                'plate_number' => 'required|max:8',
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
@@ -153,7 +155,8 @@ class VehicleController extends Controller
                 $attachments = $request->file('attachments');   
                 foreach($attachments as $attachment){
                     $filename = $attachment->getClientOriginalName();
-                    $path = $attachment->store('document');
+                    $path = Storage::disk('public')->put('document', $attachment);
+                    // $path = $attachment->store('document');
     
                     $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
                 }
@@ -161,7 +164,7 @@ class VehicleController extends Controller
 
             $vehicle->plants()->sync(explode(",",$request->plants));
 
-            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'document', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
+            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
         }
     }
 

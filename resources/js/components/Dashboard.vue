@@ -127,11 +127,10 @@
                                         <th scope="col">Subcon vendor</th>
                                         <th scope="col">Capacity</th>
                                         <th scope="col">Goods</th>
-                                        <th scope="col">Allowed total weight</th>
+                                        <th scope="col">Allowed total weight (KG)</th>
                                         <th scope="col">Based trucks</th>
                                         <th scope="col">Remarks</th>
                                         <th scope="col">Contract</th>
-                                        <th scope="col">Document</th>
                                         <th scope="col">User</th>
                                         <th scope="col">Validity start date</th>
                                         <th scope="col">Validity end date</th>
@@ -147,6 +146,7 @@
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                                     <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#editVehicleModal" @click="copyObject(vehicle)">Edit</a>
+                                                    <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#viewDocumentsModal" @click="copyObject(vehicle)">View Document</a>
                                                     <!-- <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#deleteVehicleModal" @click="getVehicleId(vehicle.id)">Delete</a> -->
                                                 </div>
                                             </div>
@@ -174,7 +174,6 @@
                                         <td v-else></td>
                                         <td v-if="vehicle.contract">{{ vehicle.contract.code }}</td>
                                         <td v-else></td>
-                                        <td>{{ vehicle.document }}</td>
                                         <td>{{ vehicle.user.name }}</td>
                                         <td>{{ vehicle.validity_start_date }}</td>
                                         <td>{{ vehicle.validity_end_date }}</td>
@@ -305,8 +304,8 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Allowed Total Weight</label> 
-                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle.allowed_total_weight" @keypress="onlyNumber">
+                                    <label for="role">Allowed Total Weight (KG)</label> 
+                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
                                     <span class="text-danger" v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
                                 </div>
                             </div>
@@ -333,7 +332,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Remarks</label> 
-                                    <input type="text" id="remarks" class="form-control" v-model="vehicle.remarks">
+                                    <input type="text" id="remarks" class="form-control" v-model="vehicle.remarks" maxlength="40">
                                     <span class="text-danger" v-if="errors.remarks">{{ errors.remarks[0] }}</span>
                                 </div>
                             </div>
@@ -477,8 +476,8 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Allowed Total Weight</label> 
-                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight" @keypress="onlyNumber">
+                                    <label for="role">Allowed Total Weight (KG)</label> 
+                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
                                     <span class="text-danger" v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
                                 </div>
                             </div>
@@ -505,13 +504,13 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Remarks</label> 
-                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_copied.remarks">
+                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_copied.remarks" maxlength="40">
                                     <span class="text-danger" v-if="errors.good_id">The remarks field is required</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Document*</label> 
+                                    <label for="role">Document</label> 
                                     <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
                                     <span class="text-danger" v-if="errors.attachments">The attachment field is required</span>
                                 </div>
@@ -564,6 +563,39 @@
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
                     <button class="btn btn-warning" @click="deleteVehicle">Delete</button>
+                </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View Documents Modal -->
+        <div class="modal fade" id="viewDocumentsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <span class="closed" data-dismiss="modal">&times;</span>
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCompanyLabel">Documents</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <table class="table align-items-center table-flush">
+                        <thead class="thead-light">
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">File name</th>
+                                <th scope="col">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="(document, d) in this.vehicle_copied.documents" v-bind:key="d">
+                                <td>{{ d + 1 }}</td>
+                                <td>{{ document.file_name }}</td>
+                                <td><span style="text-decoration: none; color: #5e72e4; background-color: transparent; cursor: pointer;" @click="downloadAttachment(document.id)">Download Document</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 </div>
             </div>
@@ -622,6 +654,10 @@ export default {
         this.fetchPlants();
     },
     methods:{
+        downloadAttachment(id){
+            var base_url = window.location.origin;
+            window.location = base_url+`/download-attachment/${id}`;
+        },
         onlyNumber ($event) {
             //console.log($event.keyCode); //keyCodes value
             let keyCode = ($event.keyCode ? $event.keyCode : $event.which);
@@ -834,19 +870,19 @@ export default {
             var index = this.vehicles.findIndex(item => item.id == vehicle.id);
             this.errors = [];
             this.prepareFields();
-            this.formData.append('plate_number', vehicle.plate_number.toUpperCase());
-            this.formData.append('category_id', vehicle.category_id);
-            this.formData.append('capacity_id', vehicle.capacity_id);
+            this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number.toUpperCase() : '');
+            this.formData.append('category_id', vehicle.category_id ? vehicle.category_id : '');
+            this.formData.append('capacity_id', vehicle.capacity_id ? vehicle.capacity_id : '');
             this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
             this.formData.append('subcon_vendor_id', vehicle.subcon_vendor ? vehicle.subcon_vendor.id : '');
-            this.formData.append('indicator_id', vehicle.indicator_id);
-            this.formData.append('good_id', vehicle.good_id);
-            this.formData.append('allowed_total_weight', vehicle.allowed_total_weight);
-            this.formData.append('remarks', vehicle.remarks);
-            this.formData.append('based_truck_id', vehicle.based_truck_id);         
-            this.formData.append('contract_id', vehicle.contract_id);   
-            this.formData.append('validity_start_date', vehicle.validity_start_date);
-            this.formData.append('validity_end_date', vehicle.validity_end_date);
+            this.formData.append('indicator_id', vehicle.indicator_id ? vehicle.indicator_id : '');
+            this.formData.append('good_id', vehicle.good_id ? vehicle.good_id : '');
+            this.formData.append('allowed_total_weight', vehicle.allowed_total_weight ? vehicle.allowed_total_weight : '');
+            this.formData.append('remarks', vehicle.remarks ? vehicle.remarks : '');
+            this.formData.append('based_truck_id', vehicle.based_truck_id ? vehicle.based_truck_id : '');         
+            this.formData.append('contract_id', vehicle.contract_id ? vehicle.contract_id : '');   
+            this.formData.append('validity_start_date', vehicle.validity_start_date ? vehicle.validity_start_date : '');
+            this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
             this.formData.append('plants', plantIds ? plantIds : '');
             this.formData.append('_method', 'PATCH');
 
