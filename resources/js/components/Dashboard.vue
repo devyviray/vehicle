@@ -298,6 +298,7 @@
                                 <div class="form-group">
                                     <label for="role">Goods</label> 
                                     <select class="form-control" v-model="vehicle.good_id">
+                                        <option></option>
                                         <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
@@ -325,6 +326,7 @@
                                 <div class="form-group">
                                     <label for="role">Contract</label> 
                                     <select class="form-control" v-model="vehicle.contract_id">
+                                        <option></option>
                                         <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.code + ' - ' + contract.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
@@ -439,6 +441,7 @@
                                     label="vendor_description_lfug"
                                     :options="truckers"
                                     track-by="id"
+                                    disabled
                                 >      
                                 </v-select>
                                 <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
@@ -451,6 +454,7 @@
                                     label="vendor_description_lfug"
                                     :options="truckers"
                                     track-by="id"
+                                    disabled
                                 >
                                 </v-select>
                                 <span class="text-danger" v-if="errors.subcon_vendor_id">The Subcon vendor field is required</span>
@@ -470,6 +474,7 @@
                                 <div class="form-group">
                                     <label for="role">Goods</label> 
                                     <select class="form-control" v-model="vehicle_copied.good_id">
+                                        <option></option>
                                         <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
@@ -497,6 +502,7 @@
                                 <div class="form-group">
                                     <label for="role">Contract</label> 
                                     <select class="form-control" v-model="vehicle_copied.contract_id">
+                                        <option></option>
                                         <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
@@ -817,6 +823,7 @@ export default {
             })
             .catch(error => {   
                 this.errors = error.response.data.errors;
+                this.attachments = [];
                 document.getElementById('check_btn').disabled = false;
             })
         },
@@ -859,6 +866,7 @@ export default {
             .catch(error => {
                 this.vehicle_updated = false;
                 this.errors = error.response.data.errors;
+                this.attachments = [];
                 document.getElementById('edit_btn').disabled = false;
             })
         },

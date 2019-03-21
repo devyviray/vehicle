@@ -2341,6 +2341,12 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
@@ -2588,6 +2594,7 @@ __webpack_require__.r(__webpack_exports__);
         document.getElementById('check_btn').disabled = false;
       }).catch(function (error) {
         _this11.errors = error.response.data.errors;
+        _this11.attachments = [];
         document.getElementById('check_btn').disabled = false;
       });
     },
@@ -2635,6 +2642,7 @@ __webpack_require__.r(__webpack_exports__);
       }).catch(function (error) {
         _this12.vehicle_updated = false;
         _this12.errors = error.response.data.errors;
+        _this12.attachments = [];
         document.getElementById('edit_btn').disabled = false;
       });
     },
@@ -39060,14 +39068,18 @@ var render = function() {
                             }
                           }
                         },
-                        _vm._l(_vm.goods, function(good, g) {
-                          return _c(
-                            "option",
-                            { key: g, domProps: { value: good.id } },
-                            [_vm._v(" " + _vm._s(good.description))]
-                          )
-                        }),
-                        0
+                        [
+                          _c("option"),
+                          _vm._v(" "),
+                          _vm._l(_vm.goods, function(good, g) {
+                            return _c(
+                              "option",
+                              { key: g, domProps: { value: good.id } },
+                              [_vm._v(" " + _vm._s(good.description))]
+                            )
+                          })
+                        ],
+                        2
                       ),
                       _vm._v(" "),
                       _vm.errors.good_id
@@ -39215,21 +39227,27 @@ var render = function() {
                             }
                           }
                         },
-                        _vm._l(_vm.contracts, function(contract, c) {
-                          return _c(
-                            "option",
-                            { key: c, domProps: { value: contract.id } },
-                            [
-                              _vm._v(
-                                " " +
-                                  _vm._s(
-                                    contract.code + " - " + contract.description
-                                  )
-                              )
-                            ]
-                          )
-                        }),
-                        0
+                        [
+                          _c("option"),
+                          _vm._v(" "),
+                          _vm._l(_vm.contracts, function(contract, c) {
+                            return _c(
+                              "option",
+                              { key: c, domProps: { value: contract.id } },
+                              [
+                                _vm._v(
+                                  " " +
+                                    _vm._s(
+                                      contract.code +
+                                        " - " +
+                                        contract.description
+                                    )
+                                )
+                              ]
+                            )
+                          })
+                        ],
+                        2
                       ),
                       _vm._v(" "),
                       _vm.errors.contract_id
@@ -39663,7 +39681,8 @@ var render = function() {
                         attrs: {
                           label: "vendor_description_lfug",
                           options: _vm.truckers,
-                          "track-by": "id"
+                          "track-by": "id",
+                          disabled: ""
                         },
                         model: {
                           value: _vm.vehicle_copied.vendor,
@@ -39696,7 +39715,8 @@ var render = function() {
                         attrs: {
                           label: "vendor_description_lfug",
                           options: _vm.truckers,
-                          "track-by": "id"
+                          "track-by": "id",
+                          disabled: ""
                         },
                         model: {
                           value: _vm.vehicle_copied.subcon_vendor,
@@ -39812,14 +39832,18 @@ var render = function() {
                             }
                           }
                         },
-                        _vm._l(_vm.goods, function(good, g) {
-                          return _c(
-                            "option",
-                            { key: g, domProps: { value: good.id } },
-                            [_vm._v(" " + _vm._s(good.description))]
-                          )
-                        }),
-                        0
+                        [
+                          _c("option"),
+                          _vm._v(" "),
+                          _vm._l(_vm.goods, function(good, g) {
+                            return _c(
+                              "option",
+                              { key: g, domProps: { value: good.id } },
+                              [_vm._v(" " + _vm._s(good.description))]
+                            )
+                          })
+                        ],
+                        2
                       ),
                       _vm._v(" "),
                       _vm.errors.good_id
@@ -39969,14 +39993,18 @@ var render = function() {
                             }
                           }
                         },
-                        _vm._l(_vm.contracts, function(contract, c) {
-                          return _c(
-                            "option",
-                            { key: c, domProps: { value: contract.id } },
-                            [_vm._v(" " + _vm._s(contract.description))]
-                          )
-                        }),
-                        0
+                        [
+                          _c("option"),
+                          _vm._v(" "),
+                          _vm._l(_vm.contracts, function(contract, c) {
+                            return _c(
+                              "option",
+                              { key: c, domProps: { value: contract.id } },
+                              [_vm._v(" " + _vm._s(contract.description))]
+                            )
+                          })
+                        ],
+                        2
                       ),
                       _vm._v(" "),
                       _vm.errors.contract_id
