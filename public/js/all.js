@@ -38667,52 +38667,54 @@ var render = function() {
               )
             ]),
             _vm._v(" "),
-            _c("div", { staticClass: "row mb-3 mt-3 ml-1" }, [
-              _c("div", { staticClass: "col-6" }, [
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-default btn-sm btn-fill",
-                    attrs: { disabled: !_vm.showPreviousLink() },
-                    on: {
-                      click: function($event) {
-                        return _vm.setPage(_vm.currentPage - 1)
-                      }
-                    }
-                  },
-                  [_vm._v(" Previous ")]
-                ),
-                _vm._v(" "),
-                _c("span", { staticClass: "text-dark" }, [
-                  _vm._v(
-                    "Page " +
-                      _vm._s(_vm.currentPage + 1) +
-                      " of " +
-                      _vm._s(_vm.totalPages)
-                  )
-                ]),
-                _vm._v(" "),
-                _c(
-                  "button",
-                  {
-                    staticClass: "btn btn-default btn-sm btn-fill",
-                    attrs: { disabled: !_vm.showNextLink() },
-                    on: {
-                      click: function($event) {
-                        return _vm.setPage(_vm.currentPage + 1)
-                      }
-                    }
-                  },
-                  [_vm._v(" Next ")]
-                )
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-6 text-right" }, [
-                _c("span", [
-                  _vm._v(_vm._s(_vm.filteredQueues.length) + " Vehicle(s)")
+            _vm.filteredQueues.length
+              ? _c("div", { staticClass: "row mb-3 mt-3 ml-1" }, [
+                  _c("div", { staticClass: "col-6" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-default btn-sm btn-fill",
+                        attrs: { disabled: !_vm.showPreviousLink() },
+                        on: {
+                          click: function($event) {
+                            return _vm.setPage(_vm.currentPage - 1)
+                          }
+                        }
+                      },
+                      [_vm._v(" Previous ")]
+                    ),
+                    _vm._v(" "),
+                    _c("span", { staticClass: "text-dark" }, [
+                      _vm._v(
+                        "Page " +
+                          _vm._s(_vm.currentPage + 1) +
+                          " of " +
+                          _vm._s(_vm.totalPages)
+                      )
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-default btn-sm btn-fill",
+                        attrs: { disabled: !_vm.showNextLink() },
+                        on: {
+                          click: function($event) {
+                            return _vm.setPage(_vm.currentPage + 1)
+                          }
+                        }
+                      },
+                      [_vm._v(" Next ")]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-6 text-right" }, [
+                    _c("span", [
+                      _vm._v(_vm._s(_vm.filteredQueues.length) + " Vehicle(s)")
+                    ])
+                  ])
                 ])
-              ])
-            ])
+              : _vm._e()
           ])
         ])
       ])

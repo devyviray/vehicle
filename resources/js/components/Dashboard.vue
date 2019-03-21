@@ -181,7 +181,7 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row mb-3 mt-3 ml-1">
+                        <div class="row mb-3 mt-3 ml-1" v-if="filteredQueues.length ">
                             <div class="col-6">
                                 <button :disabled="!showPreviousLink()" class="btn btn-default btn-sm btn-fill" v-on:click="setPage(currentPage - 1)"> Previous </button>
                                     <span class="text-dark">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
