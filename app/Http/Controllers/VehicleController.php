@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\{
     Vehicle,
-    Document
+    Document,
+    PlantVehicle,
+    PlantVehicleDeleted
 };
 use App\Rules\ValidityRule;
 use Carbon;
@@ -160,6 +162,16 @@ class VehicleController extends Controller
     
                     $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
                 }
+            }
+            $plantVehicles = PlantVehicle::where('vehicle_id', $vehicle->id)->whereNotIn('plant_id', explode(",",$request->plants))->get();
+            
+            foreach($plantVehicles as $plantVehicle){
+
+                PlantVehicleDeleted::create(['plant_vehicle_id' => $plantVehicle['id'], 
+                    'plant_id' => $plantVehicle['plant_id'], 
+                    'vehicle_id'=> $plantVehicle['vehicle_id'],
+                    'user_id' => Auth::user()->id
+                ]);
             }
 
             $vehicle->plants()->sync(explode(",",$request->plants));

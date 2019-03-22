@@ -1,5 +1,6 @@
 <template>
     <div>
+        <loader v-if="loading"></loader>
         <div class="header pb-8 pt-5 pt-md-8" style="background-color: #04703e">
             <div class="container-fluid">
                 <div class="header-body">
@@ -428,6 +429,7 @@
                                         id="selected_plant"
                                     >
                                     </multiselect>
+                                    <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
                                 </div>  
                             </div>
                         </div> 
@@ -612,11 +614,13 @@
 
 <script>
 import vSelect from 'vue-select'
-import Multiselect from 'vue-multiselect';
+import Multiselect from 'vue-multiselect'
+import loader from './Loader'
 export default {
     components: {
         vSelect,
-        Multiselect
+        Multiselect,
+        loader
     },
     data(){
         return {
@@ -644,7 +648,8 @@ export default {
             show_plant: false,
             show_plant_add: false,
             vehicle_added: false,
-            vehicle_updated: false
+            vehicle_updated: false,
+            loading: false
         }
     },
     created(){
@@ -824,6 +829,7 @@ export default {
         },
         addVehicle(vehicle){
             this.vehicle_added = false;
+            this.loading = true;
             document.getElementById('check_btn').disabled = true;
             var final_plant = [];
             vehicle.indicator_id == 2 ? final_plant = this.plants : final_plant = vehicle.plant;
@@ -856,15 +862,18 @@ export default {
                 this.vehicles.unshift(response.data);
                 this.resetForm();
                 document.getElementById('check_btn').disabled = false;
+                this.loading = false;
             })
             .catch(error => {   
                 this.errors = error.response.data.errors;
                 this.attachments = [];
                 document.getElementById('check_btn').disabled = false;
+                this.loading = false;
             })
         },
         editVehicle(vehicle){
             this.vehicle_updated = false;
+            this.loading = true;
             document.getElementById('edit_btn').disabled = true;
             var final_plant = [];
             vehicle.indicator_id == 2 ? final_plant = this.plants : final_plant = vehicle.plants;
@@ -898,12 +907,14 @@ export default {
                 this.vehicle_updated = true;
                 this.vehicles.splice(index,1,response.data);
                 document.getElementById('edit_btn').disabled = false;
+                this.loading = false;
             })
             .catch(error => {
                 this.vehicle_updated = false;
                 this.errors = error.response.data.errors;
                 this.attachments = [];
                 document.getElementById('edit_btn').disabled = false;
+                this.loading = false;
             })
         },
         deleteVehicle(){
