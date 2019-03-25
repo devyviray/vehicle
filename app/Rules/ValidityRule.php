@@ -11,14 +11,17 @@ class ValidityRule implements Rule
 {
 
     protected $validityStartDate;
+    protected $action;
     /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct($validityStartDate)
+    public function __construct($validityStartDate, $action, $id = null)
     {
         $this->validityStartDate = $validityStartDate;
+        $this->action = $action;
+        $this->id = $id;
     }
 
     /**
@@ -30,16 +33,21 @@ class ValidityRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        $vehicle = Vehicle::where('plate_number', $value)->first();
-
-        if($vehicle && $this->validityStartDate){
-            if($vehicle->validity_end_date >=  $this->validityStartDate){
-                return false;
-            }else{
-                return true;
+        $vehicles = $this->action == 'Add' ? Vehicle::where('plate_number', $value)->get() : Vehicle::where('plate_number', $value)->where('id','!=',$this->id)->get();
+        $error = 0;
+        
+        if($vehicles && $this->validityStartDate){
+            foreach($vehicles as $vehicle){ 
+                if($vehicle->validity_end_date >=  $this->validityStartDate){
+                    $error = $error + 1;
+                }
             }
         }
-        return true;
+        if($error){
+            return false;
+        }else{
+            return true; 
+        }
     }
 
     /**

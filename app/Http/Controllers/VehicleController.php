@@ -36,7 +36,7 @@ class VehicleController extends Controller
     {
         if($request->category_id == 2){
             $request->validate([
-                'plate_number' => ['required', 'max:20','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date)],
+                'plate_number' => ['required', 'max:20','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date,'Add')],
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
@@ -53,7 +53,7 @@ class VehicleController extends Controller
             ]);
         }else{
             $request->validate([
-                'plate_number' => ['required','max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date)],
+                'plate_number' => ['required','max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Add')],
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
@@ -121,7 +121,7 @@ class VehicleController extends Controller
     {
         if($request->category_id == 2){
             $request->validate([
-                'plate_number' => 'required|max:20',
+                'plate_number' =>  ['required','max:20','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Edit',$vehicle->id)],
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
@@ -137,7 +137,7 @@ class VehicleController extends Controller
             ]);
         }else{
             $request->validate([
-                'plate_number' => 'required|max:8',
+                'plate_number' => ['required','max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Edit'),$vehicle->id],
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
