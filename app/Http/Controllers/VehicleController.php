@@ -137,7 +137,7 @@ class VehicleController extends Controller
             ]);
         }else{
             $request->validate([
-                'plate_number' => ['required','max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Edit'),$vehicle->id],
+                'plate_number' => ['required','max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Edit',$vehicle->id)],
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
