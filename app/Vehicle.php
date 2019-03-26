@@ -70,6 +70,6 @@ class Vehicle extends Model
     }
 
     public function plants() {
-        return $this->belongsToMany(Plant::Class);
+        return $this->belongsToMany(Plant::Class)->withTimestamps();
     }
 }
