@@ -3,8 +3,11 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use OwenIt\Auditing\Contracts\Auditable;
 
-class Capacity extends Model
+class Capacity extends Model implements Auditable
 {
+    use \OwenIt\Auditing\Auditable;
+
     //
 }
