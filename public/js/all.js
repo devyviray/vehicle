@@ -9407,7 +9407,7 @@ __webpack_require__.r(__webpack_exports__);
       fileSize: 0,
       errors: [],
       currentPage: 0,
-      itemsPerPage: 10,
+      itemsPerPage: 50,
       keywords: '',
       show_plant: false,
       show_plant_add: false,
