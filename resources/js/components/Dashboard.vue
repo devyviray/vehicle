@@ -123,7 +123,7 @@
                                         <th scope="col">Category</th>
                                         <th scope="col">Plate number</th>
                                         <th scope="col">Plant Indicator</th>
-                                        <th scope="col">Plant</th>
+                                        <!-- <th scope="col">Plant</th> -->
                                         <th scope="col">Vendor</th>
                                         <th scope="col">Subcon vendor</th>
                                         <th scope="col">Capacity</th>
@@ -146,7 +146,8 @@
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                    <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#editVehicleModal" @click="copyObject(vehicle)">Edit</a>
+                                                    <!-- <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#editVehicleModal" @click="copyObject(vehicle)">Edit</a> -->
+                                                    <a class="dropdown-item" style="cursor: pointer" @click="getVehicle(vehicle.id)">Edit</a>
                                                     <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#viewDocumentsModal" @click="copyObject(vehicle)">View Document</a>
                                                     <!-- <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#deleteVehicleModal" @click="getVehicleId(vehicle.id)">Delete</a> -->
                                                 </div>
@@ -156,12 +157,12 @@
                                         <td>{{ vehicle.category.description }}</td>
                                         <td>{{ vehicle.plate_number }}</td>
                                         <td>{{ vehicle.indicator.description }}</td>
-                                        <td v-if="vehicle.indicator_id == 2"> ALL PLANT</td>
+                                        <!-- <td v-if="vehicle.indicator_id == 2"> ALL PLANT</td>
                                         <td v-else>
                                             <span v-for="(plant, p) in vehicle.plants" :key="p">
                                                 {{ plant.name }} <br/>
                                             </span>
-                                        </td>
+                                        </td> -->
                                         <td>{{ vehicle.vendor.vendor_description_lfug }}</td>
                                         <td v-if="vehicle.subcon_vendor">{{ vehicle.subcon_vendor.vendor_description_lfug }}</td>
                                         <td v-else></td>
@@ -372,7 +373,7 @@
         </div>
 
         <!-- Edit Vehicle Modal -->
-        <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <!-- <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
                 <div class="modal-content">
@@ -546,6 +547,183 @@
                     </div>
                 </div>
             </div>
+        </div> -->
+
+
+        <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <span class="closed" data-dismiss="modal">&times;</span>
+            <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
+                <div class="modal-content">
+                    <div>
+                        <button type="button" class="close mt-2 mr-2" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div> 
+                    <div class="modal-header">
+                        <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Edit Vehicle</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-success" v-if="vehicle_updated">
+                            <strong>Success!</strong> Vehicle succesfully updated
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Category*</label> 
+                                    <select class="form-control" v-model="vehicle_fetch.category_id" disabled>
+                                        <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.category_id">The category field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Plate Number*</label> 
+                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_fetch.plate_number" disabled>
+                                    <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Plant Indicator*</label> 
+                                    <select class="form-control" v-model="vehicle_fetch.indicator_id" @change="plantChange">
+                                        <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.indicator_id">The indicator field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" v-if="show_plant">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="role">Plant</label> 
+                                    <multiselect
+                                        v-model="vehicle_fetch.plants"
+                                        :options="plants"
+                                        :multiple="true"
+                                        track-by="id"
+                                        :custom-label="customLabelPlant"
+                                        placeholder="Select Plant"
+                                        id="selected_plant"
+                                    >
+                                    </multiselect>
+                                    <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
+                                </div>  
+                            </div>
+                        </div> 
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label for="role">Vendor*</label> 
+                                <v-select
+                                    style="width: 100%" 
+                                    v-model="vehicle_fetch.vendor"
+                                    label="vendor_description_lfug"
+                                    :options="truckers"
+                                    track-by="id"
+                                    disabled
+                                >      
+                                </v-select>
+                                <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="role">Subcon Vendor</label> 
+                                <v-select 
+                                    style="width: 100%"
+                                    v-model="vehicle_fetch.subcon_vendor"
+                                    label="vendor_description_lfug"
+                                    :options="truckers"
+                                    track-by="id"
+                                    disabled
+                                >
+                                </v-select>
+                                <span class="text-danger" v-if="errors.subcon_vendor_id">The Subcon vendor field is required</span>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Capacity*</label> 
+                                    <select class="form-control" v-model="vehicle_fetch.capacity_id">
+                                        <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.capacity_id">The capacity field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Goods</label> 
+                                    <select class="form-control" v-model="vehicle_fetch.good_id">
+                                        <option></option>
+                                        <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Allowed Total Weight (KG)</label> 
+                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_fetch.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
+                                    <span class="text-danger" v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Based Trucks*</label> 
+                                    <select class="form-control" v-model="vehicle_fetch.based_truck_id">
+                                        <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.based_truck_id">The based truck field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Contract</label> 
+                                    <select class="form-control" v-model="vehicle_fetch.contract_id">
+                                        <option></option>
+                                        <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Remarks</label> 
+                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_fetch.remarks" maxlength="40">
+                                    <span class="text-danger" v-if="errors.good_id">The remarks field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Document</label> 
+                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
+                                    <span class="text-danger" v-if="errors.attachments">The attachment field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Validity Start Date*</label> 
+                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle_fetch.validity_start_date">
+                                    <span class="text-danger" v-if="errors.validity_start_date">The validity start date field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Validity End Date*</label> 
+                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle_fetch.validity_end_date">
+                                    <span class="text-danger" v-if="errors.validity_end_date">The validity end date field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="edit_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="editVehicle(vehicle_fetch)">Save</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Delete Vehicle Modal -->
@@ -626,6 +804,7 @@ export default {
         return {
             vehicles: [],
             vehicle: [],
+            vehicle_fetch: [],
             vehicle_copied: [],
             vehicle_id: '',
             categories: [],
@@ -665,6 +844,17 @@ export default {
         this.fetchPlants();
     },
     methods:{
+        getVehicle(id){
+            axios.get(`/vehicle-specific/${id}`)
+            .then(response => {
+                this.vehicle_fetch = response.data;
+                $('#editVehicleModal').modal('show');
+                this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+            })
+            .catch(error => {
+                this.errors = error.response.data.errors
+            })
+        },
         downloadAttachment(id){
             var base_url = window.location.origin;
             window.location = base_url+`/download-attachment/${id}`;
@@ -679,6 +869,7 @@ export default {
         plantChange(){
             this.vehicle.indicator_id == 2 ? this.show_plant_add = false : this.show_plant_add = true;
             this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+            this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
         customLabelPlant (plant) {
             return `${plant.name }`

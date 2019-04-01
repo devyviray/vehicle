@@ -23,7 +23,8 @@ class VehicleController extends Controller
      */
     public function index()
     {
-        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','plants')->orderBy('id', 'desc')->get();
+        // return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','plants')->orderBy('id', 'desc')->get();
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor')->orderBy('id', 'desc')->get();
     }
 
     /**
@@ -107,7 +108,8 @@ class VehicleController extends Controller
      */
     public function show($id)
     {
-        //
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','plants')
+            ->where('id',$id)->orderBy('id', 'desc')->first();
     }
 
     /**

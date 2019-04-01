@@ -9198,6 +9198,184 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -9211,6 +9389,7 @@ __webpack_require__.r(__webpack_exports__);
     return {
       vehicles: [],
       vehicle: [],
+      vehicle_fetch: [],
       vehicle_copied: [],
       vehicle_id: '',
       categories: [],
@@ -9250,6 +9429,17 @@ __webpack_require__.r(__webpack_exports__);
     this.fetchPlants();
   },
   methods: {
+    getVehicle: function getVehicle(id) {
+      var _this = this;
+
+      axios.get("/vehicle-specific/".concat(id)).then(function (response) {
+        _this.vehicle_fetch = response.data;
+        $('#editVehicleModal').modal('show');
+        _this.vehicle_copied.indicator_id == 2 ? _this.show_plant = false : _this.show_plant = true;
+      }).catch(function (error) {
+        _this.errors = error.response.data.errors;
+      });
+    },
     downloadAttachment: function downloadAttachment(id) {
       var base_url = window.location.origin;
       window.location = base_url + "/download-attachment/".concat(id);
@@ -9266,6 +9456,7 @@ __webpack_require__.r(__webpack_exports__);
     plantChange: function plantChange() {
       this.vehicle.indicator_id == 2 ? this.show_plant_add = false : this.show_plant_add = true;
       this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+      this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
     },
     customLabelPlant: function customLabelPlant(plant) {
       return "".concat(plant.name);
@@ -9281,93 +9472,93 @@ __webpack_require__.r(__webpack_exports__);
       this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
     },
     fetchVehicles: function fetchVehicles() {
-      var _this = this;
-
-      axios.get('/vehicle').then(function (response) {
-        _this.vehicles = response.data;
-      }).catch(function (error) {
-        _this.errors = error.response.data.error;
-      });
-    },
-    fetchCategories: function fetchCategories() {
       var _this2 = this;
 
-      axios.get('/categories').then(function (response) {
-        _this2.categories = response.data;
+      axios.get('/vehicle').then(function (response) {
+        _this2.vehicles = response.data;
       }).catch(function (error) {
         _this2.errors = error.response.data.error;
       });
     },
-    fetchCapacities: function fetchCapacities() {
+    fetchCategories: function fetchCategories() {
       var _this3 = this;
 
-      axios.get('/capacities').then(function (response) {
-        _this3.capacities = response.data;
+      axios.get('/categories').then(function (response) {
+        _this3.categories = response.data;
       }).catch(function (error) {
         _this3.errors = error.response.data.error;
       });
     },
-    fetchIndicators: function fetchIndicators() {
+    fetchCapacities: function fetchCapacities() {
       var _this4 = this;
 
-      axios.get('/indicators').then(function (response) {
-        _this4.indicators = response.data;
+      axios.get('/capacities').then(function (response) {
+        _this4.capacities = response.data;
       }).catch(function (error) {
         _this4.errors = error.response.data.error;
       });
     },
-    fetchGoods: function fetchGoods() {
+    fetchIndicators: function fetchIndicators() {
       var _this5 = this;
 
-      axios.get('/goods').then(function (response) {
-        _this5.goods = response.data;
+      axios.get('/indicators').then(function (response) {
+        _this5.indicators = response.data;
       }).catch(function (error) {
         _this5.errors = error.response.data.error;
       });
     },
-    fetchBasedTrucks: function fetchBasedTrucks() {
+    fetchGoods: function fetchGoods() {
       var _this6 = this;
 
-      axios.get('/based-trucks').then(function (response) {
-        _this6.based_trucks = response.data;
+      axios.get('/goods').then(function (response) {
+        _this6.goods = response.data;
       }).catch(function (error) {
         _this6.errors = error.response.data.error;
       });
     },
-    fetchContracts: function fetchContracts() {
+    fetchBasedTrucks: function fetchBasedTrucks() {
       var _this7 = this;
 
-      axios.get('/contracts').then(function (response) {
-        _this7.contracts = response.data;
+      axios.get('/based-trucks').then(function (response) {
+        _this7.based_trucks = response.data;
       }).catch(function (error) {
         _this7.errors = error.response.data.error;
       });
     },
-    fetchDocuments: function fetchDocuments() {
+    fetchContracts: function fetchContracts() {
       var _this8 = this;
 
-      axios.get('/documents').then(function (response) {
-        _this8.documents = response.data;
+      axios.get('/contracts').then(function (response) {
+        _this8.contracts = response.data;
       }).catch(function (error) {
         _this8.errors = error.response.data.error;
       });
     },
-    fetchTruckers: function fetchTruckers() {
+    fetchDocuments: function fetchDocuments() {
       var _this9 = this;
 
-      axios.get('/truckers').then(function (response) {
-        _this9.truckers = response.data;
+      axios.get('/documents').then(function (response) {
+        _this9.documents = response.data;
       }).catch(function (error) {
-        _this9.errors = error.response.data.errors;
+        _this9.errors = error.response.data.error;
+      });
+    },
+    fetchTruckers: function fetchTruckers() {
+      var _this10 = this;
+
+      axios.get('/truckers').then(function (response) {
+        _this10.truckers = response.data;
+      }).catch(function (error) {
+        _this10.errors = error.response.data.errors;
       });
     },
     fetchPlants: function fetchPlants() {
-      var _this10 = this;
+      var _this11 = this;
 
       axios.get('/plants').then(function (response) {
-        _this10.plants = response.data;
+        _this11.plants = response.data;
       }).catch(function (error) {
-        _this10.errors = error.response.data.errors;
+        _this11.errors = error.response.data.errors;
       });
     },
     prepareFields: function prepareFields() {
@@ -9412,7 +9603,7 @@ __webpack_require__.r(__webpack_exports__);
       document.getElementById('attachments').value = "";
     },
     addVehicle: function addVehicle(vehicle) {
-      var _this11 = this;
+      var _this12 = this;
 
       this.vehicle_added = false;
       this.loading = true;
@@ -9444,23 +9635,23 @@ __webpack_require__.r(__webpack_exports__);
       this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
       this.formData.append('plants', plantIds ? plantIds : '');
       axios.post('/vehicle', this.formData).then(function (response) {
-        _this11.vehicle_added = true;
+        _this12.vehicle_added = true;
 
-        _this11.vehicles.unshift(response.data);
+        _this12.vehicles.unshift(response.data);
 
-        _this11.resetForm();
+        _this12.resetForm();
 
         document.getElementById('check_btn').disabled = false;
-        _this11.loading = false;
+        _this12.loading = false;
       }).catch(function (error) {
-        _this11.errors = error.response.data.errors;
-        _this11.attachments = [];
+        _this12.errors = error.response.data.errors;
+        _this12.attachments = [];
         document.getElementById('check_btn').disabled = false;
-        _this11.loading = false;
+        _this12.loading = false;
       });
     },
     editVehicle: function editVehicle(vehicle) {
-      var _this12 = this;
+      var _this13 = this;
 
       this.vehicle_updated = false;
       this.loading = true;
@@ -9496,33 +9687,33 @@ __webpack_require__.r(__webpack_exports__);
       this.formData.append('plants', plantIds ? plantIds : '');
       this.formData.append('_method', 'PATCH');
       axios.post("/vehicle/".concat(vehicle.id), this.formData).then(function (response) {
-        _this12.vehicle_updated = true;
+        _this13.vehicle_updated = true;
 
-        _this12.vehicles.splice(index, 1, response.data);
+        _this13.vehicles.splice(index, 1, response.data);
 
         document.getElementById('edit_btn').disabled = false;
-        _this12.loading = false;
+        _this13.loading = false;
       }).catch(function (error) {
-        _this12.vehicle_updated = false;
-        _this12.errors = error.response.data.errors;
-        _this12.attachments = [];
+        _this13.vehicle_updated = false;
+        _this13.errors = error.response.data.errors;
+        _this13.attachments = [];
         document.getElementById('edit_btn').disabled = false;
-        _this12.loading = false;
+        _this13.loading = false;
       });
     },
     deleteVehicle: function deleteVehicle() {
-      var _this13 = this;
+      var _this14 = this;
 
       var index = this.vehicles.findIndex(function (item) {
-        return item.id == _this13.vehicle_id;
+        return item.id == _this14.vehicle_id;
       });
       axios.delete("/vehicle/".concat(this.vehicle_id)).then(function (response) {
         $('#deleteVehicleModal').modal('hide');
         alert('Vehicle successfully deleted');
 
-        _this13.vehicles.splice(index, 1);
+        _this14.vehicles.splice(index, 1);
       }).catch(function (error) {
-        _this13.errors = error.response.data.errors;
+        _this14.errors = error.response.data.errors;
       });
     },
     setPage: function setPage(pageNumber) {
@@ -9540,11 +9731,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     filteredVehicles: function filteredVehicles() {
-      var _this14 = this;
+      var _this15 = this;
 
       var self = this;
       return Object.values(self.vehicles).filter(function (vehicle) {
-        return vehicle.plate_number.toLowerCase().includes(_this14.keywords.toLowerCase());
+        return vehicle.plate_number.toLowerCase().includes(_this15.keywords.toLowerCase());
       });
     },
     totalPages: function totalPages() {
@@ -45481,14 +45672,10 @@ var render = function() {
                                     "a",
                                     {
                                       staticClass: "dropdown-item",
-                                      attrs: {
-                                        href: "javascript.void(0)",
-                                        "data-toggle": "modal",
-                                        "data-target": "#editVehicleModal"
-                                      },
+                                      staticStyle: { cursor: "pointer" },
                                       on: {
                                         click: function($event) {
-                                          return _vm.copyObject(vehicle)
+                                          return _vm.getVehicle(vehicle.id)
                                         }
                                       }
                                     },
@@ -45530,23 +45717,6 @@ var render = function() {
                           _c("td", [
                             _vm._v(_vm._s(vehicle.indicator.description))
                           ]),
-                          _vm._v(" "),
-                          vehicle.indicator_id == 2
-                            ? _c("td", [_vm._v(" ALL PLANT")])
-                            : _c(
-                                "td",
-                                _vm._l(vehicle.plants, function(plant, p) {
-                                  return _c("span", { key: p }, [
-                                    _vm._v(
-                                      "\n                                            " +
-                                        _vm._s(plant.name) +
-                                        " "
-                                    ),
-                                    _c("br")
-                                  ])
-                                }),
-                                0
-                              ),
                           _vm._v(" "),
                           _c("td", [
                             _vm._v(
@@ -46492,8 +46662,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.vehicle_copied.category_id,
-                                expression: "vehicle_copied.category_id"
+                                value: _vm.vehicle_fetch.category_id,
+                                expression: "vehicle_fetch.category_id"
                               }
                             ],
                             staticClass: "form-control",
@@ -46509,7 +46679,7 @@ var render = function() {
                                     return val
                                   })
                                 _vm.$set(
-                                  _vm.vehicle_copied,
+                                  _vm.vehicle_fetch,
                                   "category_id",
                                   $event.target.multiple
                                     ? $$selectedVal
@@ -46547,8 +46717,8 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.vehicle_copied.plate_number,
-                              expression: "vehicle_copied.plate_number"
+                              value: _vm.vehicle_fetch.plate_number,
+                              expression: "vehicle_fetch.plate_number"
                             }
                           ],
                           staticClass: "form-control",
@@ -46557,14 +46727,14 @@ var render = function() {
                             id: "plate_number",
                             disabled: ""
                           },
-                          domProps: { value: _vm.vehicle_copied.plate_number },
+                          domProps: { value: _vm.vehicle_fetch.plate_number },
                           on: {
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
                               }
                               _vm.$set(
-                                _vm.vehicle_copied,
+                                _vm.vehicle_fetch,
                                 "plate_number",
                                 $event.target.value
                               )
@@ -46593,8 +46763,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.vehicle_copied.indicator_id,
-                                expression: "vehicle_copied.indicator_id"
+                                value: _vm.vehicle_fetch.indicator_id,
+                                expression: "vehicle_fetch.indicator_id"
                               }
                             ],
                             staticClass: "form-control",
@@ -46611,7 +46781,7 @@ var render = function() {
                                       return val
                                     })
                                   _vm.$set(
-                                    _vm.vehicle_copied,
+                                    _vm.vehicle_fetch,
                                     "indicator_id",
                                     $event.target.multiple
                                       ? $$selectedVal
@@ -46662,11 +46832,11 @@ var render = function() {
                                   id: "selected_plant"
                                 },
                                 model: {
-                                  value: _vm.vehicle_copied.plants,
+                                  value: _vm.vehicle_fetch.plants,
                                   callback: function($$v) {
-                                    _vm.$set(_vm.vehicle_copied, "plants", $$v)
+                                    _vm.$set(_vm.vehicle_fetch, "plants", $$v)
                                   },
-                                  expression: "vehicle_copied.plants"
+                                  expression: "vehicle_fetch.plants"
                                 }
                               }),
                               _vm._v(" "),
@@ -46700,11 +46870,11 @@ var render = function() {
                             disabled: ""
                           },
                           model: {
-                            value: _vm.vehicle_copied.vendor,
+                            value: _vm.vehicle_fetch.vendor,
                             callback: function($$v) {
-                              _vm.$set(_vm.vehicle_copied, "vendor", $$v)
+                              _vm.$set(_vm.vehicle_fetch, "vendor", $$v)
                             },
-                            expression: "vehicle_copied.vendor"
+                            expression: "vehicle_fetch.vendor"
                           }
                         }),
                         _vm._v(" "),
@@ -46734,11 +46904,11 @@ var render = function() {
                             disabled: ""
                           },
                           model: {
-                            value: _vm.vehicle_copied.subcon_vendor,
+                            value: _vm.vehicle_fetch.subcon_vendor,
                             callback: function($$v) {
-                              _vm.$set(_vm.vehicle_copied, "subcon_vendor", $$v)
+                              _vm.$set(_vm.vehicle_fetch, "subcon_vendor", $$v)
                             },
-                            expression: "vehicle_copied.subcon_vendor"
+                            expression: "vehicle_fetch.subcon_vendor"
                           }
                         }),
                         _vm._v(" "),
@@ -46764,8 +46934,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.vehicle_copied.capacity_id,
-                                expression: "vehicle_copied.capacity_id"
+                                value: _vm.vehicle_fetch.capacity_id,
+                                expression: "vehicle_fetch.capacity_id"
                               }
                             ],
                             staticClass: "form-control",
@@ -46780,7 +46950,7 @@ var render = function() {
                                     return val
                                   })
                                 _vm.$set(
-                                  _vm.vehicle_copied,
+                                  _vm.vehicle_fetch,
                                   "capacity_id",
                                   $event.target.multiple
                                     ? $$selectedVal
@@ -46822,8 +46992,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.vehicle_copied.good_id,
-                                expression: "vehicle_copied.good_id"
+                                value: _vm.vehicle_fetch.good_id,
+                                expression: "vehicle_fetch.good_id"
                               }
                             ],
                             staticClass: "form-control",
@@ -46838,7 +47008,7 @@ var render = function() {
                                     return val
                                   })
                                 _vm.$set(
-                                  _vm.vehicle_copied,
+                                  _vm.vehicle_fetch,
                                   "good_id",
                                   $event.target.multiple
                                     ? $$selectedVal
@@ -46880,8 +47050,8 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.vehicle_copied.allowed_total_weight,
-                              expression: "vehicle_copied.allowed_total_weight"
+                              value: _vm.vehicle_fetch.allowed_total_weight,
+                              expression: "vehicle_fetch.allowed_total_weight"
                             }
                           ],
                           staticClass: "form-control",
@@ -46891,7 +47061,7 @@ var render = function() {
                             maxlength: "20"
                           },
                           domProps: {
-                            value: _vm.vehicle_copied.allowed_total_weight
+                            value: _vm.vehicle_fetch.allowed_total_weight
                           },
                           on: {
                             keypress: _vm.onlyNumber,
@@ -46900,7 +47070,7 @@ var render = function() {
                                 return
                               }
                               _vm.$set(
-                                _vm.vehicle_copied,
+                                _vm.vehicle_fetch,
                                 "allowed_total_weight",
                                 $event.target.value
                               )
@@ -46929,8 +47099,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.vehicle_copied.based_truck_id,
-                                expression: "vehicle_copied.based_truck_id"
+                                value: _vm.vehicle_fetch.based_truck_id,
+                                expression: "vehicle_fetch.based_truck_id"
                               }
                             ],
                             staticClass: "form-control",
@@ -46945,7 +47115,7 @@ var render = function() {
                                     return val
                                   })
                                 _vm.$set(
-                                  _vm.vehicle_copied,
+                                  _vm.vehicle_fetch,
                                   "based_truck_id",
                                   $event.target.multiple
                                     ? $$selectedVal
@@ -46987,8 +47157,8 @@ var render = function() {
                               {
                                 name: "model",
                                 rawName: "v-model",
-                                value: _vm.vehicle_copied.contract_id,
-                                expression: "vehicle_copied.contract_id"
+                                value: _vm.vehicle_fetch.contract_id,
+                                expression: "vehicle_fetch.contract_id"
                               }
                             ],
                             staticClass: "form-control",
@@ -47003,7 +47173,7 @@ var render = function() {
                                     return val
                                   })
                                 _vm.$set(
-                                  _vm.vehicle_copied,
+                                  _vm.vehicle_fetch,
                                   "contract_id",
                                   $event.target.multiple
                                     ? $$selectedVal
@@ -47045,8 +47215,8 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.vehicle_copied.remarks,
-                              expression: "vehicle_copied.remarks"
+                              value: _vm.vehicle_fetch.remarks,
+                              expression: "vehicle_fetch.remarks"
                             }
                           ],
                           staticClass: "form-control",
@@ -47055,14 +47225,14 @@ var render = function() {
                             id: "remarks",
                             maxlength: "40"
                           },
-                          domProps: { value: _vm.vehicle_copied.remarks },
+                          domProps: { value: _vm.vehicle_fetch.remarks },
                           on: {
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
                               }
                               _vm.$set(
-                                _vm.vehicle_copied,
+                                _vm.vehicle_fetch,
                                 "remarks",
                                 $event.target.value
                               )
@@ -47116,14 +47286,14 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.vehicle_copied.validity_start_date,
-                              expression: "vehicle_copied.validity_start_date"
+                              value: _vm.vehicle_fetch.validity_start_date,
+                              expression: "vehicle_fetch.validity_start_date"
                             }
                           ],
                           staticClass: "form-control",
                           attrs: { type: "date", id: "validity_start_date" },
                           domProps: {
-                            value: _vm.vehicle_copied.validity_start_date
+                            value: _vm.vehicle_fetch.validity_start_date
                           },
                           on: {
                             input: function($event) {
@@ -47131,7 +47301,7 @@ var render = function() {
                                 return
                               }
                               _vm.$set(
-                                _vm.vehicle_copied,
+                                _vm.vehicle_fetch,
                                 "validity_start_date",
                                 $event.target.value
                               )
@@ -47160,14 +47330,14 @@ var render = function() {
                             {
                               name: "model",
                               rawName: "v-model",
-                              value: _vm.vehicle_copied.validity_end_date,
-                              expression: "vehicle_copied.validity_end_date"
+                              value: _vm.vehicle_fetch.validity_end_date,
+                              expression: "vehicle_fetch.validity_end_date"
                             }
                           ],
                           staticClass: "form-control",
                           attrs: { type: "date", id: "validity_end_date" },
                           domProps: {
-                            value: _vm.vehicle_copied.validity_end_date
+                            value: _vm.vehicle_fetch.validity_end_date
                           },
                           on: {
                             input: function($event) {
@@ -47175,7 +47345,7 @@ var render = function() {
                                 return
                               }
                               _vm.$set(
-                                _vm.vehicle_copied,
+                                _vm.vehicle_fetch,
                                 "validity_end_date",
                                 $event.target.value
                               )
@@ -47201,7 +47371,7 @@ var render = function() {
                       attrs: { id: "edit_btn", type: "button" },
                       on: {
                         click: function($event) {
-                          return _vm.editVehicle(_vm.vehicle_copied)
+                          return _vm.editVehicle(_vm.vehicle_fetch)
                         }
                       }
                     },
@@ -47487,8 +47657,6 @@ var staticRenderFns = [
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Plate number")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Plant Indicator")]),
-        _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("Plant")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Vendor")]),
         _vm._v(" "),
