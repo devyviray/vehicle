@@ -47530,106 +47530,12 @@ var staticRenderFns = [
     return _c(
       "div",
       {
-        staticClass: "header pb-8 pt-5 pt-md-8",
+        staticClass: "header pt-md-8",
         staticStyle: { "background-color": "#04703e" }
       },
       [
         _c("div", { staticClass: "container-fluid" }, [
-          _c("div", { staticClass: "header-body" }, [
-            _c("div", { staticClass: "row" }, [
-              _c("div", { staticClass: "col-xl-3 col-lg-6" }, [
-                _c("div", { staticClass: "card card-stats mb-4 mb-xl-0" }, [
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "row" }, [
-                      _c("div", { staticClass: "col" }),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-auto" }, [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "icon icon-shape bg-danger text-white rounded-circle shadow"
-                          },
-                          [_c("i", { staticClass: "fas fa-chart-bar" })]
-                        )
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("p", { staticClass: "mt-3 mb-0 text-muted text-sm" })
-                  ])
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-xl-3 col-lg-6" }, [
-                _c("div", { staticClass: "card card-stats mb-4 mb-xl-0" }, [
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "row" }, [
-                      _c("div", { staticClass: "col" }),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-auto" }, [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "icon icon-shape bg-warning text-white rounded-circle shadow"
-                          },
-                          [_c("i", { staticClass: "fas fa-chart-pie" })]
-                        )
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("p", { staticClass: "mt-3 mb-0 text-muted text-sm" })
-                  ])
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-xl-3 col-lg-6" }, [
-                _c("div", { staticClass: "card card-stats mb-4 mb-xl-0" }, [
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "row" }, [
-                      _c("div", { staticClass: "col" }),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-auto" }, [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "icon icon-shape bg-yellow text-white rounded-circle shadow"
-                          },
-                          [_c("i", { staticClass: "fas fa-users" })]
-                        )
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("p", { staticClass: "mt-3 mb-0 text-muted text-sm" })
-                  ])
-                ])
-              ]),
-              _vm._v(" "),
-              _c("div", { staticClass: "col-xl-3 col-lg-6" }, [
-                _c("div", { staticClass: "card card-stats mb-4 mb-xl-0" }, [
-                  _c("div", { staticClass: "card-body" }, [
-                    _c("div", { staticClass: "row" }, [
-                      _c("div", { staticClass: "col" }),
-                      _vm._v(" "),
-                      _c("div", { staticClass: "col-auto" }, [
-                        _c(
-                          "div",
-                          {
-                            staticClass:
-                              "icon icon-shape bg-info text-white rounded-circle shadow"
-                          },
-                          [_c("i", { staticClass: "fas fa-percent" })]
-                        )
-                      ])
-                    ]),
-                    _vm._v(" "),
-                    _c("p", { staticClass: "mt-3 mb-0 text-muted text-sm" })
-                  ])
-                ])
-              ])
-            ])
-          ])
+          _c("div", { staticClass: "header-body" })
         ])
       ]
     )
