@@ -8584,6 +8584,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-multiselect */ "./node_modules/vue-multiselect/dist/vue-multiselect.min.js");
 /* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue_multiselect__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _Loader__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Loader */ "./resources/js/components/Loader.vue");
+/* harmony import */ var vue_content_placeholders__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-content-placeholders */ "./node_modules/vue-content-placeholders/index.js");
 //
 //
 //
@@ -9103,6 +9104,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
 
 
 
@@ -9111,7 +9122,8 @@ __webpack_require__.r(__webpack_exports__);
   components: {
     vSelect: vue_select__WEBPACK_IMPORTED_MODULE_0___default.a,
     Multiselect: vue_multiselect__WEBPACK_IMPORTED_MODULE_1___default.a,
-    loader: _Loader__WEBPACK_IMPORTED_MODULE_2__["default"]
+    loader: _Loader__WEBPACK_IMPORTED_MODULE_2__["default"],
+    VueContentPlaceholders: vue_content_placeholders__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   data: function data() {
     return {
@@ -9141,7 +9153,8 @@ __webpack_require__.r(__webpack_exports__);
       show_plant_add: false,
       vehicle_added: false,
       vehicle_updated: false,
-      loading: false
+      loading: false,
+      table_loading: false
     };
   },
   created: function created() {
@@ -9202,8 +9215,10 @@ __webpack_require__.r(__webpack_exports__);
     fetchVehicles: function fetchVehicles() {
       var _this2 = this;
 
+      this.table_loading = true;
       axios.get('/vehicle').then(function (response) {
         _this2.vehicles = response.data;
+        _this2.table_loading = false;
       }).catch(function (error) {
         _this2.errors = error.response.data.error;
       });
@@ -14551,6 +14566,25 @@ __webpack_require__.r(__webpack_exports__);
 
 }));
 //# sourceMappingURL=bootstrap.js.map
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-content-placeholders/dist/vue-content-placeholders.css":
+/*!*****************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--5-1!./node_modules/postcss-loader/src??ref--5-2!./node_modules/vue-content-placeholders/dist/vue-content-placeholders.css ***!
+  \*****************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n@keyframes vueContentPlaceholdersAnimation {\n0% {\n    transform: translate3d(-30%, 0, 0);\n}\n100% {\n    transform: translate3d(100%, 0, 0);\n}\n}\n.vue-content-placeholders-heading {\n  display: flex;\n}\n[class^=\"vue-content-placeholders-\"] + .vue-content-placeholders-heading {\n    margin-top: 20px;\n}\n.vue-content-placeholders-heading__img {\n    position: relative;\n    overflow: hidden;\n    height: 15px;\n    background: #eee;\n    width: 60px;\n    height: 60px;\n    margin-right: 15px;\n}\n.vue-content-placeholders-is-rounded .vue-content-placeholders-heading__img {\n      border-radius: 6px;\n}\n.vue-content-placeholders-is-centered .vue-content-placeholders-heading__img {\n      margin-left: auto;\n      margin-right: auto;\n}\n.vue-content-placeholders-is-animated .vue-content-placeholders-heading__img::before {\n      content: '';\n      position: absolute;\n      top: 0;\n      left: 0;\n      width: 100vw;\n      max-width: 1000px;\n      height: 100%;\n      background: linear-gradient(to right, transparent 0%, #e1e1e1 15%, transparent 30%);\n      animation-duration: 1.5s;\n      animation-fill-mode: forwards;\n      animation-iteration-count: infinite;\n      animation-name: vueContentPlaceholdersAnimation;\n      animation-timing-function: linear;\n}\n.vue-content-placeholders-heading__content {\n    display: flex;\n    flex: 1;\n    flex-direction: column;\n    justify-content: center;\n}\n.vue-content-placeholders-heading__title {\n    position: relative;\n    overflow: hidden;\n    height: 15px;\n    background: #eee;\n    width: 85%;\n    margin-bottom: 10px;\n    background: #ccc;\n}\n.vue-content-placeholders-is-rounded .vue-content-placeholders-heading__title {\n      border-radius: 6px;\n}\n.vue-content-placeholders-is-centered .vue-content-placeholders-heading__title {\n      margin-left: auto;\n      margin-right: auto;\n}\n.vue-content-placeholders-is-animated .vue-content-placeholders-heading__title::before {\n      content: '';\n      position: absolute;\n      top: 0;\n      left: 0;\n      width: 100vw;\n      max-width: 1000px;\n      height: 100%;\n      background: linear-gradient(to right, transparent 0%, #e1e1e1 15%, transparent 30%);\n      animation-duration: 1.5s;\n      animation-fill-mode: forwards;\n      animation-iteration-count: infinite;\n      animation-name: vueContentPlaceholdersAnimation;\n      animation-timing-function: linear;\n}\n.vue-content-placeholders-heading__subtitle {\n    position: relative;\n    overflow: hidden;\n    height: 15px;\n    background: #eee;\n    width: 90%;\n}\n.vue-content-placeholders-is-rounded .vue-content-placeholders-heading__subtitle {\n      border-radius: 6px;\n}\n.vue-content-placeholders-is-centered .vue-content-placeholders-heading__subtitle {\n      margin-left: auto;\n      margin-right: auto;\n}\n.vue-content-placeholders-is-animated .vue-content-placeholders-heading__subtitle::before {\n      content: '';\n      position: absolute;\n      top: 0;\n      left: 0;\n      width: 100vw;\n      max-width: 1000px;\n      height: 100%;\n      background: linear-gradient(to right, transparent 0%, #e1e1e1 15%, transparent 30%);\n      animation-duration: 1.5s;\n      animation-fill-mode: forwards;\n      animation-iteration-count: infinite;\n      animation-name: vueContentPlaceholdersAnimation;\n      animation-timing-function: linear;\n}\n[class^=\"vue-content-placeholders-\"] + .vue-content-placeholders-text {\n  margin-top: 20px;\n}\n.vue-content-placeholders-text__line {\n  position: relative;\n  overflow: hidden;\n  height: 15px;\n  background: #eee;\n  width: 100%;\n  margin-bottom: 10px;\n}\n.vue-content-placeholders-is-rounded .vue-content-placeholders-text__line {\n    border-radius: 6px;\n}\n.vue-content-placeholders-is-centered .vue-content-placeholders-text__line {\n    margin-left: auto;\n    margin-right: auto;\n}\n.vue-content-placeholders-is-animated .vue-content-placeholders-text__line::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100vw;\n    max-width: 1000px;\n    height: 100%;\n    background: linear-gradient(to right, transparent 0%, #e1e1e1 15%, transparent 30%);\n    animation-duration: 1.5s;\n    animation-fill-mode: forwards;\n    animation-iteration-count: infinite;\n    animation-name: vueContentPlaceholdersAnimation;\n    animation-timing-function: linear;\n}\n.vue-content-placeholders-text__line:nth-child(4n + 1) {\n    width: 80%;\n}\n.vue-content-placeholders-text__line:nth-child(4n + 2) {\n    width: 100%;\n}\n.vue-content-placeholders-text__line:nth-child(4n + 3) {\n    width: 70%;\n}\n.vue-content-placeholders-text__line:nth-child(4n + 4) {\n    width: 85%;\n}\n.vue-content-placeholders-img {\n  position: relative;\n  overflow: hidden;\n  height: 15px;\n  background: #eee;\n  width: 100%;\n  height: 120px;\n}\n.vue-content-placeholders-is-rounded .vue-content-placeholders-img {\n    border-radius: 6px;\n}\n.vue-content-placeholders-is-centered .vue-content-placeholders-img {\n    margin-left: auto;\n    margin-right: auto;\n}\n.vue-content-placeholders-is-animated .vue-content-placeholders-img::before {\n    content: '';\n    position: absolute;\n    top: 0;\n    left: 0;\n    width: 100vw;\n    max-width: 1000px;\n    height: 100%;\n    background: linear-gradient(to right, transparent 0%, #e1e1e1 15%, transparent 30%);\n    animation-duration: 1.5s;\n    animation-fill-mode: forwards;\n    animation-iteration-count: infinite;\n    animation-name: vueContentPlaceholdersAnimation;\n    animation-timing-function: linear;\n}\n[class^=\"vue-content-placeholders-\"] + .vue-content-placeholders-img {\n    margin-top: 20px;\n}\n", ""]);
+
+// exports
 
 
 /***/ }),
@@ -45831,6 +45865,70 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
+/***/ "./node_modules/vue-content-placeholders/dist/vue-content-placeholders.common.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/vue-content-placeholders/dist/vue-content-placeholders.common.js ***!
+  \***************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+/* WEBPACK VAR INJECTION */(function(global) {module.exports=function(modules){function __webpack_require__(moduleId){if(installedModules[moduleId])return installedModules[moduleId].exports;var module=installedModules[moduleId]={i:moduleId,l:!1,exports:{}};return modules[moduleId].call(module.exports,module,module.exports,__webpack_require__),module.l=!0,module.exports}var installedModules={};return __webpack_require__.m=modules,__webpack_require__.c=installedModules,__webpack_require__.i=function(value){return value},__webpack_require__.d=function(exports,name,getter){__webpack_require__.o(exports,name)||Object.defineProperty(exports,name,{configurable:!1,enumerable:!0,get:getter})},__webpack_require__.n=function(module){var getter=module&&module.__esModule?function(){return module.default}:function(){return module};return __webpack_require__.d(getter,"a",getter),getter},__webpack_require__.o=function(object,property){return Object.prototype.hasOwnProperty.call(object,property)},__webpack_require__.p="",__webpack_require__(__webpack_require__.s=5)}([function(module,exports){module.exports=function(rawScriptExports,compiledTemplate,scopeId,cssModules){var esModule,scriptExports=rawScriptExports=rawScriptExports||{},type=typeof rawScriptExports.default;"object"!==type&&"function"!==type||(esModule=rawScriptExports,scriptExports=rawScriptExports.default);var options="function"==typeof scriptExports?scriptExports.options:scriptExports;if(compiledTemplate&&(options.render=compiledTemplate.render,options.staticRenderFns=compiledTemplate.staticRenderFns),scopeId&&(options._scopeId=scopeId),cssModules){var computed=options.computed||(options.computed={});Object.keys(cssModules).forEach(function(key){var module=cssModules[key];computed[key]=function(){return module}})}return{esModule:esModule,exports:scriptExports,options:options}}},function(module,exports,__webpack_require__){__webpack_require__(10);var Component=__webpack_require__(0)(__webpack_require__(6),__webpack_require__(12),null,null);module.exports=Component.exports},function(module,exports,__webpack_require__){var Component=__webpack_require__(0)(__webpack_require__(7),__webpack_require__(11),null,null);module.exports=Component.exports},function(module,exports,__webpack_require__){var Component=__webpack_require__(0)(__webpack_require__(8),__webpack_require__(14),null,null);module.exports=Component.exports},function(module,exports,__webpack_require__){var Component=__webpack_require__(0)(__webpack_require__(9),__webpack_require__(13),null,null);module.exports=Component.exports},function(module,exports,__webpack_require__){"use strict";function _interopRequireDefault(obj){return obj&&obj.__esModule?obj:{default:obj}}function install(Vue){Vue.component("ContentPlaceholders",_ContentPlaceholders2.default),Vue.component("ContentPlaceholdersHeading",_ContentPlaceholdersHeading2.default),Vue.component("ContentPlaceholdersImg",_ContentPlaceholdersImg2.default),Vue.component("ContentPlaceholdersText",_ContentPlaceholdersText2.default)}Object.defineProperty(exports,"__esModule",{value:!0}),exports.ContentPlaceholdersText=exports.ContentPlaceholdersImg=exports.ContentPlaceholdersHeading=exports.ContentPlaceholders=void 0,exports.install=install;var _ContentPlaceholders=__webpack_require__(1),_ContentPlaceholders2=_interopRequireDefault(_ContentPlaceholders),_ContentPlaceholdersHeading=__webpack_require__(2),_ContentPlaceholdersHeading2=_interopRequireDefault(_ContentPlaceholdersHeading),_ContentPlaceholdersImg=__webpack_require__(3),_ContentPlaceholdersImg2=_interopRequireDefault(_ContentPlaceholdersImg),_ContentPlaceholdersText=__webpack_require__(4),_ContentPlaceholdersText2=_interopRequireDefault(_ContentPlaceholdersText);exports.ContentPlaceholders=_ContentPlaceholders2.default,exports.ContentPlaceholdersHeading=_ContentPlaceholdersHeading2.default,exports.ContentPlaceholdersImg=_ContentPlaceholdersImg2.default,exports.ContentPlaceholdersText=_ContentPlaceholdersText2.default;var plugin={version:"0.2.1",install:install};exports.default=plugin;var GlobalVue=null;"undefined"!=typeof window?GlobalVue=window.Vue:"undefined"!=typeof global&&(GlobalVue=global.Vue),GlobalVue&&GlobalVue.use(plugin)},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default={name:"content-placeholders",computed:{classObject:function(){return{"vue-content-placeholders":!0,"vue-content-placeholders-is-rounded":this.rounded,"vue-content-placeholders-is-centered":this.centered,"vue-content-placeholders-is-animated":this.animated}}},props:{rounded:{type:Boolean,default:!1},centered:{type:Boolean,default:!1},animated:{type:Boolean,default:!0}}}},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default={name:"content-placeholders-heading",data:function(){return{className:"vue-content-placeholders-heading"}},props:{img:{type:Boolean,default:!1}}}},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default={name:"content-placeholders-img",data:function(){return{className:"vue-content-placeholders-img"}}}},function(module,exports,__webpack_require__){"use strict";Object.defineProperty(exports,"__esModule",{value:!0}),exports.default={name:"content-placeholders-text",data:function(){return{className:"vue-content-placeholders-text"}},props:{lines:{type:Number,default:4}}}},function(module,exports){},function(module,exports){module.exports={render:function(){var _vm=this,_h=_vm.$createElement,_c=_vm._self._c||_h;return _c("div",{class:_vm.className},[_vm.img?_c("div",{class:_vm.className+"__img"}):_vm._e(),_vm._v(" "),_c("div",{class:_vm.className+"__content"},[_c("div",{class:_vm.className+"__title"}),_vm._v(" "),_c("div",{class:_vm.className+"__subtitle"})])])},staticRenderFns:[]}},function(module,exports){module.exports={render:function(){var _vm=this,_h=_vm.$createElement;return(_vm._self._c||_h)("div",{class:_vm.classObject},[_vm._t("default")],2)},staticRenderFns:[]}},function(module,exports){module.exports={render:function(){var _vm=this,_h=_vm.$createElement,_c=_vm._self._c||_h;return _c("div",{class:_vm.className},_vm._l(_vm.lines,function(n){return _c("div",{key:n,class:_vm.className+"__line"})}))},staticRenderFns:[]}},function(module,exports){module.exports={render:function(){var _vm=this,_h=_vm.$createElement;return(_vm._self._c||_h)("div",{class:_vm.className})},staticRenderFns:[]}}]);
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(/*! ./../../webpack/buildin/global.js */ "./node_modules/webpack/buildin/global.js")))
+
+/***/ }),
+
+/***/ "./node_modules/vue-content-placeholders/dist/vue-content-placeholders.css":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/vue-content-placeholders/dist/vue-content-placeholders.css ***!
+  \*********************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../css-loader??ref--5-1!../../postcss-loader/src??ref--5-2!./vue-content-placeholders.css */ "./node_modules/css-loader/index.js?!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-content-placeholders/dist/vue-content-placeholders.css");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-content-placeholders/index.js":
+/*!********************************************************!*\
+  !*** ./node_modules/vue-content-placeholders/index.js ***!
+  \********************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _dist_vue_content_placeholders_common__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./dist/vue-content-placeholders.common */ "./node_modules/vue-content-placeholders/dist/vue-content-placeholders.common.js");
+/* harmony import */ var _dist_vue_content_placeholders_common__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_dist_vue_content_placeholders_common__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (default from non-harmony) */ __webpack_require__.d(__webpack_exports__, "default", function() { return _dist_vue_content_placeholders_common__WEBPACK_IMPORTED_MODULE_0___default.a; });
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _dist_vue_content_placeholders_common__WEBPACK_IMPORTED_MODULE_0__) if(["default","default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _dist_vue_content_placeholders_common__WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+/* harmony import */ var _dist_vue_content_placeholders_css__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./dist/vue-content-placeholders.css */ "./node_modules/vue-content-placeholders/dist/vue-content-placeholders.css");
+/* harmony import */ var _dist_vue_content_placeholders_css__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_dist_vue_content_placeholders_css__WEBPACK_IMPORTED_MODULE_1__);
+
+
+
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Dashboard.vue?vue&type=template&id=040e2ab9&":
 /*!************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Dashboard.vue?vue&type=template&id=040e2ab9& ***!
@@ -45927,126 +46025,160 @@ var render = function() {
                     _vm._v(" "),
                     _c(
                       "tbody",
-                      _vm._l(_vm.filteredQueues, function(vehicle, v) {
-                        return _c("tr", { key: v }, [
-                          _c("td", { staticClass: "text-right" }, [
-                            _vm.userLevel > 2
-                              ? _c("div", { staticClass: "dropdown" }, [
-                                  _vm._m(3, true),
-                                  _vm._v(" "),
+                      [
+                        _vm.table_loading
+                          ? _c("tr", [
+                              _c(
+                                "td",
+                                { attrs: { colspan: "15" } },
+                                [
                                   _c(
-                                    "div",
-                                    {
-                                      staticClass:
-                                        "dropdown-menu dropdown-menu-right dropdown-menu-arrow"
-                                    },
+                                    "content-placeholders",
                                     [
-                                      _c(
-                                        "a",
-                                        {
-                                          staticClass: "dropdown-item",
-                                          staticStyle: { cursor: "pointer" },
-                                          on: {
-                                            click: function($event) {
-                                              return _vm.getVehicle(vehicle.id)
-                                            }
-                                          }
-                                        },
-                                        [_vm._v("Edit")]
-                                      ),
+                                      _c("content-placeholders-heading", {
+                                        attrs: { img: true }
+                                      }),
                                       _vm._v(" "),
-                                      _c(
-                                        "a",
-                                        {
-                                          staticClass: "dropdown-item",
-                                          attrs: {
-                                            href: "javascript.void(0)",
-                                            "data-toggle": "modal",
-                                            "data-target": "#viewDocumentsModal"
-                                          },
-                                          on: {
-                                            click: function($event) {
-                                              return _vm.copyObject(vehicle)
+                                      _c("content-placeholders-text", {
+                                        attrs: { lines: 3 }
+                                      })
+                                    ],
+                                    1
+                                  )
+                                ],
+                                1
+                              )
+                            ])
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _vm._l(_vm.filteredQueues, function(vehicle, v) {
+                          return _c("tr", { key: v }, [
+                            _c("td", { staticClass: "text-right" }, [
+                              _vm.userLevel > 2
+                                ? _c("div", { staticClass: "dropdown" }, [
+                                    _vm._m(3, true),
+                                    _vm._v(" "),
+                                    _c(
+                                      "div",
+                                      {
+                                        staticClass:
+                                          "dropdown-menu dropdown-menu-right dropdown-menu-arrow"
+                                      },
+                                      [
+                                        _c(
+                                          "a",
+                                          {
+                                            staticClass: "dropdown-item",
+                                            staticStyle: { cursor: "pointer" },
+                                            on: {
+                                              click: function($event) {
+                                                return _vm.getVehicle(
+                                                  vehicle.id
+                                                )
+                                              }
                                             }
-                                          }
-                                        },
-                                        [_vm._v("View Document")]
-                                      )
-                                    ]
+                                          },
+                                          [_vm._v("Edit")]
+                                        ),
+                                        _vm._v(" "),
+                                        _c(
+                                          "a",
+                                          {
+                                            staticClass: "dropdown-item",
+                                            attrs: {
+                                              href: "javascript.void(0)",
+                                              "data-toggle": "modal",
+                                              "data-target":
+                                                "#viewDocumentsModal"
+                                            },
+                                            on: {
+                                              click: function($event) {
+                                                return _vm.copyObject(vehicle)
+                                              }
+                                            }
+                                          },
+                                          [_vm._v("View Document")]
+                                        )
+                                      ]
+                                    )
+                                  ])
+                                : _vm._e()
+                            ]),
+                            _vm._v(" "),
+                            _c("td", { attrs: { scope: "row" } }, [
+                              _vm._v(_vm._s(vehicle.id))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(vehicle.category.description))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(vehicle.plate_number))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(vehicle.indicator.description))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(
+                                _vm._s(vehicle.vendor.vendor_description_lfug)
+                              )
+                            ]),
+                            _vm._v(" "),
+                            vehicle.subcon_vendor
+                              ? _c("td", [
+                                  _vm._v(
+                                    _vm._s(
+                                      vehicle.subcon_vendor
+                                        .vendor_description_lfug
+                                    )
                                   )
                                 ])
-                              : _vm._e()
-                          ]),
-                          _vm._v(" "),
-                          _c("td", { attrs: { scope: "row" } }, [
-                            _vm._v(_vm._s(vehicle.id))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(vehicle.category.description))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(vehicle.plate_number))]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(vehicle.indicator.description))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(
-                              _vm._s(vehicle.vendor.vendor_description_lfug)
-                            )
-                          ]),
-                          _vm._v(" "),
-                          vehicle.subcon_vendor
-                            ? _c("td", [
-                                _vm._v(
-                                  _vm._s(
-                                    vehicle.subcon_vendor
-                                      .vendor_description_lfug
-                                  )
-                                )
-                              ])
-                            : _c("td"),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(vehicle.capacity.description))
-                          ]),
-                          _vm._v(" "),
-                          vehicle.good
-                            ? _c("td", [
-                                _vm._v(_vm._s(vehicle.good.description))
-                              ])
-                            : _c("td"),
-                          _vm._v(" "),
-                          vehicle.allowed_total_weight
-                            ? _c("td", [
-                                _vm._v(_vm._s(vehicle.allowed_total_weight))
-                              ])
-                            : _c("td"),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(vehicle.based_truck.description))
-                          ]),
-                          _vm._v(" "),
-                          vehicle.remarks
-                            ? _c("td", [_vm._v(_vm._s(vehicle.remarks))])
-                            : _c("td"),
-                          _vm._v(" "),
-                          vehicle.contract
-                            ? _c("td", [_vm._v(_vm._s(vehicle.contract.code))])
-                            : _c("td"),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(vehicle.user.name))]),
-                          _vm._v(" "),
-                          _c("td", [
-                            _vm._v(_vm._s(vehicle.validity_start_date))
-                          ]),
-                          _vm._v(" "),
-                          _c("td", [_vm._v(_vm._s(vehicle.validity_end_date))])
-                        ])
-                      }),
-                      0
+                              : _c("td"),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(vehicle.capacity.description))
+                            ]),
+                            _vm._v(" "),
+                            vehicle.good
+                              ? _c("td", [
+                                  _vm._v(_vm._s(vehicle.good.description))
+                                ])
+                              : _c("td"),
+                            _vm._v(" "),
+                            vehicle.allowed_total_weight
+                              ? _c("td", [
+                                  _vm._v(_vm._s(vehicle.allowed_total_weight))
+                                ])
+                              : _c("td"),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(vehicle.based_truck.description))
+                            ]),
+                            _vm._v(" "),
+                            vehicle.remarks
+                              ? _c("td", [_vm._v(_vm._s(vehicle.remarks))])
+                              : _c("td"),
+                            _vm._v(" "),
+                            vehicle.contract
+                              ? _c("td", [
+                                  _vm._v(_vm._s(vehicle.contract.code))
+                                ])
+                              : _c("td"),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(vehicle.user.name))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(vehicle.validity_start_date))
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _vm._v(_vm._s(vehicle.validity_end_date))
+                            ])
+                          ])
+                        })
+                      ],
+                      2
                     )
                   ]
                 )

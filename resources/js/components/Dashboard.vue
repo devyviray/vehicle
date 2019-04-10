@@ -50,6 +50,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <tr v-if="table_loading">
+                                        <td colspan="15">
+                                            <content-placeholders>
+                                                <content-placeholders-heading :img="true" />
+                                                <content-placeholders-text :lines="3" />
+                                            </content-placeholders>
+                                        </td>
+                                    </tr>
+
                                     <tr v-for="(vehicle, v) in filteredQueues" v-bind:key="v">
                                         <td class="text-right">
                                             <div class="dropdown" v-if="userLevel > 2">
@@ -521,12 +530,15 @@
 import vSelect from 'vue-select'
 import Multiselect from 'vue-multiselect'
 import loader from './Loader'
+import VueContentPlaceholders from 'vue-content-placeholders'
+
 export default {
     props:['userLevel'],
     components: {
         vSelect,
         Multiselect,
-        loader
+        loader,
+        VueContentPlaceholders
     },
     data(){
         return {
@@ -556,7 +568,8 @@ export default {
             show_plant_add: false,
             vehicle_added: false,
             vehicle_updated: false,
-            loading: false
+            loading: false,
+            table_loading: false
         }
     },
     created(){
@@ -613,9 +626,11 @@ export default {
             this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
         fetchVehicles(){
+            this.table_loading = true;
             axios.get('/vehicle')
             .then(response => { 
                 this.vehicles = response.data;
+                this.table_loading = false;
             })
             .catch(error => { 
                 this.errors = error.response.data.error;
