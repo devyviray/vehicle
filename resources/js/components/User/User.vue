@@ -49,6 +49,7 @@
                                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                                     <a class="dropdown-item" data-toggle="modal" data-target="#editModal" style="cursor: pointer" @click="copyObject(user)">Edit</a>
                                                     <a class="dropdown-item" data-toggle="modal" data-target="#deleteModal" style="cursor: pointer" @click="copyObject(user)">Delete</a>
+                                                    <a class="dropdown-item" data-toggle="modal" data-target="#changePasswordModal" style="cursor: pointer" @click="copyObject(user)">Change Password</a>
                                                 </div>
                                             </div>
                                         </td>
@@ -118,18 +119,18 @@
                                 </div>
                             </div>
                         </div>
-                        <div class=row>
+                        <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="role">Role*</label> 
-                                    <select class="form-control" v-model="user.role">
+                                    <select class="form-control" v-model="user.role" @change="changeRole(user.role)">
                                         <option v-for="(role,r) in roles" v-bind:key="r" :value="role.id"> {{ role.name }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.role">The indicator field is required</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" v-if="show_based_trucks">
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-control-label" for="role">Based Trucks</label>
@@ -139,10 +140,10 @@
                                             :multiple="true"
                                             track-by="id"
                                             :custom-label="customLabel"
-                                            placeholder="Select based_trucks"
+                                            placeholder="Select based truck"
                                         >
                                     </multiselect>
-                                    <span class="text-danger" v-if="errors.based_trucks">{{ errors.based_trucks[0] }}</span>
+                                    <span class="text-danger" v-if="errors.based_trucks">The based trucks field is required</span>
                                 </div>
                             </div>
                         </div>
@@ -154,6 +155,7 @@
                 </div>
         </div>
 
+        <!-- Edit User Modal -->
         <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -192,14 +194,14 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="role">Role*</label> 
-                                    <select class="form-control" v-model="copied_role">
+                                    <select class="form-control" v-model="copied_role" @change="changeRole(copied_role)">
                                         <option v-for="(role,r) in roles" v-bind:key="r" :value="role.id"> {{ role.name }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.role">{{ errors.role[0] }}</span>
                                 </div>
                             </div>
                         </div>
-                        <div class="row">
+                        <div class="row" v-if="show_based_trucks">
                             <div class="col-lg-12">
                                 <div class="form-group">
                                     <label class="form-control-label" for="role">Based Trucks</label>
@@ -209,10 +211,10 @@
                                             :multiple="true"
                                             track-by="id"
                                             :custom-label="customLabel"
-                                            placeholder="Select based_trucks"
+                                            placeholder="Select based truck"
                                         >
                                     </multiselect>
-                                    <span class="text-danger" v-if="errors.based_trucks">{{ errors.based_trucks[0] }}</span>
+                                    <span class="text-danger" v-if="errors.based_trucks">The based trucks field is required</span>
                                 </div>
                             </div>
                         </div>
@@ -251,6 +253,50 @@
                 </div>
             </div>
         </div>
+
+        
+        <!-- Change password Modal -->
+        <div class="modal fade" id="changePasswordModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+            <span class="closed" data-dismiss="modal">&times;</span>
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div>
+                        <button type="button" class="close mt-2 mr-2" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div> 
+                    <div class="modal-header">
+                        <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Change Password</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-success" v-if="user_updated">
+                            <strong>Success!</strong> Password succesfully changed
+                        </div>
+                         <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="role">New password*</label> 
+                                    <input type="password"  class="form-control" v-model="user.new_password">
+                                    <span class="text-danger" v-if="errors.new_password">{{ errors.new_password[0] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class=row>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="role">Confirm password*</label> 
+                                    <input type="password" class="form-control" v-model="user.new_password_confirmation">
+                                    <span class="text-danger" v-if="errors.new_password_confirmation">{{ errors.new_password_confirmation[0] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="edit_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="changePassword(user)" >Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
@@ -281,7 +327,8 @@ export default {
             loading: false,
             user_added: false,
             user_updated: false,
-            user_id: ''
+            user_id: '',
+            show_based_trucks: false
         }
     },
     created(){
@@ -290,6 +337,24 @@ export default {
         this.fetchBasedTrucks();
     },
     methods:{
+        changeRole(role){
+            role > 3 ? this.show_based_trucks = true : this.show_based_trucks = false;
+        },
+        changePassword(user){
+            axios.post('/change-password', {
+                user_id: this.user_id,
+                new_password: user.new_password,
+                new_password_confirmation: user.new_password_confirmation
+            })
+            .then(response => {
+                $('#changePasswordModal').modal('hide');
+                alert('Password successfully changed');
+                this.resetForm();
+            })
+            .catch(error => {
+                this.errors = error.response.data.errors;
+            })
+        },
         customLabel (based_truck) {
             return `${based_truck.description  }`
         },
@@ -297,6 +362,7 @@ export default {
             this.user_copied = Object.assign({}, user);
             this.copied_role = this.user_copied.roles[0].id;
             this.user_id = user.id;
+            user.roles[0].level < 4 ? this.show_based_trucks = true : this.show_based_trucks = false;
         },
         fetchBasedTrucks(){
             axios.get('/based-trucks')
@@ -331,9 +397,11 @@ export default {
         },
         addUser(user){
             var based_trucks_ids = [];
-            user.based_trucks.forEach((based_truck) => {
-                based_trucks_ids.push(based_truck.id);
-            });
+            if(user.based_trucks){
+                user.based_trucks.forEach((based_truck) => {
+                    based_trucks_ids.push(based_truck.id);
+                });
+            }
         
             this.user_added = false;
             this.loading = true;
@@ -360,7 +428,7 @@ export default {
             })
         },
         updateUser(user_copied, copied_role){
-
+            this.errors = [];
             var based_trucks_ids = [];
             user_copied.based_trucks.forEach((based_truck) => {
                 based_trucks_ids.push(based_truck.id);

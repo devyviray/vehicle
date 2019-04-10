@@ -42,7 +42,8 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|unique:users,email',
             'password' => 'required',
-            'role' => 'required'
+            'role' => 'required',
+            'based_trucks' => 'required_if:role,4|required_if:role,5|required_if:role,6'
 
         ]);
 
@@ -69,7 +70,7 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|unique:users,email,' .$user->id,
             'role' => 'required',
-            'based_trucks' => 'required'
+            'based_trucks' => 'required_if:role,4|required_if:role,5|required_if:role,6'
 
         ]);
 
@@ -95,5 +96,26 @@ class UserController extends Controller
         if($user->delete()){
             return $user;
         }
+    }
+
+     /*
+     * Change password 
+     * 
+     * @return \Illuminate\Http\Response
+     */
+
+    public function changePassword(Request $request){
+
+        $validator = $request->validate([
+            'user_id' => 'required',
+            'new_password' => 'required|confirmed',
+            'new_password_confirmation' => 'required'
+        ]);
+    
+        $user = User::findOrFail($request->user_id);
+        $user->password = bcrypt($request->input('new_password'));
+        $user->save();
+
+        return $user;
     }
 }

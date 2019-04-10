@@ -9102,6 +9102,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 
 
@@ -9840,6 +9841,52 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -9865,7 +9912,8 @@ __webpack_require__.r(__webpack_exports__);
       loading: false,
       user_added: false,
       user_updated: false,
-      user_id: ''
+      user_id: '',
+      show_based_trucks: false
     };
   },
   created: function created() {
@@ -9874,6 +9922,25 @@ __webpack_require__.r(__webpack_exports__);
     this.fetchBasedTrucks();
   },
   methods: {
+    changeRole: function changeRole(role) {
+      role > 3 ? this.show_based_trucks = true : this.show_based_trucks = false;
+    },
+    changePassword: function changePassword(user) {
+      var _this = this;
+
+      axios.post('/change-password', {
+        user_id: this.user_id,
+        new_password: user.new_password,
+        new_password_confirmation: user.new_password_confirmation
+      }).then(function (response) {
+        $('#changePasswordModal').modal('hide');
+        alert('Password successfully changed');
+
+        _this.resetForm();
+      }).catch(function (error) {
+        _this.errors = error.response.data.errors;
+      });
+    },
     customLabel: function customLabel(based_truck) {
       return "".concat(based_truck.description);
     },
@@ -9881,32 +9948,33 @@ __webpack_require__.r(__webpack_exports__);
       this.user_copied = Object.assign({}, user);
       this.copied_role = this.user_copied.roles[0].id;
       this.user_id = user.id;
+      user.roles[0].level < 4 ? this.show_based_trucks = true : this.show_based_trucks = false;
     },
     fetchBasedTrucks: function fetchBasedTrucks() {
-      var _this = this;
-
-      axios.get('/based-trucks').then(function (response) {
-        _this.based_trucks = response.data;
-      }).catch(function (error) {
-        _this.errors = error.response.data.error;
-      });
-    },
-    fetchRoles: function fetchRoles() {
       var _this2 = this;
 
-      axios.get('/roles').then(function (response) {
-        _this2.roles = response.data;
+      axios.get('/based-trucks').then(function (response) {
+        _this2.based_trucks = response.data;
       }).catch(function (error) {
         _this2.errors = error.response.data.error;
       });
     },
-    fetchUsers: function fetchUsers() {
+    fetchRoles: function fetchRoles() {
       var _this3 = this;
 
-      axios.get('/users-all').then(function (response) {
-        _this3.users = response.data;
+      axios.get('/roles').then(function (response) {
+        _this3.roles = response.data;
       }).catch(function (error) {
         _this3.errors = error.response.data.error;
+      });
+    },
+    fetchUsers: function fetchUsers() {
+      var _this4 = this;
+
+      axios.get('/users-all').then(function (response) {
+        _this4.users = response.data;
+      }).catch(function (error) {
+        _this4.errors = error.response.data.error;
       });
     },
     resetForm: function resetForm() {
@@ -9914,12 +9982,16 @@ __webpack_require__.r(__webpack_exports__);
       this.user = [];
     },
     addUser: function addUser(user) {
-      var _this4 = this;
+      var _this5 = this;
 
       var based_trucks_ids = [];
-      user.based_trucks.forEach(function (based_truck) {
-        based_trucks_ids.push(based_truck.id);
-      });
+
+      if (user.based_trucks) {
+        user.based_trucks.forEach(function (based_truck) {
+          based_trucks_ids.push(based_truck.id);
+        });
+      }
+
       this.user_added = false;
       this.loading = true;
       document.getElementById('add_btn').disabled = true;
@@ -9930,23 +10002,24 @@ __webpack_require__.r(__webpack_exports__);
         role: user.role,
         based_trucks: based_trucks_ids
       }).then(function (response) {
-        _this4.user_added = true;
+        _this5.user_added = true;
 
-        _this4.users.unshift(response.data);
+        _this5.users.unshift(response.data);
 
-        _this4.resetForm();
+        _this5.resetForm();
 
         document.getElementById('add_btn').disabled = false;
-        _this4.loading = false;
+        _this5.loading = false;
       }).catch(function (error) {
-        _this4.errors = error.response.data.errors;
+        _this5.errors = error.response.data.errors;
         document.getElementById('add_btn').disabled = false;
-        _this4.loading = false;
+        _this5.loading = false;
       });
     },
     updateUser: function updateUser(user_copied, copied_role) {
-      var _this5 = this;
+      var _this6 = this;
 
+      this.errors = [];
       var based_trucks_ids = [];
       user_copied.based_trucks.forEach(function (based_truck) {
         based_trucks_ids.push(based_truck.id);
@@ -9965,32 +10038,32 @@ __webpack_require__.r(__webpack_exports__);
         based_trucks: based_trucks_ids,
         _method: 'PATCH'
       }).then(function (response) {
-        _this5.user_updated = true;
+        _this6.user_updated = true;
 
-        _this5.users.splice(index, 1, response.data);
+        _this6.users.splice(index, 1, response.data);
 
         document.getElementById('edit_btn').disabled = false;
-        _this5.loading = false;
+        _this6.loading = false;
       }).catch(function (error) {
-        _this5.user_updated = false;
-        _this5.errors = error.response.data.errors;
+        _this6.user_updated = false;
+        _this6.errors = error.response.data.errors;
         document.getElementById('edit_btn').disabled = false;
-        _this5.loading = false;
+        _this6.loading = false;
       });
     },
     deleteVehicle: function deleteVehicle() {
-      var _this6 = this;
+      var _this7 = this;
 
       var index = this.users.findIndex(function (item) {
-        return item.id == _this6.user_id;
+        return item.id == _this7.user_id;
       });
       axios.delete("/user/".concat(this.user_id)).then(function (response) {
         $('#deleteModal').modal('hide');
         alert('User successfully deleted');
 
-        _this6.users.splice(index, 1);
+        _this7.users.splice(index, 1);
       }).catch(function (error) {
-        _this6.errors = error.response.data.errors;
+        _this7.errors = error.response.data.errors;
       });
     },
     setPage: function setPage(pageNumber) {
@@ -10008,11 +10081,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     filteredUsers: function filteredUsers() {
-      var _this7 = this;
+      var _this8 = this;
 
       var self = this;
       return Object.values(self.users).filter(function (user) {
-        return user.name.toLowerCase().includes(_this7.keywords.toLowerCase());
+        return user.name.toLowerCase().includes(_this8.keywords.toLowerCase());
       });
     },
     totalPages: function totalPages() {
@@ -46023,7 +46096,15 @@ var render = function() {
                     _c("div", { staticClass: "col-6 text-right" }, [
                       _c("span", [
                         _vm._v(
-                          _vm._s(_vm.filteredQueues.length) + " Vehicle(s)"
+                          _vm._s(_vm.filteredQueues.length) +
+                            " Filtered Vehicle(s)"
+                        )
+                      ]),
+                      _c("br"),
+                      _vm._v(" "),
+                      _c("span", [
+                        _vm._v(
+                          _vm._s(_vm.vehicles.length) + " Total Vehicle(s)"
                         )
                       ])
                     ])
@@ -48190,6 +48271,24 @@ var render = function() {
                                       }
                                     },
                                     [_vm._v("Delete")]
+                                  ),
+                                  _vm._v(" "),
+                                  _c(
+                                    "a",
+                                    {
+                                      staticClass: "dropdown-item",
+                                      staticStyle: { cursor: "pointer" },
+                                      attrs: {
+                                        "data-toggle": "modal",
+                                        "data-target": "#changePasswordModal"
+                                      },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.copyObject(user)
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("Change Password")]
                                   )
                                 ]
                               )
@@ -48445,23 +48544,29 @@ var render = function() {
                             ],
                             staticClass: "form-control",
                             on: {
-                              change: function($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function(o) {
-                                    return o.selected
-                                  })
-                                  .map(function(o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.$set(
-                                  _vm.user,
-                                  "role",
-                                  $event.target.multiple
-                                    ? $$selectedVal
-                                    : $$selectedVal[0]
-                                )
-                              }
+                              change: [
+                                function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.$set(
+                                    _vm.user,
+                                    "role",
+                                    $event.target.multiple
+                                      ? $$selectedVal
+                                      : $$selectedVal[0]
+                                  )
+                                },
+                                function($event) {
+                                  return _vm.changeRole(_vm.user.role)
+                                }
+                              ]
                             }
                           },
                           _vm._l(_vm.roles, function(role, r) {
@@ -48483,48 +48588,50 @@ var render = function() {
                     ])
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col-lg-12" }, [
-                      _c(
-                        "div",
-                        { staticClass: "form-group" },
-                        [
+                  _vm.show_based_trucks
+                    ? _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col-lg-12" }, [
                           _c(
-                            "label",
-                            {
-                              staticClass: "form-control-label",
-                              attrs: { for: "role" }
-                            },
-                            [_vm._v("Based Trucks")]
-                          ),
-                          _vm._v(" "),
-                          _c("multiselect", {
-                            attrs: {
-                              options: _vm.based_trucks,
-                              multiple: true,
-                              "track-by": "id",
-                              "custom-label": _vm.customLabel,
-                              placeholder: "Select based_trucks"
-                            },
-                            model: {
-                              value: _vm.user.based_trucks,
-                              callback: function($$v) {
-                                _vm.$set(_vm.user, "based_trucks", $$v)
-                              },
-                              expression: "user.based_trucks"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _vm.errors.based_trucks
-                            ? _c("span", { staticClass: "text-danger" }, [
-                                _vm._v(_vm._s(_vm.errors.based_trucks[0]))
-                              ])
-                            : _vm._e()
-                        ],
-                        1
-                      )
-                    ])
-                  ])
+                            "div",
+                            { staticClass: "form-group" },
+                            [
+                              _c(
+                                "label",
+                                {
+                                  staticClass: "form-control-label",
+                                  attrs: { for: "role" }
+                                },
+                                [_vm._v("Based Trucks")]
+                              ),
+                              _vm._v(" "),
+                              _c("multiselect", {
+                                attrs: {
+                                  options: _vm.based_trucks,
+                                  multiple: true,
+                                  "track-by": "id",
+                                  "custom-label": _vm.customLabel,
+                                  placeholder: "Select based truck"
+                                },
+                                model: {
+                                  value: _vm.user.based_trucks,
+                                  callback: function($$v) {
+                                    _vm.$set(_vm.user, "based_trucks", $$v)
+                                  },
+                                  expression: "user.based_trucks"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _vm.errors.based_trucks
+                                ? _c("span", { staticClass: "text-danger" }, [
+                                    _vm._v("The based trucks field is required")
+                                  ])
+                                : _vm._e()
+                            ],
+                            1
+                          )
+                        ])
+                      ])
+                    : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-footer" }, [
@@ -48695,19 +48802,25 @@ var render = function() {
                             ],
                             staticClass: "form-control",
                             on: {
-                              change: function($event) {
-                                var $$selectedVal = Array.prototype.filter
-                                  .call($event.target.options, function(o) {
-                                    return o.selected
-                                  })
-                                  .map(function(o) {
-                                    var val = "_value" in o ? o._value : o.value
-                                    return val
-                                  })
-                                _vm.copied_role = $event.target.multiple
-                                  ? $$selectedVal
-                                  : $$selectedVal[0]
-                              }
+                              change: [
+                                function($event) {
+                                  var $$selectedVal = Array.prototype.filter
+                                    .call($event.target.options, function(o) {
+                                      return o.selected
+                                    })
+                                    .map(function(o) {
+                                      var val =
+                                        "_value" in o ? o._value : o.value
+                                      return val
+                                    })
+                                  _vm.copied_role = $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                },
+                                function($event) {
+                                  return _vm.changeRole(_vm.copied_role)
+                                }
+                              ]
                             }
                           },
                           _vm._l(_vm.roles, function(role, r) {
@@ -48729,48 +48842,54 @@ var render = function() {
                     ])
                   ]),
                   _vm._v(" "),
-                  _c("div", { staticClass: "row" }, [
-                    _c("div", { staticClass: "col-lg-12" }, [
-                      _c(
-                        "div",
-                        { staticClass: "form-group" },
-                        [
+                  _vm.show_based_trucks
+                    ? _c("div", { staticClass: "row" }, [
+                        _c("div", { staticClass: "col-lg-12" }, [
                           _c(
-                            "label",
-                            {
-                              staticClass: "form-control-label",
-                              attrs: { for: "role" }
-                            },
-                            [_vm._v("Based Trucks")]
-                          ),
-                          _vm._v(" "),
-                          _c("multiselect", {
-                            attrs: {
-                              options: _vm.based_trucks,
-                              multiple: true,
-                              "track-by": "id",
-                              "custom-label": _vm.customLabel,
-                              placeholder: "Select based_trucks"
-                            },
-                            model: {
-                              value: _vm.user_copied.based_trucks,
-                              callback: function($$v) {
-                                _vm.$set(_vm.user_copied, "based_trucks", $$v)
-                              },
-                              expression: "user_copied.based_trucks"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _vm.errors.based_trucks
-                            ? _c("span", { staticClass: "text-danger" }, [
-                                _vm._v(_vm._s(_vm.errors.based_trucks[0]))
-                              ])
-                            : _vm._e()
-                        ],
-                        1
-                      )
-                    ])
-                  ])
+                            "div",
+                            { staticClass: "form-group" },
+                            [
+                              _c(
+                                "label",
+                                {
+                                  staticClass: "form-control-label",
+                                  attrs: { for: "role" }
+                                },
+                                [_vm._v("Based Trucks")]
+                              ),
+                              _vm._v(" "),
+                              _c("multiselect", {
+                                attrs: {
+                                  options: _vm.based_trucks,
+                                  multiple: true,
+                                  "track-by": "id",
+                                  "custom-label": _vm.customLabel,
+                                  placeholder: "Select based truck"
+                                },
+                                model: {
+                                  value: _vm.user_copied.based_trucks,
+                                  callback: function($$v) {
+                                    _vm.$set(
+                                      _vm.user_copied,
+                                      "based_trucks",
+                                      $$v
+                                    )
+                                  },
+                                  expression: "user_copied.based_trucks"
+                                }
+                              }),
+                              _vm._v(" "),
+                              _vm.errors.based_trucks
+                                ? _c("span", { staticClass: "text-danger" }, [
+                                    _vm._v("The based trucks field is required")
+                                  ])
+                                : _vm._e()
+                            ],
+                            1
+                          )
+                        ])
+                      ])
+                    : _vm._e()
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-footer" }, [
@@ -48846,6 +48965,158 @@ var render = function() {
                       on: { click: _vm.deleteVehicle }
                     },
                     [_vm._v("Delete")]
+                  )
+                ])
+              ])
+            ]
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "changePasswordModal",
+            tabindex: "-1",
+            role: "dialog",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true",
+            "data-backdrop": "static"
+          }
+        },
+        [
+          _c(
+            "span",
+            { staticClass: "closed", attrs: { "data-dismiss": "modal" } },
+            [_vm._v("×")]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "modal-dialog modal-dialog-centered modal-lg",
+              attrs: { role: "document" }
+            },
+            [
+              _c("div", { staticClass: "modal-content" }, [
+                _vm._m(10),
+                _vm._v(" "),
+                _vm._m(11),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _vm.user_updated
+                    ? _c("div", { staticClass: "alert alert-success" }, [
+                        _c("strong", [_vm._v("Success!")]),
+                        _vm._v(
+                          " Password succesfully changed\n                    "
+                        )
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-md-12" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "role" } }, [
+                          _vm._v("New password*")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.user.new_password,
+                              expression: "user.new_password"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "password" },
+                          domProps: { value: _vm.user.new_password },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.user,
+                                "new_password",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _vm.errors.new_password
+                          ? _c("span", { staticClass: "text-danger" }, [
+                              _vm._v(_vm._s(_vm.errors.new_password[0]))
+                            ])
+                          : _vm._e()
+                      ])
+                    ])
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-md-12" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "role" } }, [
+                          _vm._v("Confirm password*")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.user.new_password_confirmation,
+                              expression: "user.new_password_confirmation"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { type: "password" },
+                          domProps: {
+                            value: _vm.user.new_password_confirmation
+                          },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.user,
+                                "new_password_confirmation",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _vm.errors.new_password_confirmation
+                          ? _c("span", { staticClass: "text-danger" }, [
+                              _vm._v(
+                                _vm._s(_vm.errors.new_password_confirmation[0])
+                              )
+                            ])
+                          : _vm._e()
+                      ])
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary btn-round btn-fill",
+                      attrs: { id: "edit_btn", type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.changePassword(_vm.user)
+                        }
+                      }
+                    },
+                    [_vm._v("Save")]
                   )
                 ])
               ])
@@ -49027,6 +49298,40 @@ var staticRenderFns = [
           ])
         ])
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", [
+      _c(
+        "button",
+        {
+          staticClass: "close mt-2 mr-2",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h2",
+        {
+          staticClass: "col-12 modal-title text-center",
+          attrs: { id: "addCompanyLabel" }
+        },
+        [_vm._v("Change Password")]
+      )
     ])
   }
 ]

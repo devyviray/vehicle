@@ -82,6 +82,7 @@ Route::group(['middleware' => 'auth'], function(){
     Route::post('/user', 'UserController@store');
     Route::patch('/user/{user}', 'UserController@update');
     Route::delete('/user/{user}', 'UserController@destroy');
+    Route::post('/change-password', 'UserController@changePassword');
 
     // Truckers
     Route::get('/truckers', 'TruckerController@index');
