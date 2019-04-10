@@ -15,17 +15,19 @@ class UserController extends Controller
      */
     public function index()
     {
-        return User::orderBy('id', 'desc')->get();
+        session(['header_text' => 'Users']);
+
+        return view('user.index');
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Fetch all users
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function indexData()
     {
-        //
+        return User::with('roles','basedTrucks')->orderBy('id', 'desc')->get();
     }
 
     /**
@@ -36,29 +38,22 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
-    }
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|unique:users,email',
+            'password' => 'required',
+            'role' => 'required'
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        if($user = User::create($request->all())){
+            // Assigning of role
+            $user->syncRoles($request->role);
+            // Assigning of based trucks
+            $user->basedTrucks()->sync( (array) $request->based_trucks);
+            return $user;   
+        }
+        return false;
     }
 
     /**
@@ -68,9 +63,25 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        //
+        $request->validate([
+            'name' => 'required',
+            'email' => 'required|unique:users,email,' .$user->id,
+            'role' => 'required',
+            'based_trucks' => 'required'
+
+        ]);
+
+        if($user->update($request->all())){
+            // Assigning of role
+            $user->syncRoles($request->role);
+            // Assigning of based trucks
+            $user->basedTrucks()->sync( (array) $request->based_trucks);
+
+            return User::with('roles', 'basedTrucks')->where('id', $user->id)->first();   
+        }
+        return false;
     }
 
     /**
@@ -79,8 +90,10 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
-        //
+        if($user->delete()){
+            return $user;
+        }
     }
 }

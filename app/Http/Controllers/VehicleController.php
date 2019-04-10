@@ -22,9 +22,11 @@ class VehicleController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function index()
-    {
-        // return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','plants')->orderBy('id', 'desc')->get();
-        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor')->orderBy('id', 'desc')->get();
+    {   
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor')
+            ->when(Auth::user()->level() < 5, function ($query){
+                $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
+            })->orderBy('id', 'desc')->get();
     }
 
     /**

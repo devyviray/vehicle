@@ -23,6 +23,8 @@ class HomeController extends Controller
      */
     public function index()
     {
+        session(['header_text' => 'Vehicles']);
+        
         return view('home');
     }
 }

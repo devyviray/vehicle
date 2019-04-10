@@ -4,93 +4,6 @@
         <div class="header pt-md-8" style="background-color: #04703e">
             <div class="container-fluid">
                 <div class="header-body">
-                    <!-- Card stats -->
-                    <!-- <div class="row">
-                        <div class="col-xl-3 col-lg-6">
-                            <div class="card card-stats mb-4 mb-xl-0">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">Traffic</h5>
-                                            <span class="h2 font-weight-bold mb-0">350,897</span>
-                                        </div>
-                                        <div class="col-auto">
-                                            <div class="icon icon-shape bg-danger text-white rounded-circle shadow">
-                                                <i class="fas fa-chart-bar"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="mt-3 mb-0 text-muted text-sm">
-                                        <span class="text-success mr-2"><i class="fa fa-arrow-up"></i> 3.48%</span>
-                                        <span class="text-nowrap">Since last month</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-lg-6">
-                            <div class="card card-stats mb-4 mb-xl-0">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">New users</h5>
-                                            <span class="h2 font-weight-bold mb-0">2,356</span>
-                                        </div>
-                                        <div class="col-auto">
-                                            <div class="icon icon-shape bg-warning text-white rounded-circle shadow">
-                                                <i class="fas fa-chart-pie"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="mt-3 mb-0 text-muted text-sm">
-                                        <span class="text-danger mr-2"><i class="fas fa-arrow-down"></i> 3.48%</span>
-                                        <span class="text-nowrap">Since last week</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-lg-6">
-                            <div class="card card-stats mb-4 mb-xl-0">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">Sales</h5>
-                                            <span class="h2 font-weight-bold mb-0">924</span>
-                                        </div>
-                                        <div class="col-auto">
-                                            <div class="icon icon-shape bg-yellow text-white rounded-circle shadow">
-                                                <i class="fas fa-users"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="mt-3 mb-0 text-muted text-sm">
-                                        <span class="text-warning mr-2"><i class="fas fa-arrow-down"></i> 1.10%</span>
-                                        <span class="text-nowrap">Since yesterday</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 col-lg-6">
-                            <div class="card card-stats mb-4 mb-xl-0">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col">
-                                            <h5 class="card-title text-uppercase text-muted mb-0">Performance</h5>
-                                            <span class="h2 font-weight-bold mb-0">49,65%</span>
-                                        </div>
-                                        <div class="col-auto">
-                                            <div class="icon icon-shape bg-info text-white rounded-circle shadow">
-                                                <i class="fas fa-percent"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <p class="mt-3 mb-0 text-muted text-sm">
-                                        <span class="text-success mr-2"><i class="fas fa-arrow-up"></i> 12%</span>
-                                        <span class="text-nowrap">Since last month</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
                 </div>
             </div>
         </div>
@@ -103,7 +16,7 @@
                                 <div class="col">
                                     <h3 class="mb-0">Vehicle List</h3>
                                 </div> 
-                                <div class="col text-right">
+                                <div class="col text-right" v-if="this.userLevel > 4">
                                     <a href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
                                 </div>
                             </div>
@@ -123,7 +36,6 @@
                                         <th scope="col">Category</th>
                                         <th scope="col">Plate number</th>
                                         <th scope="col">Plant Indicator</th>
-                                        <!-- <th scope="col">Plant</th> -->
                                         <th scope="col">Vendor</th>
                                         <th scope="col">Subcon vendor</th>
                                         <th scope="col">Capacity</th>
@@ -140,16 +52,14 @@
                                 <tbody>
                                     <tr v-for="(vehicle, v) in filteredQueues" v-bind:key="v">
                                         <td class="text-right">
-                                            <div class="dropdown">
+                                            <div class="dropdown" v-if="userLevel > 2">
                                                 <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
                                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                    <!-- <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#editVehicleModal" @click="copyObject(vehicle)">Edit</a> -->
                                                     <a class="dropdown-item" style="cursor: pointer" @click="getVehicle(vehicle.id)">Edit</a>
                                                     <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#viewDocumentsModal" @click="copyObject(vehicle)">View Document</a>
-                                                    <!-- <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#deleteVehicleModal" @click="getVehicleId(vehicle.id)">Delete</a> -->
                                                 </div>
                                             </div>
                                         </td>
@@ -157,12 +67,6 @@
                                         <td>{{ vehicle.category.description }}</td>
                                         <td>{{ vehicle.plate_number }}</td>
                                         <td>{{ vehicle.indicator.description }}</td>
-                                        <!-- <td v-if="vehicle.indicator_id == 2"> ALL PLANT</td>
-                                        <td v-else>
-                                            <span v-for="(plant, p) in vehicle.plants" :key="p">
-                                                {{ plant.name }} <br/>
-                                            </span>
-                                        </td> -->
                                         <td>{{ vehicle.vendor.vendor_description_lfug }}</td>
                                         <td v-if="vehicle.subcon_vendor">{{ vehicle.subcon_vendor.vendor_description_lfug }}</td>
                                         <td v-else></td>
@@ -198,7 +102,7 @@
             </div>
         </div>
         <!-- Add Vehicle Modal -->
-        <div class="modal fade" id="addVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="addVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
                 <div class="modal-content">
@@ -372,185 +276,7 @@
                 </div>
         </div>
 
-        <!-- Edit Vehicle Modal -->
-        <!-- <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <span class="closed" data-dismiss="modal">&times;</span>
-            <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
-                <div class="modal-content">
-                    <div>
-                        <button type="button" class="close mt-2 mr-2" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div> 
-                    <div class="modal-header">
-                        <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Edit Vehicle</h2>
-                    </div>
-                    <div class="modal-body">
-                        <div class="alert alert-success" v-if="vehicle_updated">
-                            <strong>Success!</strong> Vehicle succesfully updated
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Category*</label> 
-                                    <select class="form-control" v-model="vehicle_copied.category_id" disabled>
-                                        <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.category_id">The category field is required</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Plate Number*</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_copied.plate_number" disabled>
-                                    <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Plant Indicator*</label> 
-                                    <select class="form-control" v-model="vehicle_copied.indicator_id" @change="plantChange">
-                                        <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.indicator_id">The indicator field is required</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row" v-if="show_plant">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="role">Plant</label> 
-                                    <multiselect
-                                        v-model="vehicle_copied.plants"
-                                        :options="plants"
-                                        :multiple="true"
-                                        track-by="id"
-                                        :custom-label="customLabelPlant"
-                                        placeholder="Select Plant"
-                                        id="selected_plant"
-                                    >
-                                    </multiselect>
-                                    <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
-                                </div>  
-                            </div>
-                        </div> 
-                        <div class="row">
-                            <div class="col-md-4">
-                                <label for="role">Vendor*</label> 
-                                <v-select
-                                    style="width: 100%" 
-                                    v-model="vehicle_copied.vendor"
-                                    label="vendor_description_lfug"
-                                    :options="truckers"
-                                    track-by="id"
-                                    disabled
-                                >      
-                                </v-select>
-                                <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
-                            </div>
-                            <div class="col-md-4">
-                                <label for="role">Subcon Vendor</label> 
-                                <v-select 
-                                    style="width: 100%"
-                                    v-model="vehicle_copied.subcon_vendor"
-                                    label="vendor_description_lfug"
-                                    :options="truckers"
-                                    track-by="id"
-                                    disabled
-                                >
-                                </v-select>
-                                <span class="text-danger" v-if="errors.subcon_vendor_id">The Subcon vendor field is required</span>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Capacity*</label> 
-                                    <select class="form-control" v-model="vehicle_copied.capacity_id">
-                                        <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.capacity_id">The capacity field is required</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Goods</label> 
-                                    <select class="form-control" v-model="vehicle_copied.good_id">
-                                        <option></option>
-                                        <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Allowed Total Weight (KG)</label> 
-                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_copied.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
-                                    <span class="text-danger" v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Based Trucks*</label> 
-                                    <select class="form-control" v-model="vehicle_copied.based_truck_id">
-                                        <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.based_truck_id">The based truck field is required</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Contract</label> 
-                                    <select class="form-control" v-model="vehicle_copied.contract_id">
-                                        <option></option>
-                                        <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Remarks</label> 
-                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_copied.remarks" maxlength="40">
-                                    <span class="text-danger" v-if="errors.good_id">The remarks field is required</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Document</label> 
-                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
-                                    <span class="text-danger" v-if="errors.attachments">The attachment field is required</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Validity Start Date*</label> 
-                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle_copied.validity_start_date">
-                                    <span class="text-danger" v-if="errors.validity_start_date">The validity start date field is required</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Validity End Date*</label> 
-                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle_copied.validity_end_date">
-                                    <span class="text-danger" v-if="errors.validity_end_date">The validity end date field is required</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button id="edit_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="editVehicle(vehicle_copied)">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div> -->
-
-
-        <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
                 <div class="modal-content">
@@ -727,7 +453,7 @@
         </div>
 
         <!-- Delete Vehicle Modal -->
-        <div class="modal fade" id="deleteVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="deleteVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
@@ -795,6 +521,7 @@ import vSelect from 'vue-select'
 import Multiselect from 'vue-multiselect'
 import loader from './Loader'
 export default {
+    props:['userLevel'],
     components: {
         vSelect,
         Multiselect,

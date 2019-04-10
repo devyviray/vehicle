@@ -9,7 +9,7 @@
 
 <style>
     .outer{
-        height: 100%;
+        height: 100vh;
         width: 100%;
         position: absolute;
         background-color: rgba(255,255,255,0.7);

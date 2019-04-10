@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <dashboard :user-level="{{ Auth::user()->level() }}"></dashboard>
+    <user></user>
 @endsection
 
 @push('js')
