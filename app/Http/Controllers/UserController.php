@@ -52,7 +52,7 @@ class UserController extends Controller
             $user->syncRoles($request->role);
             // Assigning of based trucks
             $user->basedTrucks()->sync( (array) $request->based_trucks);
-            return $user;   
+            return User::with('roles','basedTrucks')->where('id', $user->id)->first();   
         }
         return false;
     }
