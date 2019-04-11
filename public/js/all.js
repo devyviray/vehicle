@@ -9170,6 +9170,17 @@ __webpack_require__.r(__webpack_exports__);
     this.fetchPlants();
   },
   methods: {
+    disabledEdit: function disabledEdit() {
+      document.getElementById('capacity-edit').disabled = true;
+      document.getElementById('good-edit').disabled = true;
+      document.getElementById('based_truck-edit').disabled = true;
+      document.getElementById('contract-edit').disabled = true;
+      document.getElementById('validity_start_date-edit').disabled = true;
+      document.getElementById('validity_end_date-edit').disabled = true;
+      document.getElementById('allowed_total_weight-edit').readOnly = true;
+      document.getElementById('remarks-edit').readOnly = true;
+      $('.attachments-edit').attr('disabled', 'disabled');
+    },
     getVehicle: function getVehicle(id) {
       var _this = this;
 
@@ -9177,6 +9188,11 @@ __webpack_require__.r(__webpack_exports__);
         _this.vehicle_fetch = response.data;
         $('#editVehicleModal').modal('show');
         _this.vehicle_copied.indicator_id == 2 ? _this.show_plant = false : _this.show_plant = true;
+        _this.vehicle_fetch.indicator_id == 2 ? _this.show_plant = false : _this.show_plant = true;
+
+        if (_this.userLevel < 5) {
+          _this.disabledEdit();
+        }
       }).catch(function (error) {
         _this.errors = error.response.data.errors;
       });
@@ -9186,7 +9202,6 @@ __webpack_require__.r(__webpack_exports__);
       window.location = base_url + "/download-attachment/".concat(id);
     },
     onlyNumber: function onlyNumber($event) {
-      //console.log($event.keyCode); //keyCodes value
       var keyCode = $event.keyCode ? $event.keyCode : $event.which;
 
       if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
@@ -46738,6 +46753,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control",
+                            attrs: { id: "based_truck" },
                             on: {
                               change: function($event) {
                                 var $$selectedVal = Array.prototype.filter
@@ -46796,6 +46812,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control",
+                            attrs: { id: "contract" },
                             on: {
                               change: function($event) {
                                 var $$selectedVal = Array.prototype.filter
@@ -47355,6 +47372,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control",
+                            attrs: { id: "capacity-edit" },
                             on: {
                               change: function($event) {
                                 var $$selectedVal = Array.prototype.filter
@@ -47413,6 +47431,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control",
+                            attrs: { id: "good-edit" },
                             on: {
                               change: function($event) {
                                 var $$selectedVal = Array.prototype.filter
@@ -47473,7 +47492,7 @@ var render = function() {
                           staticClass: "form-control",
                           attrs: {
                             type: "text",
-                            id: "allowed_total_weight",
+                            id: "allowed_total_weight-edit",
                             maxlength: "20"
                           },
                           domProps: {
@@ -47520,6 +47539,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control",
+                            attrs: { id: "based_truck-edit" },
                             on: {
                               change: function($event) {
                                 var $$selectedVal = Array.prototype.filter
@@ -47578,6 +47598,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control",
+                            attrs: { id: "contract-edit" },
                             on: {
                               change: function($event) {
                                 var $$selectedVal = Array.prototype.filter
@@ -47638,7 +47659,7 @@ var render = function() {
                           staticClass: "form-control",
                           attrs: {
                             type: "text",
-                            id: "remarks",
+                            id: "remarks-edit",
                             maxlength: "40"
                           },
                           domProps: { value: _vm.vehicle_fetch.remarks },
@@ -47671,6 +47692,7 @@ var render = function() {
                         ]),
                         _vm._v(" "),
                         _c("input", {
+                          staticClass: "attachments-edit",
                           attrs: {
                             type: "file",
                             multiple: "multiple",
@@ -47707,7 +47729,10 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { type: "date", id: "validity_start_date" },
+                          attrs: {
+                            type: "date",
+                            id: "validity_start_date-edit"
+                          },
                           domProps: {
                             value: _vm.vehicle_fetch.validity_start_date
                           },
@@ -47751,7 +47776,7 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
-                          attrs: { type: "date", id: "validity_end_date" },
+                          attrs: { type: "date", id: "validity_end_date-edit" },
                           domProps: {
                             value: _vm.vehicle_fetch.validity_end_date
                           },

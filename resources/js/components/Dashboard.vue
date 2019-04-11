@@ -229,7 +229,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Based Trucks*</label> 
-                                    <select class="form-control" v-model="vehicle.based_truck_id">
+                                    <select class="form-control" v-model="vehicle.based_truck_id" id="based_truck">
                                         <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.based_truck_id">The based truck is required</span>
@@ -240,7 +240,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Contract</label> 
-                                    <select class="form-control" v-model="vehicle.contract_id">
+                                    <select class="form-control" v-model="vehicle.contract_id" id="contract">
                                         <option></option>
                                         <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.code + ' - ' + contract.description }}</option>
                                     </select>
@@ -377,7 +377,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Capacity*</label> 
-                                    <select class="form-control" v-model="vehicle_fetch.capacity_id">
+                                    <select class="form-control" v-model="vehicle_fetch.capacity_id" id="capacity-edit">
                                         <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.capacity_id">The capacity field is required</span>
@@ -388,7 +388,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Goods</label> 
-                                    <select class="form-control" v-model="vehicle_fetch.good_id">
+                                    <select class="form-control" v-model="vehicle_fetch.good_id" id="good-edit">
                                         <option></option>
                                         <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
                                     </select>
@@ -398,14 +398,14 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Allowed Total Weight (KG)</label> 
-                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle_fetch.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
+                                    <input type="text" id="allowed_total_weight-edit" class="form-control" v-model="vehicle_fetch.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
                                     <span class="text-danger" v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Based Trucks*</label> 
-                                    <select class="form-control" v-model="vehicle_fetch.based_truck_id">
+                                    <select class="form-control" v-model="vehicle_fetch.based_truck_id" id="based_truck-edit">
                                         <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.based_truck_id">The based truck field is required</span>
@@ -416,7 +416,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Contract</label> 
-                                    <select class="form-control" v-model="vehicle_fetch.contract_id">
+                                    <select class="form-control" v-model="vehicle_fetch.contract_id"  id="contract-edit">
                                         <option></option>
                                         <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
                                     </select>
@@ -426,14 +426,14 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Remarks</label> 
-                                    <input type="text" id="remarks" class="form-control" v-model="vehicle_fetch.remarks" maxlength="40">
+                                    <input type="text" id="remarks-edit" class="form-control" v-model="vehicle_fetch.remarks" maxlength="40">
                                     <span class="text-danger" v-if="errors.good_id">The remarks field is required</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Document</label> 
-                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
+                                    <input type="file" multiple="multiple" id="attachments" class="attachments-edit" placeholder="Attach file" @change="uploadFileChange"><br>
                                     <span class="text-danger" v-if="errors.attachments">The attachment field is required</span>
                                 </div>
                             </div>
@@ -442,14 +442,14 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Validity Start Date*</label> 
-                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle_fetch.validity_start_date">
+                                    <input type="date" id="validity_start_date-edit" class="form-control" v-model="vehicle_fetch.validity_start_date">
                                     <span class="text-danger" v-if="errors.validity_start_date">The validity start date field is required</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Validity End Date*</label> 
-                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle_fetch.validity_end_date">
+                                    <input type="date" id="validity_end_date-edit" class="form-control" v-model="vehicle_fetch.validity_end_date">
                                     <span class="text-danger" v-if="errors.validity_end_date">The validity end date field is required</span>
                                 </div>
                             </div>
@@ -585,12 +585,27 @@ export default {
         this.fetchPlants();
     },
     methods:{
+        disabledEdit(){
+            document.getElementById('capacity-edit').disabled = true;
+            document.getElementById('good-edit').disabled = true;
+            document.getElementById('based_truck-edit').disabled = true;
+            document.getElementById('contract-edit').disabled = true;
+            document.getElementById('validity_start_date-edit').disabled = true;
+            document.getElementById('validity_end_date-edit').disabled = true;
+            document.getElementById('allowed_total_weight-edit').readOnly = true;
+            document.getElementById('remarks-edit').readOnly = true;
+            $('.attachments-edit').attr('disabled','disabled');
+        },
         getVehicle(id){
             axios.get(`/vehicle-specific/${id}`)
             .then(response => {
                 this.vehicle_fetch = response.data;
                 $('#editVehicleModal').modal('show');
                 this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+                this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+                if(this.userLevel < 5){
+                    this.disabledEdit();
+                }
             })
             .catch(error => {
                 this.errors = error.response.data.errors
@@ -601,7 +616,6 @@ export default {
             window.location = base_url+`/download-attachment/${id}`;
         },
         onlyNumber ($event) {
-            //console.log($event.keyCode); //keyCodes value
             let keyCode = ($event.keyCode ? $event.keyCode : $event.which);
             if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) { // 46 is dot
                 $event.preventDefault();
