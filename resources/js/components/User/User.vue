@@ -363,6 +363,7 @@ export default {
             this.copied_role = this.user_copied.roles[0].id;
             this.user_id = user.id;
             user.roles[0].level < 4 ? this.show_based_trucks = true : this.show_based_trucks = false;
+            this.user_updated = false;
         },
         fetchBasedTrucks(){
             axios.get('/based-trucks')
