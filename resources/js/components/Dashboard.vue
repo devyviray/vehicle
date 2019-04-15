@@ -450,7 +450,7 @@
                                 <div class="form-group">
                                     <label for="role">Validity End Date*</label> 
                                     <input type="date" id="validity_end_date-edit" class="form-control" v-model="vehicle_fetch.validity_end_date">
-                                    <span class="text-danger" v-if="errors.validity_end_date">The validity end date field is required</span>
+                                    <span class="text-danger" v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -569,7 +569,8 @@ export default {
             vehicle_added: false,
             vehicle_updated: false,
             loading: false,
-            table_loading: false
+            table_loading: false,
+            old_plants: []
         }
     },
     created(){
@@ -600,6 +601,7 @@ export default {
             axios.get(`/vehicle-specific/${id}`)
             .then(response => {
                 this.vehicle_fetch = response.data;
+                this.old_plants = response.data.plants;
                 $('#editVehicleModal').modal('show');
                 this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
                 this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
@@ -831,6 +833,11 @@ export default {
                     plantIds.push(plant.id);
                 });
             }
+            var oldPlants = [];
+            this.old_plants.forEach((fetch) => {
+                oldPlants.push(fetch.id);
+            });
+           
             var index = this.vehicles.findIndex(item => item.id == vehicle.id);
             this.errors = [];
             this.prepareFields();
@@ -848,6 +855,7 @@ export default {
             this.formData.append('validity_start_date', vehicle.validity_start_date ? vehicle.validity_start_date : '');
             this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
             this.formData.append('plants', plantIds ? plantIds : '');
+            this.formData.append('old_plants', oldPlants ? oldPlants : '');
             this.formData.append('_method', 'PATCH');
 
             axios.post(`/vehicle/${vehicle.id}`, this.formData)

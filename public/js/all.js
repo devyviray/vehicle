@@ -9154,7 +9154,8 @@ __webpack_require__.r(__webpack_exports__);
       vehicle_added: false,
       vehicle_updated: false,
       loading: false,
-      table_loading: false
+      table_loading: false,
+      old_plants: []
     };
   },
   created: function created() {
@@ -9186,6 +9187,7 @@ __webpack_require__.r(__webpack_exports__);
 
       axios.get("/vehicle-specific/".concat(id)).then(function (response) {
         _this.vehicle_fetch = response.data;
+        _this.old_plants = response.data.plants;
         $('#editVehicleModal').modal('show');
         _this.vehicle_copied.indicator_id == 2 ? _this.show_plant = false : _this.show_plant = true;
         _this.vehicle_fetch.indicator_id == 2 ? _this.show_plant = false : _this.show_plant = true;
@@ -9424,6 +9426,10 @@ __webpack_require__.r(__webpack_exports__);
         });
       }
 
+      var oldPlants = [];
+      this.old_plants.forEach(function (fetch) {
+        oldPlants.push(fetch.id);
+      });
       var index = this.vehicles.findIndex(function (item) {
         return item.id == vehicle.id;
       });
@@ -9443,6 +9449,7 @@ __webpack_require__.r(__webpack_exports__);
       this.formData.append('validity_start_date', vehicle.validity_start_date ? vehicle.validity_start_date : '');
       this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
       this.formData.append('plants', plantIds ? plantIds : '');
+      this.formData.append('old_plants', oldPlants ? oldPlants : '');
       this.formData.append('_method', 'PATCH');
       axios.post("/vehicle/".concat(vehicle.id), this.formData).then(function (response) {
         _this13.vehicle_updated = true;
@@ -47797,7 +47804,7 @@ var render = function() {
                         _vm._v(" "),
                         _vm.errors.validity_end_date
                           ? _c("span", { staticClass: "text-danger" }, [
-                              _vm._v("The validity end date field is required")
+                              _vm._v(_vm._s(_vm.errors.validity_end_date[0]))
                             ])
                           : _vm._e()
                       ])

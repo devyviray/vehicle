@@ -7,7 +7,8 @@ use App\{
     Vehicle,
     Document,
     PlantVehicle,
-    PlantVehicleDeleted
+    PlantVehicleDeleted,
+    PlantVehicleAdded
 };
 use App\Rules\ValidityRule;
 use Carbon;
@@ -84,6 +85,15 @@ class VehicleController extends Controller
              
             $vehicle->plants()->sync(explode(",",$request->plants));
 
+            foreach(explode(",",$request->plants) as $newPlant){                             
+                $plantVehicle = PlantVehicle::where('vehicle_id', $vehicle->id)->where('plant_id', $newPlant)->first();
+                PlantVehicleAdded::create(['plant_vehicle_id' => $plantVehicle->id, 
+                    'plant_id' => $newPlant, 
+                    'vehicle_id'=> $vehicle->id,
+                    'user_id' => Auth::user()->id
+                ]);
+            }
+
             return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
         }
     }
@@ -138,6 +148,7 @@ class VehicleController extends Controller
                 'validity_start_date' => 'required',
                 'validity_end_date' => 'required|after_or_equal:validity_start_date',
                 'plants' => 'required',
+                'old_plants' => 'required'
             ]);
         }else{
             $request->validate([
@@ -154,6 +165,7 @@ class VehicleController extends Controller
                 'validity_start_date' => 'required',
                 'validity_end_date' => 'required|after_or_equal:validity_start_date',
                 'plants' => 'required',
+                'old_plants' => 'required'
             ]);
         }
         if($vehicle->update(['user_id' => Auth::user()->id] + $request->all())){
@@ -169,7 +181,7 @@ class VehicleController extends Controller
             }
             $plantVehicles = PlantVehicle::where('vehicle_id', $vehicle->id)->whereNotIn('plant_id', explode(",",$request->plants))->get();
             
-            foreach($plantVehicles as $plantVehicle){
+            foreach($plantVehicles as $plantVehicle){                             
 
                 PlantVehicleDeleted::create(['plant_vehicle_id' => $plantVehicle['id'], 
                     'plant_id' => $plantVehicle['plant_id'], 
@@ -179,6 +191,17 @@ class VehicleController extends Controller
             }
 
             $vehicle->plants()->sync(explode(",",$request->plants));
+
+            $newPlants =  array_diff(explode(",",$request->plants), explode(",",$request->old_plants));
+
+            foreach($newPlants as $newPlant){                             
+                $plantVehicle = PlantVehicle::where('vehicle_id', $vehicle->id)->where('plant_id', $newPlant)->first();
+                PlantVehicleAdded::create(['plant_vehicle_id' => $plantVehicle->id, 
+                    'plant_id' => $newPlant, 
+                    'vehicle_id'=> $vehicle->id,
+                    'user_id' => Auth::user()->id
+                ]);
+            }
 
             return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
         }
