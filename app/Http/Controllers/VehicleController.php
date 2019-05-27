@@ -148,7 +148,7 @@ class VehicleController extends Controller
                 'validity_start_date' => 'required',
                 'validity_end_date' => 'required|after_or_equal:validity_start_date',
                 'plants' => 'required',
-                'old_plants' => 'required'
+                // 'old_plants' => 'required'
             ]);
         }else{
             $request->validate([
@@ -165,7 +165,7 @@ class VehicleController extends Controller
                 'validity_start_date' => 'required',
                 'validity_end_date' => 'required|after_or_equal:validity_start_date',
                 'plants' => 'required',
-                'old_plants' => 'required'
+                // 'old_plants' => 'required'
             ]);
         }
         if($vehicle->update(['user_id' => Auth::user()->id] + $request->all())){
