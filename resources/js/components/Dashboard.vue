@@ -204,7 +204,7 @@
                                     <select class="form-control" v-model="vehicle.capacity_id">
                                         <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.category_id">The capacity field is required.</span>
+                                    <span class="text-danger" v-if="errors.capacity_id">The capacity field is required.</span>
                                 </div>
                             </div>
                         </div> 

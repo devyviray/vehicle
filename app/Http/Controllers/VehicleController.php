@@ -13,6 +13,7 @@ use App\{
 use App\Rules\ValidityRule;
 use Carbon;
 use Auth;
+use DB;
 use Storage;
 
 class VehicleController extends Controller
@@ -73,28 +74,37 @@ class VehicleController extends Controller
                 'plants' => 'required',
             ]);
         }
-        if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
-            $attachments = $request->file('attachments');   
-            foreach($attachments as $attachment){
-                $filename = $attachment->getClientOriginalName();
-                $path = Storage::disk('public')->put('document', $attachment);
-                // $path = $attachment->store('document');
 
-                $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+        DB::beginTransaction();
+        try {
+
+            if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
+                $attachments = $request->file('attachments');   
+                foreach($attachments as $attachment){
+                    $filename = $attachment->getClientOriginalName();
+                    $path = Storage::disk('public')->put('document', $attachment);
+                    // $path = $attachment->store('document');
+    
+                    $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+                }
+                 
+                $vehicle->plants()->sync(explode(",",$request->plants));
+    
+                foreach(explode(",",$request->plants) as $newPlant){                             
+                    $plantVehicle = PlantVehicle::where('vehicle_id', $vehicle->id)->where('plant_id', $newPlant)->first();
+                    PlantVehicleAdded::create(['plant_vehicle_id' => $plantVehicle->id, 
+                        'plant_id' => $newPlant, 
+                        'vehicle_id'=> $vehicle->id,
+                        'user_id' => Auth::user()->id
+                    ]);
+                }
+
+                DB::commit();
+                return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
             }
-             
-            $vehicle->plants()->sync(explode(",",$request->plants));
 
-            foreach(explode(",",$request->plants) as $newPlant){                             
-                $plantVehicle = PlantVehicle::where('vehicle_id', $vehicle->id)->where('plant_id', $newPlant)->first();
-                PlantVehicleAdded::create(['plant_vehicle_id' => $plantVehicle->id, 
-                    'plant_id' => $newPlant, 
-                    'vehicle_id'=> $vehicle->id,
-                    'user_id' => Auth::user()->id
-                ]);
-            }
-
-            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
+        } catch (Exception $e) {
+            DB::rollBack();
         }
     }
 
@@ -168,42 +178,52 @@ class VehicleController extends Controller
                 'old_plants' => 'required'
             ]);
         }
-        if($vehicle->update(['user_id' => Auth::user()->id] + $request->all())){
-            if($request->has('attachments')){
-                $attachments = $request->file('attachments');   
-                foreach($attachments as $attachment){
-                    $filename = $attachment->getClientOriginalName();
-                    $path = Storage::disk('public')->put('document', $attachment);
-                    // $path = $attachment->store('document');
-    
-                    $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+        
+        DB::beginTransaction();
+        try {
+
+            if($vehicle->update(['user_id' => Auth::user()->id] + $request->all())){
+                if($request->has('attachments')){
+                    $attachments = $request->file('attachments');   
+                    foreach($attachments as $attachment){
+                        $filename = $attachment->getClientOriginalName();
+                        $path = Storage::disk('public')->put('document', $attachment);
+                        // $path = $attachment->store('document');
+        
+                        $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+                    }
                 }
+                $plantVehicles = PlantVehicle::where('vehicle_id', $vehicle->id)->whereNotIn('plant_id', explode(",",$request->plants))->get();
+                
+                foreach($plantVehicles as $plantVehicle){                             
+    
+                    PlantVehicleDeleted::create(['plant_vehicle_id' => $plantVehicle['id'], 
+                        'plant_id' => $plantVehicle['plant_id'], 
+                        'vehicle_id'=> $plantVehicle['vehicle_id'],
+                        'user_id' => Auth::user()->id
+                    ]);
+                }
+    
+                $vehicle->plants()->sync(explode(",",$request->plants));
+    
+                $newPlants =  array_diff(explode(",",$request->plants), explode(",",$request->old_plants));
+    
+                foreach($newPlants as $newPlant){                             
+                    $plantVehicle = PlantVehicle::where('vehicle_id', $vehicle->id)->where('plant_id', $newPlant)->first();
+                    PlantVehicleAdded::create(['plant_vehicle_id' => $plantVehicle->id, 
+                        'plant_id' => $newPlant, 
+                        'vehicle_id'=> $vehicle->id,
+                        'user_id' => Auth::user()->id
+                    ]);
+                }
+                
+                DB::commit();
+
+                return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
             }
-            $plantVehicles = PlantVehicle::where('vehicle_id', $vehicle->id)->whereNotIn('plant_id', explode(",",$request->plants))->get();
-            
-            foreach($plantVehicles as $plantVehicle){                             
 
-                PlantVehicleDeleted::create(['plant_vehicle_id' => $plantVehicle['id'], 
-                    'plant_id' => $plantVehicle['plant_id'], 
-                    'vehicle_id'=> $plantVehicle['vehicle_id'],
-                    'user_id' => Auth::user()->id
-                ]);
-            }
-
-            $vehicle->plants()->sync(explode(",",$request->plants));
-
-            $newPlants =  array_diff(explode(",",$request->plants), explode(",",$request->old_plants));
-
-            foreach($newPlants as $newPlant){                             
-                $plantVehicle = PlantVehicle::where('vehicle_id', $vehicle->id)->where('plant_id', $newPlant)->first();
-                PlantVehicleAdded::create(['plant_vehicle_id' => $plantVehicle->id, 
-                    'plant_id' => $newPlant, 
-                    'vehicle_id'=> $vehicle->id,
-                    'user_id' => Auth::user()->id
-                ]);
-            }
-
-            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
+        } catch (Exception $e) {
+            DB::rollBack();
         }
     }
 

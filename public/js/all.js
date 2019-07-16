@@ -46628,7 +46628,7 @@ var render = function() {
                           0
                         ),
                         _vm._v(" "),
-                        _vm.errors.category_id
+                        _vm.errors.capacity_id
                           ? _c("span", { staticClass: "text-danger" }, [
                               _vm._v("The capacity field is required.")
                             ])
