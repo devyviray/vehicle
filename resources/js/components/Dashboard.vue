@@ -18,6 +18,7 @@
                                 </div> 
                                 <div class="col text-right" v-if="this.userLevel > 4">
                                     <a href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
+                                    <button :disabled="!downloadExcelbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
                                 </div>
                             </div>
                             <div class="row align-items-center">
@@ -531,6 +532,7 @@ import vSelect from 'vue-select'
 import Multiselect from 'vue-multiselect'
 import loader from './Loader'
 import VueContentPlaceholders from 'vue-content-placeholders'
+import XLSX from 'xlsx'
 
 export default {
     props:['userLevel'],
@@ -570,7 +572,8 @@ export default {
             vehicle_updated: false,
             loading: false,
             table_loading: false,
-            old_plants: []
+            old_plants: [],
+            downloadExcelbutton:false
         }
     },
     created(){
@@ -586,6 +589,46 @@ export default {
         this.fetchPlants();
     },
     methods:{
+        exportVehicle(){
+            var vehicleData = [];
+            for (var i = 0; i < this.vehicles.length; i++) {
+                var subcon_vendor = "";
+                var goods = "";
+                var allowed_total_weight = "";
+                var contract = "";
+                if(this.vehicles[i].subcon_vendor){
+                    subcon_vendor = this.vehicles[i].subcon_vendor.vendor_description_lfug;
+                }
+                if(this.vehicles[i].good){
+                    goods = this.vehicles[i].good.description;
+                }
+                if(this.vehicles[i].allowed_total_weight){
+                    allowed_total_weight = this.vehicles[i].allowed_total_weight;
+                }
+                if(this.vehicles[i].contract){
+                    contract = this.vehicles[i].contract.code;
+                }
+                vehicleData.push({
+                    "CATEGORY": this.vehicles[i].category.description,
+                    "PLATE NUMBER": this.vehicles[i].plate_number,
+                    "PLANT INDICATOR": this.vehicles[i].indicator.description,
+                    "VENDOR":this.vehicles[i].vendor.vendor_description_lfug,
+                    "SUBCON VENDOR": subcon_vendor,
+                    "CAPACITY": this.vehicles[i].capacity.description,
+                    "GOODS":goods,
+                    "ALLOWED TOTAL WEIGHT (KG)": allowed_total_weight,
+                    "BASED TRUCKS":this.vehicles[i].based_truck.description,
+                    "REMARKS": this.vehicles[i].remarks,
+                    "VALIDITY START DATE": this.vehicles[i].validity_start_date,
+                    "VALIDITY END DATE": this.vehicles[i].validity_end_date,
+                });
+            }
+
+            var exportedData  = XLSX.utils.json_to_sheet(vehicleData)
+            var wb = XLSX.utils.book_new()
+            XLSX.utils.book_append_sheet(wb, exportedData,'Vehicle List') 
+            XLSX.writeFile(wb, 'Vechicle List.xlsx')
+        },
         disabledEdit(){
             document.getElementById('capacity-edit').disabled = true;
             document.getElementById('good-edit').disabled = true;
@@ -647,10 +690,13 @@ export default {
             .then(response => { 
                 this.vehicles = response.data;
                 this.table_loading = false;
+                this.downloadExcelbutton = true;
             })
             .catch(error => { 
                 this.errors = error.response.data.error;
             })
+
+
         },
         fetchCategories(){
             axios.get('/categories')
