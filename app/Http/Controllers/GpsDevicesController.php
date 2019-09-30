@@ -9,7 +9,6 @@ use App\{
 };
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Psr7;
 use GuzzleHttp\Exception\BadResponseException;
 
 
@@ -133,33 +132,40 @@ class GpsDevicesController extends Controller
 
         }catch (BadResponseException $ex) {
             $response = $ex->getResponse()->getBody();
-            return json_decode($response, true);;
+            return json_decode($response, true);
         }
     
     }
 
-    public function destroy(GpsDevice $gps_device)
-    {
+    private function destroy_api_gps($device_id){
+        $client = new Client();
         $user_api_hash = $this->get_user_api_hash();
-
         try{
-            $client = new Client();
-
-            Vehicle::whereId($gps_device->vehicle_id)->update(['gps_device_id' => null]);
-
-            $response = $client->delete('http://gpstracker.lafilgroup.com/api/destroy_device?user_api_hash='.$user_api_hash.'&device_id='.$gps_device->device_id);
-            
-            $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice')->where('id', $gps_device->vehicle_id)->first();
-
-            if($gps_device->delete()){
-                return $vehicle;
-            }
+            $response = $client->delete('http://gpstracker.lafilgroup.com/api/destroy_device?user_api_hash='.$user_api_hash.'&device_id='.$device_id);
+            return "Success";
         }catch (BadResponseException $ex) {
             $response = $ex->getResponse()->getBody();
-            return $vehicle;
+            return "Error";
+        }
+    }
+
+    public function destroy(GpsDevice $gps_device)
+    {
+        try{
+            $destroy_api = $this->destroy_api_gps($gps_device->device_id);
+            if($destroy_api == "Success"){
+                Vehicle::whereId($gps_device->vehicle_id)->update(['gps_device_id' => null]);
+                if($gps_device->delete()){
+                    $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice')->where('id', $gps_device->vehicle_id)->first();
+                    return $vehicle;
+                }
+            }else{
+                $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice')->where('id', $gps_device->vehicle_id)->first();
+                return $vehicle;
+            }
         }catch (NotFoundHttpException $e) {
             $response = $e->getResponse();
-            return $vehicle;
+            return $response;
         }
         
     }
