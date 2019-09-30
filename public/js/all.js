@@ -9244,9 +9244,9 @@ __webpack_require__.r(__webpack_exports__);
       assigned_gps: false,
       gps_device: [],
       gps_device_id: '',
-      btn_assign: true,
-      btn_edit: true,
-      btn_view: true
+      btn_assign: false,
+      btn_edit: false,
+      btn_view: false
     };
   },
   created: function created() {
