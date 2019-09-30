@@ -27,7 +27,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 
 // Authenticated Routes
 Route::group(['middleware' => 'auth'], function(){
-        // Vehicle
+    // Vehicle
     Route::get('/vehicle', 'VehicleController@index');
     Route::post('/vehicle', 'VehicleController@store');
     Route::patch('/vehicle/{vehicle}', 'VehicleController@update');
@@ -89,6 +89,13 @@ Route::group(['middleware' => 'auth'], function(){
 
     // Plants
     Route::get('/plants', 'PlantController@index');
+
+    // GPS Devices
+    Route::get('/gps_devices', 'GpsDevicesController@index');
+    Route::post('/gps_device', 'GpsDevicesController@store');
+    Route::patch('/gps_device/{gps_device}', 'GpsDevicesController@update');
+    Route::get('/send_api_assign_gps', 'GpsDevicesController@send_api_assign_gps');
+    Route::delete('/gps_device/{gps_device}', 'GpsDevicesController@destroy');
 
     // Roles
     Route::get('/roles', 'RoleController@index');

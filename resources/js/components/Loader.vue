@@ -11,9 +11,9 @@
     .outer{
         height: 100vh;
         width: 100%;
-        position: absolute;
+        position: fixed;
         background-color: rgba(255,255,255,0.7);
-        z-index: 1100;
+        z-index: 10000;
         text-align: center;
     }
     .sk-spinner[data-v-39432f99]{

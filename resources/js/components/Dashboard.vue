@@ -29,11 +29,12 @@
                         </div>
                         <div class="table-responsive">
                             <!-- Projects table -->
+                           
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                     <tr>
                                         <th></th>
-                                        <th scope="col">ID</th>
+                                        <th scope="col"></th>
                                         <th scope="col">Category</th>
                                         <th scope="col">Plate number</th>
                                         <th scope="col">Plant Indicator</th>
@@ -68,12 +69,13 @@
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                    <a class="dropdown-item" style="cursor: pointer" @click="getVehicle(vehicle.id)">Edit</a>
-                                                    <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#viewDocumentsModal" @click="copyObject(vehicle)">View Document</a>
+                                                    <a class="dropdown-item" style="cursor: pointer" data-toggle="modal" data-target="#assignGPSModal" @click="viewAssignGPS(vehicle,vehicle.gpsdevice)" v-if="btn_assign">Assign GPS</a>
+                                                    <a class="dropdown-item" style="cursor: pointer" @click="getVehicle(vehicle.id)" v-if="btn_edit">Edit</a>
+                                                    <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#viewDocumentsModal" @click="copyObject(vehicle)" v-if="btn_view">View Document</a>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td scope="row">{{ vehicle.id }}</td>
+                                        <td><i class="fas fa-location-arrow" v-if="vehicle.gpsdevice"></i></td>
                                         <td>{{ vehicle.category.description }}</td>
                                         <td>{{ vehicle.plate_number }}</td>
                                         <td>{{ vehicle.indicator.description }}</td>
@@ -523,6 +525,84 @@
                 </div>
             </div>
         </div>
+
+        <!-- Assign GPS Modal -->
+        <div class="modal fade" id="assignGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <span class="closed" data-dismiss="modal">&times;</span>
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCompanyLabel">ASSIGN GPS DEVICE</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                         <div class="alert alert-success" v-if="assigned_gps">
+                            <strong>Success!</strong> GPS device succesfully assigned
+                        </div>
+                        <div class="row">
+
+                             <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="role">PLATE NUMBER</label> 
+                                    <input type="text" id="plate_number" class="form-control" v-model="gps_device.plate_number" disabled>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">IMEI NUMBER</label> 
+                                    <input type="text" id="imei" class="form-control" v-model="gps_device.imei" @keypress="onlyNumber" maxlength="15" placeholder="XXXXXXXXXXXXXXX" required>
+                                    <span class="text-danger" v-if="errors.imei">{{ errors.imei[0] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">SIM NUMBER</label> 
+                                    <input type="text" id="sim_number" class="form-control" v-model="gps_device.sim_number" @keypress="onlyNumber" maxlength="11" placeholder="09XXXXXXXXX" required>
+                                    <span class="text-danger" v-if="errors.sim_number">{{ errors.sim_number[0] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button id="assign_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="assignGPS(gps_device)">Assign</button>
+                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#deleteGPSModal" class="btn btn-danger btn-round btn-fill" v-if="gps_device_id">Delete</button>
+                    </div>
+                </div>
+            </div>  
+        </div>  
+
+         <!-- Delete GPS Device Modal -->
+        <div class="modal fade" id="deleteGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+            <span class="closed" data-dismiss="modal">&times;</span>
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCompanyLabel">Delete GPS Device</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                   <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                Are you sure you want to delete this GPS Device?
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
+                    <button class="btn btn-warning" @click="deleteGPSDevice">Delete</button>
+                </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </template>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
@@ -535,7 +615,7 @@ import VueContentPlaceholders from 'vue-content-placeholders'
 import XLSX from 'xlsx'
 
 export default {
-    props:['userLevel'],
+    props:['userLevel','role'],
     components: {
         vSelect,
         Multiselect,
@@ -573,7 +653,14 @@ export default {
             loading: false,
             table_loading: false,
             old_plants: [],
-            downloadExcelbutton:false
+            downloadExcelbutton:false,
+            assigned_gps:false,
+            gps_device: [],
+            gps_device_id: '',
+            btn_assign: true,
+            btn_edit: true,
+            btn_view: true
+
         }
     },
     created(){
@@ -587,6 +674,7 @@ export default {
         this.fetchDocuments();
         this.fetchTruckers();
         this.fetchPlants();
+        this.buttonAuth();
     },
     methods:{
         exportVehicle(){
@@ -695,8 +783,6 @@ export default {
             .catch(error => { 
                 this.errors = error.response.data.error;
             })
-
-
         },
         fetchCategories(){
             axios.get('/categories')
@@ -930,6 +1016,102 @@ export default {
             .catch(error => {
                 this.errors = error.response.data.errors;
             })
+        },
+        viewAssignGPS(vehicle,gps_device){
+            this.loading = false;
+            this.assigned_gps = false;
+            this.resetAssignGPS();
+            this.vehicle_copied = Object.assign({}, vehicle);
+
+            if(gps_device){
+                this.gps_device_id = gps_device.id;
+                this.gps_device.imei = gps_device.imei;
+                this.gps_device.sim_number = gps_device.sim_number;
+            }else{
+                this.gps_device_id = null;
+                this.gps_device.imei = null;
+                this.gps_device.sim_number = null;
+            }
+
+            this.gps_device.plate_number = this.vehicle_copied.plate_number;
+            
+        },
+        buttonAuth(){
+            console.log(this.role); 
+            if(this.role == "GPS Custodian"){
+                this.btn_assign = true;
+                this.btn_edit = false;
+                this.btn_view = false;
+            }else{
+                this.btn_assign = false;
+                this.btn_edit = true;
+                this.btn_view = true;
+
+            }
+        },
+        assignGPS(gps_device){
+
+            var index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
+            this.loading = true;
+            this.assigned_gps = false;
+            this.errors = [];
+
+            if(this.gps_device_id){
+                axios.post(`/gps_device/${this.gps_device_id}`, {
+                    vehicle_id: this.vehicle_copied.id,
+                    imei: gps_device.imei,
+                    sim_number: gps_device.sim_number,
+                    _method:'PATCH'
+                }).then(response =>{
+                    this.loading = false;
+                    this.assigned_gps = true;
+                    this.vehicles.splice(index,1,response.data);
+                })
+                .catch(error => {
+                    this.loading = false;
+                    this.assigned_gps = false;
+                    this.errors = error.response.data.errors;
+                })
+
+            }else{
+                axios.post('/gps_device', {
+                    vehicle_id: this.vehicle_copied.id,
+                    imei: gps_device.imei,
+                    sim_number: gps_device.sim_number,
+                    _method:'POST'
+                }).then(response =>{
+                    this.loading = false;
+                    this.assigned_gps = true;
+                    this.gps_device_id = response.data.gps_device_id;
+                    this.vehicles.splice(index,1,response.data);
+                })
+                .catch(error => {
+                    this.loading = false;
+                    this.assigned_gps = false;
+                    this.errors = error.response.data.errors;
+                })
+            }
+        },
+
+        deleteGPSDevice(){
+            this.loading = true;
+            var index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
+            axios.delete(`/gps_device/${this.gps_device_id}`)
+            .then(response => {
+                $('#deleteGPSModal').modal('hide');
+                $('#assignGPSModal').modal('hide');
+                this.vehicles.splice(index,1,response.data);
+                this.loading = false;
+                alert('GPS Device successfully deleted');
+            })
+            .catch(error => {
+                this.errors = error.response.data.errors;
+            })
+        },
+
+        resetAssignGPS(){
+            this.errors = [];
+            this.gps_device = [];
         },
         setPage(pageNumber) {
             this.currentPage = pageNumber;

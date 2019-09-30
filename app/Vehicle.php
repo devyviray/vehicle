@@ -64,6 +64,11 @@ class Vehicle extends Model implements Auditable
         return $this->belongsTo(User::Class);
     }
 
+
+    public function gpsdevice(){
+        return $this->belongsTo(GpsDevice::Class, 'gps_device_id');
+    }
+
     public function vendor(){
         return $this->belongsTo(Trucker::Class, 'vendor_id');
     }

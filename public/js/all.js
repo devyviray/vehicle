@@ -9116,13 +9116,93 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['userLevel'],
+  props: ['userLevel', 'role'],
   components: {
     vSelect: vue_select__WEBPACK_IMPORTED_MODULE_0___default.a,
     Multiselect: vue_multiselect__WEBPACK_IMPORTED_MODULE_1___default.a,
@@ -9160,7 +9240,13 @@ __webpack_require__.r(__webpack_exports__);
       loading: false,
       table_loading: false,
       old_plants: [],
-      downloadExcelbutton: false
+      downloadExcelbutton: false,
+      assigned_gps: false,
+      gps_device: [],
+      gps_device_id: '',
+      btn_assign: true,
+      btn_edit: true,
+      btn_view: true
     };
   },
   created: function created() {
@@ -9174,6 +9260,7 @@ __webpack_require__.r(__webpack_exports__);
     this.fetchDocuments();
     this.fetchTruckers();
     this.fetchPlants();
+    this.buttonAuth();
   },
   methods: {
     exportVehicle: function exportVehicle() {
@@ -9533,6 +9620,105 @@ __webpack_require__.r(__webpack_exports__);
         _this14.errors = error.response.data.errors;
       });
     },
+    viewAssignGPS: function viewAssignGPS(vehicle, gps_device) {
+      this.loading = false;
+      this.assigned_gps = false;
+      this.resetAssignGPS();
+      this.vehicle_copied = Object.assign({}, vehicle);
+
+      if (gps_device) {
+        this.gps_device_id = gps_device.id;
+        this.gps_device.imei = gps_device.imei;
+        this.gps_device.sim_number = gps_device.sim_number;
+      } else {
+        this.gps_device_id = null;
+        this.gps_device.imei = null;
+        this.gps_device.sim_number = null;
+      }
+
+      this.gps_device.plate_number = this.vehicle_copied.plate_number;
+    },
+    buttonAuth: function buttonAuth() {
+      console.log(this.role);
+
+      if (this.role == "GPS Custodian") {
+        this.btn_assign = true;
+        this.btn_edit = false;
+        this.btn_view = false;
+      } else {
+        this.btn_assign = false;
+        this.btn_edit = true;
+        this.btn_view = true;
+      }
+    },
+    assignGPS: function assignGPS(gps_device) {
+      var _this15 = this;
+
+      var index = this.vehicles.findIndex(function (item) {
+        return item.id == _this15.vehicle_copied.id;
+      });
+      this.loading = true;
+      this.assigned_gps = false;
+      this.errors = [];
+
+      if (this.gps_device_id) {
+        axios.post("/gps_device/".concat(this.gps_device_id), {
+          vehicle_id: this.vehicle_copied.id,
+          imei: gps_device.imei,
+          sim_number: gps_device.sim_number,
+          _method: 'PATCH'
+        }).then(function (response) {
+          _this15.loading = false;
+          _this15.assigned_gps = true;
+
+          _this15.vehicles.splice(index, 1, response.data);
+        }).catch(function (error) {
+          _this15.loading = false;
+          _this15.assigned_gps = false;
+          _this15.errors = error.response.data.errors;
+        });
+      } else {
+        axios.post('/gps_device', {
+          vehicle_id: this.vehicle_copied.id,
+          imei: gps_device.imei,
+          sim_number: gps_device.sim_number,
+          _method: 'POST'
+        }).then(function (response) {
+          _this15.loading = false;
+          _this15.assigned_gps = true;
+          _this15.gps_device_id = response.data.gps_device_id;
+
+          _this15.vehicles.splice(index, 1, response.data);
+        }).catch(function (error) {
+          _this15.loading = false;
+          _this15.assigned_gps = false;
+          _this15.errors = error.response.data.errors;
+        });
+      }
+    },
+    deleteGPSDevice: function deleteGPSDevice() {
+      var _this16 = this;
+
+      this.loading = true;
+      var index = this.vehicles.findIndex(function (item) {
+        return item.id == _this16.vehicle_copied.id;
+      });
+      axios.delete("/gps_device/".concat(this.gps_device_id)).then(function (response) {
+        $('#deleteGPSModal').modal('hide');
+        $('#assignGPSModal').modal('hide');
+
+        _this16.vehicles.splice(index, 1, response.data);
+
+        _this16.loading = false;
+        alert('GPS Device successfully deleted');
+      }).catch(function (error) {
+        _this16.errors = error.response.data.errors;
+      });
+    },
+    resetAssignGPS: function resetAssignGPS() {
+      this.errors = [];
+      this.gps_device = [];
+    },
     setPage: function setPage(pageNumber) {
       this.currentPage = pageNumber;
     },
@@ -9548,11 +9734,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     filteredVehicles: function filteredVehicles() {
-      var _this15 = this;
+      var _this17 = this;
 
       var self = this;
       return Object.values(self.vehicles).filter(function (vehicle) {
-        return vehicle.plate_number.toLowerCase().includes(_this15.keywords.toLowerCase());
+        return vehicle.plate_number.toLowerCase().includes(_this17.keywords.toLowerCase());
       });
     },
     totalPages: function totalPages() {
@@ -16641,7 +16827,7 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 
 // module
-exports.push([module.i, "\n.outer{\n    height: 100vh;\n    width: 100%;\n    position: absolute;\n    background-color: rgba(255,255,255,0.7);\n    z-index: 1100;\n    text-align: center;\n}\n.sk-spinner[data-v-39432f99]{\n    margin-top: 250px;\n}\n.loader-div{\n    height: 10%;\n    width: 3%;\n    margin: 0 auto;\n    margin-top: 25%;\n}\n", ""]);
+exports.push([module.i, "\n.outer{\n    height: 100vh;\n    width: 100%;\n    position: fixed;\n    background-color: rgba(255,255,255,0.7);\n    z-index: 10000;\n    text-align: center;\n}\n.sk-spinner[data-v-39432f99]{\n    margin-top: 250px;\n}\n.loader-div{\n    height: 10%;\n    width: 3%;\n    margin: 0 auto;\n    margin-top: 25%;\n}\n", ""]);
 
 // exports
 
@@ -48233,48 +48419,86 @@ var render = function() {
                                           "dropdown-menu dropdown-menu-right dropdown-menu-arrow"
                                       },
                                       [
-                                        _c(
-                                          "a",
-                                          {
-                                            staticClass: "dropdown-item",
-                                            staticStyle: { cursor: "pointer" },
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.getVehicle(
-                                                  vehicle.id
-                                                )
-                                              }
-                                            }
-                                          },
-                                          [_vm._v("Edit")]
-                                        ),
+                                        _vm.btn_assign
+                                          ? _c(
+                                              "a",
+                                              {
+                                                staticClass: "dropdown-item",
+                                                staticStyle: {
+                                                  cursor: "pointer"
+                                                },
+                                                attrs: {
+                                                  "data-toggle": "modal",
+                                                  "data-target":
+                                                    "#assignGPSModal"
+                                                },
+                                                on: {
+                                                  click: function($event) {
+                                                    return _vm.viewAssignGPS(
+                                                      vehicle,
+                                                      vehicle.gpsdevice
+                                                    )
+                                                  }
+                                                }
+                                              },
+                                              [_vm._v("Assign GPS")]
+                                            )
+                                          : _vm._e(),
                                         _vm._v(" "),
-                                        _c(
-                                          "a",
-                                          {
-                                            staticClass: "dropdown-item",
-                                            attrs: {
-                                              href: "javascript.void(0)",
-                                              "data-toggle": "modal",
-                                              "data-target":
-                                                "#viewDocumentsModal"
-                                            },
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.copyObject(vehicle)
-                                              }
-                                            }
-                                          },
-                                          [_vm._v("View Document")]
-                                        )
+                                        _vm.btn_edit
+                                          ? _c(
+                                              "a",
+                                              {
+                                                staticClass: "dropdown-item",
+                                                staticStyle: {
+                                                  cursor: "pointer"
+                                                },
+                                                on: {
+                                                  click: function($event) {
+                                                    return _vm.getVehicle(
+                                                      vehicle.id
+                                                    )
+                                                  }
+                                                }
+                                              },
+                                              [_vm._v("Edit")]
+                                            )
+                                          : _vm._e(),
+                                        _vm._v(" "),
+                                        _vm.btn_view
+                                          ? _c(
+                                              "a",
+                                              {
+                                                staticClass: "dropdown-item",
+                                                attrs: {
+                                                  href: "javascript.void(0)",
+                                                  "data-toggle": "modal",
+                                                  "data-target":
+                                                    "#viewDocumentsModal"
+                                                },
+                                                on: {
+                                                  click: function($event) {
+                                                    return _vm.copyObject(
+                                                      vehicle
+                                                    )
+                                                  }
+                                                }
+                                              },
+                                              [_vm._v("View Document")]
+                                            )
+                                          : _vm._e()
                                       ]
                                     )
                                   ])
                                 : _vm._e()
                             ]),
                             _vm._v(" "),
-                            _c("td", { attrs: { scope: "row" } }, [
-                              _vm._v(_vm._s(vehicle.id))
+                            _c("td", [
+                              vehicle.gpsdevice
+                                ? _c("i", {
+                                    staticClass: "fas fa-location-arrow"
+                                  })
+                                : _vm._e()
                             ]),
                             _vm._v(" "),
                             _c("td", [
@@ -50112,6 +50336,274 @@ var render = function() {
             ]
           )
         ]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "assignGPSModal",
+            tabindex: "-1",
+            role: "dialog",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true"
+          }
+        },
+        [
+          _c(
+            "span",
+            { staticClass: "closed", attrs: { "data-dismiss": "modal" } },
+            [_vm._v("×")]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "modal-dialog modal-dialog-centered modal-lg",
+              attrs: { role: "document" }
+            },
+            [
+              _c("div", { staticClass: "modal-content" }, [
+                _vm._m(12),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _vm.assigned_gps
+                    ? _c("div", { staticClass: "alert alert-success" }, [
+                        _c("strong", [_vm._v("Success!")]),
+                        _vm._v(
+                          " GPS device succesfully assigned\n                    "
+                        )
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-md-12" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "role" } }, [
+                          _vm._v("PLATE NUMBER")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.gps_device.plate_number,
+                              expression: "gps_device.plate_number"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "plate_number",
+                            disabled: ""
+                          },
+                          domProps: { value: _vm.gps_device.plate_number },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.gps_device,
+                                "plate_number",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        })
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "role" } }, [
+                          _vm._v("IMEI NUMBER")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.gps_device.imei,
+                              expression: "gps_device.imei"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "imei",
+                            maxlength: "15",
+                            placeholder: "XXXXXXXXXXXXXXX",
+                            required: ""
+                          },
+                          domProps: { value: _vm.gps_device.imei },
+                          on: {
+                            keypress: _vm.onlyNumber,
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.gps_device,
+                                "imei",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _vm.errors.imei
+                          ? _c("span", { staticClass: "text-danger" }, [
+                              _vm._v(_vm._s(_vm.errors.imei[0]))
+                            ])
+                          : _vm._e()
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "role" } }, [
+                          _vm._v("SIM NUMBER")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.gps_device.sim_number,
+                              expression: "gps_device.sim_number"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: {
+                            type: "text",
+                            id: "sim_number",
+                            maxlength: "11",
+                            placeholder: "09XXXXXXXXX",
+                            required: ""
+                          },
+                          domProps: { value: _vm.gps_device.sim_number },
+                          on: {
+                            keypress: _vm.onlyNumber,
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.$set(
+                                _vm.gps_device,
+                                "sim_number",
+                                $event.target.value
+                              )
+                            }
+                          }
+                        }),
+                        _vm._v(" "),
+                        _vm.errors.sim_number
+                          ? _c("span", { staticClass: "text-danger" }, [
+                              _vm._v(_vm._s(_vm.errors.sim_number[0]))
+                            ])
+                          : _vm._e()
+                      ])
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-primary btn-round btn-fill",
+                      attrs: { id: "assign_btn", type: "button" },
+                      on: {
+                        click: function($event) {
+                          return _vm.assignGPS(_vm.gps_device)
+                        }
+                      }
+                    },
+                    [_vm._v("Assign")]
+                  ),
+                  _vm._v(" "),
+                  _vm.gps_device_id
+                    ? _c(
+                        "button",
+                        {
+                          staticClass: "btn btn-danger btn-round btn-fill",
+                          attrs: {
+                            id: "assign_btn",
+                            type: "button",
+                            "data-toggle": "modal",
+                            "data-target": "#deleteGPSModal"
+                          }
+                        },
+                        [_vm._v("Delete")]
+                      )
+                    : _vm._e()
+                ])
+              ])
+            ]
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "deleteGPSModal",
+            tabindex: "-1",
+            role: "dialog",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true",
+            "data-backdrop": "static"
+          }
+        },
+        [
+          _c(
+            "span",
+            { staticClass: "closed", attrs: { "data-dismiss": "modal" } },
+            [_vm._v("×")]
+          ),
+          _vm._v(" "),
+          _c(
+            "div",
+            {
+              staticClass: "modal-dialog modal-dialog-centered modal-lg",
+              attrs: { role: "document" }
+            },
+            [
+              _c("div", { staticClass: "modal-content" }, [
+                _vm._m(13),
+                _vm._v(" "),
+                _vm._m(14),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-secondary",
+                      attrs: { "data-dismiss": "modal" }
+                    },
+                    [_vm._v("Close")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-warning",
+                      on: { click: _vm.deleteGPSDevice }
+                    },
+                    [_vm._v("Delete")]
+                  )
+                ])
+              ])
+            ]
+          )
+        ]
       )
     ],
     1
@@ -50151,7 +50643,7 @@ var staticRenderFns = [
       _c("tr", [
         _c("th"),
         _vm._v(" "),
-        _c("th", { attrs: { scope: "col" } }, [_vm._v("ID")]),
+        _c("th", { attrs: { scope: "col" } }),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Category")]),
         _vm._v(" "),
@@ -50349,6 +50841,72 @@ var staticRenderFns = [
         _c("th", { attrs: { scope: "col" } }, [_vm._v("File name")]),
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Action")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "addCompanyLabel" } },
+        [_vm._v("ASSIGN GPS DEVICE")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "addCompanyLabel" } },
+        [_vm._v("Delete GPS Device")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-body" }, [
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-md-12" }, [
+          _c("div", { staticClass: "form-group" }, [
+            _vm._v(
+              "\n                            Are you sure you want to delete this GPS Device?\n                        "
+            )
+          ])
+        ])
       ])
     ])
   }
