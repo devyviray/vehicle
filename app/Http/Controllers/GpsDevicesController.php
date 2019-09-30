@@ -18,7 +18,7 @@ class GpsDevicesController extends Controller
 {
 
     private function get_user_api_hash(){
-        return '$2y$10$cgtB39dh3RjWI411T6MwjuYUHrRTv/4iUC.A7RSTktZQrjJ5UWl1W&device_id=570';
+        return '$2y$10$cgtB39dh3RjWI411T6MwjuYUHrRTv/4iUC.A7RSTktZQrjJ5UWl1W';
     }
 
     public function index(){
@@ -142,11 +142,10 @@ class GpsDevicesController extends Controller
     {
         $user_api_hash = $this->get_user_api_hash();
 
-        Vehicle::whereId($gps_device->vehicle_id)->update(['gps_device_id' => null]);
-
-
         try{
             $client = new Client();
+
+            Vehicle::whereId($gps_device->vehicle_id)->update(['gps_device_id' => null]);
 
             $response = $client->delete('http://gpstracker.lafilgroup.com/api/destroy_device?user_api_hash='.$user_api_hash.'&device_id='.$gps_device->device_id);
             
