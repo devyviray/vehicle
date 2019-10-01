@@ -542,7 +542,6 @@
                             <strong>Success!</strong> GPS device succesfully assigned
                         </div>
                         <div class="row">
-
                              <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="role">PLATE NUMBER</label> 
@@ -553,22 +552,51 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="role">IMEI NUMBER</label> 
-                                    <input type="text" id="imei" class="form-control" v-model="gps_device.imei" @keypress="onlyNumber" maxlength="15" placeholder="XXXXXXXXXXXXXXX" required>
+                                    <input type="text" id="imei" class="form-control" v-model="gps_device.imei" @keypress="gpsNumber" maxlength="15" placeholder="XXXXXXXXXXXXXXX" required>
                                     <span class="text-danger" v-if="errors.imei">{{ errors.imei[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="role">SIM NUMBER</label> 
-                                    <input type="text" id="sim_number" class="form-control" v-model="gps_device.sim_number" @keypress="onlyNumber" maxlength="11" placeholder="09XXXXXXXXX" required>
+                                    <input type="text" id="sim_number" class="form-control" v-model="gps_device.sim_number" @keypress="gpsNumber" maxlength="11" placeholder="09XXXXXXXXX" required>
                                     <span class="text-danger" v-if="errors.sim_number">{{ errors.sim_number[0] }}</span>
                                 </div>
                             </div>
+
+                             <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="role">Attachment(s)</label> 
+                                    <input type="file" multiple="multiple" id="gps_attachments" class="gps-attachments-edit" placeholder="Attach file" @change="uploadGPSFileChange" v-if="isUploadGPSAttachment"><br>
+                                    <span class="text-danger" v-if="errors.gps_attachments">The attachment field is required</span>
+                                </div>
+                            </div>
+
+                            <table class="table align-items-center table-flush">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">File name</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(attachment, d) in this.vehicle_copied.gpsdeviceattachments" v-bind:key="d">
+                                        <td>{{ d + 1 }}</td>
+                                        <td>{{ attachment.file_name }}</td>
+                                        <td>
+                                            <span style="text-decoration: none; color: #5e72e4; background-color: transparent; cursor: pointer;"  title="Download" @click="downloadGPSAttachment(attachment.id)">Download</span>
+                                            <span> | </span>
+                                            <span style="text-decoration: none; color: red; background-color: transparent; cursor: pointer;" title="Delete" @click="deleteGPSAttachment(attachment.id)">Delete</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button id="assign_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="assignGPS(gps_device)">Assign</button>
-                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#deleteGPSModal" class="btn btn-danger btn-round btn-fill" v-if="gps_device_id">Delete</button>
+                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#deleteGPSModal" class="btn btn-danger btn-round btn-fill" v-if="gps_device_id">Remove</button>
                     </div>
                 </div>
             </div>  
@@ -580,7 +608,7 @@
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addCompanyLabel">Delete GPS Device</h5>
+                    <h5 class="modal-title" id="addCompanyLabel">Remove GPS Device</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -589,14 +617,14 @@
                    <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                Are you sure you want to delete this GPS Device?
+                                Are you sure you want to remove this GPS Device?
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
-                    <button class="btn btn-warning" @click="deleteGPSDevice">Delete</button>
+                    <button class="btn btn-warning" @click="deleteGPSDevice">Remove</button>
                 </div>
                 </div>
             </div>
@@ -654,12 +682,16 @@ export default {
             table_loading: false,
             old_plants: [],
             downloadExcelbutton:false,
+            formGPSData: new FormData(),
             assigned_gps:false,
             gps_device: [],
             gps_device_id: '',
+            gps_device_attachments: [],
+            gps_device_files: [],
+            isUploadGPSAttachment : true,
             btn_assign: false,
             btn_edit: false,
-            btn_view: false
+            btn_view: false,
 
         }
     },
@@ -748,9 +780,19 @@ export default {
             var base_url = window.location.origin;
             window.location = base_url+`/download-attachment/${id}`;
         },
+        downloadGPSAttachment(id){
+            var base_url = window.location.origin;
+            window.location = base_url+`/download-gps-attachment/${id}`;
+        },
         onlyNumber ($event) {
             let keyCode = ($event.keyCode ? $event.keyCode : $event.which);
             if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) { // 46 is dot
+                $event.preventDefault();
+            }
+        },
+        gpsNumber ($event) {
+            let keyCode = ($event.keyCode ? $event.keyCode : $event.which);
+            if ((keyCode < 48 || keyCode > 57)) { // 46 is dot
                 $event.preventDefault();
             }
         },
@@ -1018,11 +1060,12 @@ export default {
             })
         },
         viewAssignGPS(vehicle,gps_device){
+            this.formGPSData = new FormData();
             this.loading = false;
             this.assigned_gps = false;
             this.resetAssignGPS();
             this.vehicle_copied = Object.assign({}, vehicle);
-
+            this.gpsDeviceAttachmentButton();
             if(gps_device){
                 this.gps_device_id = gps_device.id;
                 this.gps_device.imei = gps_device.imei;
@@ -1031,6 +1074,7 @@ export default {
                 this.gps_device_id = null;
                 this.gps_device.imei = null;
                 this.gps_device.sim_number = null;
+                this.gps_device_attachments = [];
             }
 
             this.gps_device.plate_number = this.vehicle_copied.plate_number;
@@ -1049,23 +1093,64 @@ export default {
 
             }
         },
-        assignGPS(gps_device){
+        gpsDeviceAttachmentButton(){
+            if(this.vehicle_copied.gpsdeviceattachments.length < 5){
+                this.isUploadGPSAttachment = true;
+            }else{
+                this.isUploadGPSAttachment = false;
+            }
+        },
+        prepareGPSAttachmentFields(){
+            if(this.gps_device_attachments.length > 0){
+                for(var i = 0; i < this.gps_device_attachments.length; i++){
+                    let gps_device_attachments = this.gps_device_attachments[i];
+                    this.formGPSData.append('attachments[]', gps_device_attachments);
+                }
+            } 
+        },
+        uploadGPSFileChange(e){
+            var files = e.target.files || e.dataTransfer.files;
 
+            if(!files.length)
+                return;
+            
+            for (var i = files.length - 1; i >= 0; i--){
+                this.gps_device_attachments.push(files[i]);
+                this.fileSize = this.fileSize+files[i].size / 1024 / 1024;
+            }
+            if(this.fileSize > 5){
+                alert('File size exceeds 5 MB');
+                document.getElementById('gps_attachments').value = "";
+                this.gps_device_attachments = [];
+                this.fileSize = 0;
+            }
+
+        },
+        assignGPS(gps_device){
+            this.formGPSData = new FormData();
             var index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
             this.loading = true;
             this.assigned_gps = false;
             this.errors = [];
 
+          
             if(this.gps_device_id){
-                axios.post(`/gps_device/${this.gps_device_id}`, {
-                    vehicle_id: this.vehicle_copied.id,
-                    imei: gps_device.imei,
-                    sim_number: gps_device.sim_number,
-                    _method:'PATCH'
-                }).then(response =>{
+
+                this.prepareGPSAttachmentFields();
+                this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
+                this.formGPSData.append('imei', gps_device.imei);
+                this.formGPSData.append('sim_number', gps_device.sim_number);
+                this.formGPSData.append('_method', 'PATCH');
+
+                axios.post(`/gps_device/${this.gps_device_id}`, this.formGPSData)
+                .then(response =>{
+                    document.getElementById('gps_attachments').value = "";
+                    this.gps_device_attachments = [];
                     this.loading = false;
                     this.assigned_gps = true;
                     this.vehicles.splice(index,1,response.data);
+                    this.vehicle_copied = Object.assign({}, response.data);
+                    this.gpsDeviceAttachmentButton();
                 })
                 .catch(error => {
                     this.loading = false;
@@ -1074,16 +1159,23 @@ export default {
                 })
 
             }else{
-                axios.post('/gps_device', {
-                    vehicle_id: this.vehicle_copied.id,
-                    imei: gps_device.imei,
-                    sim_number: gps_device.sim_number,
-                    _method:'POST'
-                }).then(response =>{
+
+                this.prepareGPSAttachmentFields();
+                this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
+                this.formGPSData.append('imei', gps_device.imei);
+                this.formGPSData.append('sim_number', gps_device.sim_number);
+                this.formGPSData.append('_method', 'POST');
+
+                axios.post('/gps_device', this.formGPSData)    
+                .then(response =>{
+                    document.getElementById('gps_attachments').value = "";
+                    this.gps_device_attachments = [];
                     this.loading = false;
                     this.assigned_gps = true;
                     this.gps_device_id = response.data.gps_device_id;
                     this.vehicles.splice(index,1,response.data);
+                    this.vehicle_copied = Object.assign({}, response.data);
+                    this.gpsDeviceAttachmentButton();
                 })
                 .catch(error => {
                     this.loading = false;
@@ -1092,7 +1184,6 @@ export default {
                 })
             }
         },
-
         deleteGPSDevice(){
             this.loading = true;
             var index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
@@ -1102,16 +1193,31 @@ export default {
                 $('#assignGPSModal').modal('hide');
                 this.vehicles.splice(index,1,response.data);
                 this.loading = false;
-                alert('GPS Device successfully deleted');
+                 alert('GPS Device successfully removed');
             })
             .catch(error => {
                 this.errors = error.response.data.errors;
             })
         },
-
+        deleteGPSAttachment($id){
+            var index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
+            if(confirm("Do you really want to delete this GPS Device Attachment?")){
+                axios.delete(`/delete-gps-attachment/${$id}`)
+                .then(response => {
+                     this.vehicles.splice(index,1,response.data);
+                     this.vehicle_copied = Object.assign({}, response.data);
+                     this.gpsDeviceAttachmentButton();
+                     alert('GPS Device Attachment successfully deleted');
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                })
+            }
+        },
         resetAssignGPS(){
             this.errors = [];
             this.gps_device = [];
+            this.gps_device_attachments = [];
         },
         setPage(pageNumber) {
             this.currentPage = pageNumber;

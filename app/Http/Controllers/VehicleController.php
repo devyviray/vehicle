@@ -25,7 +25,7 @@ class VehicleController extends Controller
      */
     public function index()
     {   
-        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice')
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
             ->when(Auth::user()->level() < 4, function ($query){
                 $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
             })->orderBy('id', 'desc')->get();

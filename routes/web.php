@@ -73,8 +73,16 @@ Route::group(['middleware' => 'auth'], function(){
 
     // Documents
     Route::get('/documents', 'DocumentController@index');
+    
     // Download files upload
     Route::get('/download-attachment/{fileId}', 'DocumentController@downloadAttachment');
+
+    // Download files upload
+    Route::get('/download-gps-attachment/{fileId}', 'GpsDevicesController@downloadGPSAttachment');
+
+    // Download files upload
+    Route::delete('/delete-gps-attachment/{file}', 'GpsDevicesController@deleteGPSAttachment');
+
 
     // Users
     Route::get('/users', 'UserController@index')->name('users');

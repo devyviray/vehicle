@@ -9196,6 +9196,34 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -9241,9 +9269,13 @@ __webpack_require__.r(__webpack_exports__);
       table_loading: false,
       old_plants: [],
       downloadExcelbutton: false,
+      formGPSData: new FormData(),
       assigned_gps: false,
       gps_device: [],
       gps_device_id: '',
+      gps_device_attachments: [],
+      gps_device_files: [],
+      isUploadGPSAttachment: true,
       btn_assign: false,
       btn_edit: false,
       btn_view: false
@@ -9341,10 +9373,22 @@ __webpack_require__.r(__webpack_exports__);
       var base_url = window.location.origin;
       window.location = base_url + "/download-attachment/".concat(id);
     },
+    downloadGPSAttachment: function downloadGPSAttachment(id) {
+      var base_url = window.location.origin;
+      window.location = base_url + "/download-gps-attachment/".concat(id);
+    },
     onlyNumber: function onlyNumber($event) {
       var keyCode = $event.keyCode ? $event.keyCode : $event.which;
 
       if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) {
+        // 46 is dot
+        $event.preventDefault();
+      }
+    },
+    gpsNumber: function gpsNumber($event) {
+      var keyCode = $event.keyCode ? $event.keyCode : $event.which;
+
+      if (keyCode < 48 || keyCode > 57) {
         // 46 is dot
         $event.preventDefault();
       }
@@ -9621,10 +9665,12 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     viewAssignGPS: function viewAssignGPS(vehicle, gps_device) {
+      this.formGPSData = new FormData();
       this.loading = false;
       this.assigned_gps = false;
       this.resetAssignGPS();
       this.vehicle_copied = Object.assign({}, vehicle);
+      this.gpsDeviceAttachmentButton();
 
       if (gps_device) {
         this.gps_device_id = gps_device.id;
@@ -9634,6 +9680,7 @@ __webpack_require__.r(__webpack_exports__);
         this.gps_device_id = null;
         this.gps_device.imei = null;
         this.gps_device.sim_number = null;
+        this.gps_device_attachments = [];
       }
 
       this.gps_device.plate_number = this.vehicle_copied.plate_number;
@@ -9651,9 +9698,41 @@ __webpack_require__.r(__webpack_exports__);
         this.btn_view = true;
       }
     },
+    gpsDeviceAttachmentButton: function gpsDeviceAttachmentButton() {
+      if (this.vehicle_copied.gpsdeviceattachments.length < 5) {
+        this.isUploadGPSAttachment = true;
+      } else {
+        this.isUploadGPSAttachment = false;
+      }
+    },
+    prepareGPSAttachmentFields: function prepareGPSAttachmentFields() {
+      if (this.gps_device_attachments.length > 0) {
+        for (var i = 0; i < this.gps_device_attachments.length; i++) {
+          var gps_device_attachments = this.gps_device_attachments[i];
+          this.formGPSData.append('attachments[]', gps_device_attachments);
+        }
+      }
+    },
+    uploadGPSFileChange: function uploadGPSFileChange(e) {
+      var files = e.target.files || e.dataTransfer.files;
+      if (!files.length) return;
+
+      for (var i = files.length - 1; i >= 0; i--) {
+        this.gps_device_attachments.push(files[i]);
+        this.fileSize = this.fileSize + files[i].size / 1024 / 1024;
+      }
+
+      if (this.fileSize > 5) {
+        alert('File size exceeds 5 MB');
+        document.getElementById('gps_attachments').value = "";
+        this.gps_device_attachments = [];
+        this.fileSize = 0;
+      }
+    },
     assignGPS: function assignGPS(gps_device) {
       var _this15 = this;
 
+      this.formGPSData = new FormData();
       var index = this.vehicles.findIndex(function (item) {
         return item.id == _this15.vehicle_copied.id;
       });
@@ -9662,33 +9741,45 @@ __webpack_require__.r(__webpack_exports__);
       this.errors = [];
 
       if (this.gps_device_id) {
-        axios.post("/gps_device/".concat(this.gps_device_id), {
-          vehicle_id: this.vehicle_copied.id,
-          imei: gps_device.imei,
-          sim_number: gps_device.sim_number,
-          _method: 'PATCH'
-        }).then(function (response) {
+        this.prepareGPSAttachmentFields();
+        this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
+        this.formGPSData.append('imei', gps_device.imei);
+        this.formGPSData.append('sim_number', gps_device.sim_number);
+        this.formGPSData.append('_method', 'PATCH');
+        axios.post("/gps_device/".concat(this.gps_device_id), this.formGPSData).then(function (response) {
+          document.getElementById('gps_attachments').value = "";
+          _this15.gps_device_attachments = [];
           _this15.loading = false;
           _this15.assigned_gps = true;
 
           _this15.vehicles.splice(index, 1, response.data);
+
+          _this15.vehicle_copied = Object.assign({}, response.data);
+
+          _this15.gpsDeviceAttachmentButton();
         }).catch(function (error) {
           _this15.loading = false;
           _this15.assigned_gps = false;
           _this15.errors = error.response.data.errors;
         });
       } else {
-        axios.post('/gps_device', {
-          vehicle_id: this.vehicle_copied.id,
-          imei: gps_device.imei,
-          sim_number: gps_device.sim_number,
-          _method: 'POST'
-        }).then(function (response) {
+        this.prepareGPSAttachmentFields();
+        this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
+        this.formGPSData.append('imei', gps_device.imei);
+        this.formGPSData.append('sim_number', gps_device.sim_number);
+        this.formGPSData.append('_method', 'POST');
+        axios.post('/gps_device', this.formGPSData).then(function (response) {
+          document.getElementById('gps_attachments').value = "";
+          _this15.gps_device_attachments = [];
           _this15.loading = false;
           _this15.assigned_gps = true;
           _this15.gps_device_id = response.data.gps_device_id;
 
           _this15.vehicles.splice(index, 1, response.data);
+
+          _this15.vehicle_copied = Object.assign({}, response.data);
+
+          _this15.gpsDeviceAttachmentButton();
         }).catch(function (error) {
           _this15.loading = false;
           _this15.assigned_gps = false;
@@ -9710,14 +9801,36 @@ __webpack_require__.r(__webpack_exports__);
         _this16.vehicles.splice(index, 1, response.data);
 
         _this16.loading = false;
-        alert('GPS Device successfully deleted');
+        alert('GPS Device successfully removed');
       }).catch(function (error) {
         _this16.errors = error.response.data.errors;
       });
     },
+    deleteGPSAttachment: function deleteGPSAttachment($id) {
+      var _this17 = this;
+
+      var index = this.vehicles.findIndex(function (item) {
+        return item.id == _this17.vehicle_copied.id;
+      });
+
+      if (confirm("Do you really want to delete this GPS Device Attachment?")) {
+        axios.delete("/delete-gps-attachment/".concat($id)).then(function (response) {
+          _this17.vehicles.splice(index, 1, response.data);
+
+          _this17.vehicle_copied = Object.assign({}, response.data);
+
+          _this17.gpsDeviceAttachmentButton();
+
+          alert('GPS Device Attachment successfully deleted');
+        }).catch(function (error) {
+          _this17.errors = error.response.data.errors;
+        });
+      }
+    },
     resetAssignGPS: function resetAssignGPS() {
       this.errors = [];
       this.gps_device = [];
+      this.gps_device_attachments = [];
     },
     setPage: function setPage(pageNumber) {
       this.currentPage = pageNumber;
@@ -9734,11 +9847,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     filteredVehicles: function filteredVehicles() {
-      var _this17 = this;
+      var _this18 = this;
 
       var self = this;
       return Object.values(self.vehicles).filter(function (vehicle) {
-        return vehicle.plate_number.toLowerCase().includes(_this17.keywords.toLowerCase());
+        return vehicle.plate_number.toLowerCase().includes(_this18.keywords.toLowerCase());
       });
     },
     totalPages: function totalPages() {
@@ -50441,7 +50554,7 @@ var render = function() {
                           },
                           domProps: { value: _vm.gps_device.imei },
                           on: {
-                            keypress: _vm.onlyNumber,
+                            keypress: _vm.gpsNumber,
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
@@ -50488,7 +50601,7 @@ var render = function() {
                           },
                           domProps: { value: _vm.gps_device.sim_number },
                           on: {
-                            keypress: _vm.onlyNumber,
+                            keypress: _vm.gpsNumber,
                             input: function($event) {
                               if ($event.target.composing) {
                                 return
@@ -50508,7 +50621,106 @@ var render = function() {
                             ])
                           : _vm._e()
                       ])
-                    ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-6" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "role" } }, [
+                          _vm._v("Attachment(s)")
+                        ]),
+                        _vm._v(" "),
+                        _vm.isUploadGPSAttachment
+                          ? _c("input", {
+                              staticClass: "gps-attachments-edit",
+                              attrs: {
+                                type: "file",
+                                multiple: "multiple",
+                                id: "gps_attachments",
+                                placeholder: "Attach file"
+                              },
+                              on: { change: _vm.uploadGPSFileChange }
+                            })
+                          : _vm._e(),
+                        _c("br"),
+                        _vm._v(" "),
+                        _vm.errors.gps_attachments
+                          ? _c("span", { staticClass: "text-danger" }, [
+                              _vm._v("The attachment field is required")
+                            ])
+                          : _vm._e()
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "table",
+                      { staticClass: "table align-items-center table-flush" },
+                      [
+                        _vm._m(13),
+                        _vm._v(" "),
+                        _c(
+                          "tbody",
+                          _vm._l(
+                            this.vehicle_copied.gpsdeviceattachments,
+                            function(attachment, d) {
+                              return _c("tr", { key: d }, [
+                                _c("td", [_vm._v(_vm._s(d + 1))]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _vm._v(_vm._s(attachment.file_name))
+                                ]),
+                                _vm._v(" "),
+                                _c("td", [
+                                  _c(
+                                    "span",
+                                    {
+                                      staticStyle: {
+                                        "text-decoration": "none",
+                                        color: "#5e72e4",
+                                        "background-color": "transparent",
+                                        cursor: "pointer"
+                                      },
+                                      attrs: { title: "Download" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.downloadGPSAttachment(
+                                            attachment.id
+                                          )
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("Download")]
+                                  ),
+                                  _vm._v(" "),
+                                  _c("span", [_vm._v(" | ")]),
+                                  _vm._v(" "),
+                                  _c(
+                                    "span",
+                                    {
+                                      staticStyle: {
+                                        "text-decoration": "none",
+                                        color: "red",
+                                        "background-color": "transparent",
+                                        cursor: "pointer"
+                                      },
+                                      attrs: { title: "Delete" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.deleteGPSAttachment(
+                                            attachment.id
+                                          )
+                                        }
+                                      }
+                                    },
+                                    [_vm._v("Delete")]
+                                  )
+                                ])
+                              ])
+                            }
+                          ),
+                          0
+                        )
+                      ]
+                    )
                   ])
                 ]),
                 _vm._v(" "),
@@ -50539,7 +50751,7 @@ var render = function() {
                             "data-target": "#deleteGPSModal"
                           }
                         },
-                        [_vm._v("Delete")]
+                        [_vm._v("Remove")]
                       )
                     : _vm._e()
                 ])
@@ -50577,9 +50789,9 @@ var render = function() {
             },
             [
               _c("div", { staticClass: "modal-content" }, [
-                _vm._m(13),
-                _vm._v(" "),
                 _vm._m(14),
+                _vm._v(" "),
+                _vm._m(15),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-footer" }, [
                   _c(
@@ -50597,7 +50809,7 @@ var render = function() {
                       staticClass: "btn btn-warning",
                       on: { click: _vm.deleteGPSDevice }
                     },
-                    [_vm._v("Delete")]
+                    [_vm._v("Remove")]
                   )
                 ])
               ])
@@ -50873,11 +51085,25 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
+    return _c("thead", { staticClass: "thead-light" }, [
+      _c("tr", [
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("#")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("File name")]),
+        _vm._v(" "),
+        _c("th", { attrs: { scope: "col" } }, [_vm._v("Action")])
+      ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
     return _c("div", { staticClass: "modal-header" }, [
       _c(
         "h5",
         { staticClass: "modal-title", attrs: { id: "addCompanyLabel" } },
-        [_vm._v("Delete GPS Device")]
+        [_vm._v("Remove GPS Device")]
       ),
       _vm._v(" "),
       _c(
@@ -50903,7 +51129,7 @@ var staticRenderFns = [
         _c("div", { staticClass: "col-md-12" }, [
           _c("div", { staticClass: "form-group" }, [
             _vm._v(
-              "\n                            Are you sure you want to delete this GPS Device?\n                        "
+              "\n                            Are you sure you want to remove this GPS Device?\n                        "
             )
           ])
         ])
