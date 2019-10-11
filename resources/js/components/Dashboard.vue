@@ -712,10 +712,16 @@ export default {
         exportVehicle(){
             var vehicleData = [];
             for (var i = 0; i < this.vehicles.length; i++) {
+                var has_gps = "";
                 var subcon_vendor = "";
                 var goods = "";
                 var allowed_total_weight = "";
                 var contract = "";
+                if(this.vehicles[i].gpsdevice){
+                    has_gps = "Yes";
+                }else{
+                    has_gps = "No";
+                }
                 if(this.vehicles[i].subcon_vendor){
                     subcon_vendor = this.vehicles[i].subcon_vendor.vendor_description_lfug;
                 }
@@ -729,6 +735,7 @@ export default {
                     contract = this.vehicles[i].contract.code;
                 }
                 vehicleData.push({
+                    "GPS": has_gps,
                     "CATEGORY": this.vehicles[i].category.description,
                     "PLATE NUMBER": this.vehicles[i].plate_number,
                     "PLANT INDICATOR": this.vehicles[i].indicator.description,
