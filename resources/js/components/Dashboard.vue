@@ -713,15 +713,23 @@ export default {
             var vehicleData = [];
             for (var i = 0; i < this.vehicles.length; i++) {
                 var has_gps = "";
+                var imei = "";
+                var sim_number = "";
                 var subcon_vendor = "";
                 var goods = "";
                 var allowed_total_weight = "";
                 var contract = "";
+
                 if(this.vehicles[i].gpsdevice){
                     has_gps = "Yes";
+                    imei = this.vehicles[i].gpsdevice.imei ? this.vehicles[i].gpsdevice.imei : "";
+                    sim_number = this.vehicles[i].gpsdevice.sim_number ? this.vehicles[i].gpsdevice.sim_number : "";
                 }else{
                     has_gps = "No";
+                    imei = "";
+                    sim_number = "";
                 }
+               
                 if(this.vehicles[i].subcon_vendor){
                     subcon_vendor = this.vehicles[i].subcon_vendor.vendor_description_lfug;
                 }
@@ -734,8 +742,11 @@ export default {
                 if(this.vehicles[i].contract){
                     contract = this.vehicles[i].contract.code;
                 }
+
                 vehicleData.push({
                     "GPS": has_gps,
+                    "IMEI": imei,
+                    "SIM NUMBER": sim_number,
                     "CATEGORY": this.vehicles[i].category.description,
                     "PLATE NUMBER": this.vehicles[i].plate_number,
                     "PLANT INDICATOR": this.vehicles[i].indicator.description,
