@@ -246,7 +246,6 @@ class GpsDevicesController extends Controller
         return response()->download(storage_path("app/public/".$file->path), $file->file_name);
     }
     
-
     public function deleteGPSAttachment(GpsDeviceAttachment $file)
     {
         DB::beginTransaction();
@@ -267,6 +266,49 @@ class GpsDevicesController extends Controller
             return $response;
         }
         
+    }
+
+    public function reassign_gps_device(Request $request,GpsDevice $gps_device){
+
+       
+        $request->validate([
+            'reassign_vehicle_id' => 'required',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            GpsDevice::whereId($gps_device->id)->update(['vehicle_id' => $request->reassign_vehicle_id]);
+            GpsDeviceAttachment::where('gps_device_id', '=', $gps_device->id)->update(['vehicle_id' => $request->reassign_vehicle_id]);
+            Vehicle::whereId($request->vehicle_id)->update(['gps_device_id' => null]);
+            Vehicle::whereId($request->reassign_vehicle_id)->update(['gps_device_id' => $gps_device->id]);
+            DB::commit();
+
+            $data=array();
+            $data['gps_device_id'] = $gps_device->id;
+            $data['device_id'] = $gps_device->device_id;
+            $data['name'] = $request->plate_number;
+            $data['imei'] = $gps_device->imei;
+            $data['sim_number'] = $gps_device->sim_number;
+            $data['method'] = 'edit';
+
+            $api_assign_id = $this->send_api_assign_gps($data);
+
+            if($api_assign_id){
+                DB::commit();
+            }else{
+                DB::rollBack();
+            }
+
+            return $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->whereIn('id', [$request->reassign_vehicle_id,$request->vehicle_id])->get();
+        
+        }
+        catch (HttpException $ex) {
+            DB::rollBack();
+            return $vehicle;
+        }
+        
+        return $vehicle;
+        // dd($vehicle);
     }
 
 }

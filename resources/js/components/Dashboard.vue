@@ -75,7 +75,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><i class="fas fa-location-arrow" v-if="vehicle.gpsdevice"></i></td>
+                                        <td><i class="fas fa-location-arrow" title = "GPS Device: Yes" v-if="vehicle.gpsdevice"></i></td>
                                         <td>{{ vehicle.category.description }}</td>
                                         <td>{{ vehicle.plate_number }}</td>
                                         <td>{{ vehicle.indicator.description }}</td>
@@ -528,7 +528,7 @@
 
         <!-- Assign GPS Modal -->
         <div class="modal fade" id="assignGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <span class="closed" data-dismiss="modal">&times;</span>
+            <!-- <span class="closed" data-dismiss="modal">&times;</span> -->
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -596,11 +596,55 @@
                     </div>
                     <div class="modal-footer">
                         <button id="assign_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="assignGPS(gps_device)">Assign</button>
+                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#reassignGPSModal" class="btn btn-warning btn-round btn-fill" @click="viewreassignGPS(gps_device)" v-if="gps_device_id">Re-Assign</button>
                         <button id="assign_btn" type="button" data-toggle="modal" data-target="#deleteGPSModal" class="btn btn-danger btn-round btn-fill" v-if="gps_device_id">Remove</button>
                     </div>
                 </div>
             </div>  
-        </div>  
+        </div>
+
+        <!-- Reassign GPS Modal   -->
+
+        <div class="modal fade" id="reassignGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+            <!-- <span class="closed" data-dismiss="modal">&times;</span> -->
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCompanyLabel">RE-ASSIGN GPS DEVICE</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                   <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                
+                                <label for="role">Select Vehicle to Re-assign GPS Device</label> 
+                                <multiselect
+                                    v-model="reassign_vehicle"
+                                    :options="reassign_vehicles"
+                                    :multiple="false"
+                                    track-by="id"
+                                    :custom-label="customLabelReassignVehicle"
+                                    placeholder="Select Vehicle"
+                                    id="selected_reassign_vehicle"
+                                >
+                                </multiselect>
+                                <span class="text-danger" v-if="errors.reassign_vehicles">{{ errors.reassign_vehicles[0] }}</span>
+                               
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" @click="reassignGPS">Re-Assign</button>
+                    <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
+                  
+                </div>
+                </div>
+            </div>
+        </div>
 
          <!-- Delete GPS Device Modal -->
         <div class="modal fade" id="deleteGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
@@ -676,6 +720,8 @@ export default {
             keywords: '',
             show_plant: false,
             show_plant_add: false,
+            reassign_vehicle : '',
+            reassign_vehicles : [],
             vehicle_added: false,
             vehicle_updated: false,
             loading: false,
@@ -821,6 +867,9 @@ export default {
         },
         customLabelPlant (plant) {
             return `${plant.name }`
+        },
+        customLabelReassignVehicle (reassign) {
+            return `${reassign.plate_number }`
         },
         getVehicleId(id){
             this.errors = [];
@@ -1077,6 +1126,15 @@ export default {
                 this.errors = error.response.data.errors;
             })
         },
+        fetchReassignVehicle(){
+            let v = this;
+            v.reassign_vehicles = [];
+            this.vehicles.forEach(e => {
+                if(e.gpsdevice == null){
+                    v.reassign_vehicles.push(e);
+                }
+            });
+        },
         viewAssignGPS(vehicle,gps_device){
             this.formGPSData = new FormData();
             this.loading = false;
@@ -1095,8 +1153,7 @@ export default {
                 this.gps_device_attachments = [];
             }
 
-            this.gps_device.plate_number = this.vehicle_copied.plate_number;
-            
+            this.gps_device.plate_number = this.vehicle_copied.plate_number; 
         },
         buttonAuth(){
             console.log(this.role); 
@@ -1143,6 +1200,49 @@ export default {
                 this.fileSize = 0;
             }
 
+        },
+        viewreassignGPS(){
+           this.reassign_vehicle = '';
+           this.fetchReassignVehicle();
+        },
+        reassignGPS(){
+            let v = this;
+            this.loading = true;
+            this.formGPSData = new FormData();
+            this.errors = [];
+
+            if(this.gps_device_id){
+                
+                this.formGPSData.append('vehicle_id', this.vehicle_copied.id);    
+                this.formGPSData.append('reassign_vehicle_id', this.reassign_vehicle.id);
+                this.formGPSData.append('gps_device_id', this.gps_device_id);
+                this.formGPSData.append('plate_number', this.reassign_vehicle.plate_number);
+                this.formGPSData.append('_method', 'PATCH');
+
+                 axios.post(`/reassign_gps_device/${this.gps_device_id}`, this.formGPSData)
+                .then(response =>{
+                    var orginal_vehicle_index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
+                    var reassigned_vehicle_index = this.vehicles.findIndex(item => item.id == this.reassign_vehicle.id);
+                    response.data.forEach((data) => {
+                        if(v.vehicle_copied.id == data.id){
+                            v.vehicles.splice(orginal_vehicle_index,1,data);
+                        }
+                        if(this.reassign_vehicle.id == data.id){
+                            this.vehicles.splice(reassigned_vehicle_index,1,data);
+                        }
+                    });
+                    this.loading = false;
+                    $('#reassignGPSModal').modal('hide');
+                    $('#assignGPSModal').modal('hide');
+                    alert('GPS Device successfully reassigned');
+                    
+                    
+                })
+                .catch(error => {
+                    this.loading = false;
+                    this.errors = error.response.data.errors;
+                })
+            }
         },
         assignGPS(gps_device){
             this.formGPSData = new FormData();
