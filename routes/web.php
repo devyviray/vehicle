@@ -104,6 +104,8 @@ Route::group(['middleware' => 'auth'], function(){
     Route::patch('/gps_device/{gps_device}', 'GpsDevicesController@update');
     Route::get('/send_api_assign_gps', 'GpsDevicesController@send_api_assign_gps');
     Route::delete('/gps_device/{gps_device}', 'GpsDevicesController@destroy');
+   
+    Route::patch('/reassign_gps_device/{gps_device}', 'GpsDevicesController@reassign_gps_device');
 
     // Roles
     Route::get('/roles', 'RoleController@index');
