@@ -56,7 +56,7 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'CentralizedVehiclePortal@lafilgroup.com'),
+        'address' => env('MAIL_FROM_ADDRESS', 'CentralizedVehiclePortal@mail.lafilgroup.com'),
         'name' => env('MAIL_FROM_NAME', 'Centralized Vehicle Portal'),
     ],
 
