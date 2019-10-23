@@ -75,7 +75,7 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><i class="fas fa-location-arrow" v-if="vehicle.gpsdevice"></i></td>
+                                        <td><i class="fas fa-location-arrow" title = "GPS Device: Yes" v-if="vehicle.gpsdevice"></i></td>
                                         <td>{{ vehicle.category.description }}</td>
                                         <td>{{ vehicle.plate_number }}</td>
                                         <td>{{ vehicle.indicator.description }}</td>
