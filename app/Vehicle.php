@@ -12,6 +12,10 @@ class Vehicle extends Model implements Auditable
 
     use SoftDeletes;
 
+    protected $casts = [
+        'validity_end_date' => 'date:Y-m-d',
+    ];
+
     protected $fillable = [
         'plate_number',
         'category_id',

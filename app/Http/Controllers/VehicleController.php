@@ -11,7 +11,7 @@ use App\{
     PlantVehicleAdded
 };
 use App\Rules\ValidityRule;
-use Carbon;
+use Carbon\Carbon;
 use Auth;
 use DB;
 use Storage;
@@ -100,7 +100,7 @@ class VehicleController extends Controller
                 }
 
                 DB::commit();
-                return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
+                return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $vehicle->id)->first();
             }
 
         } catch (Exception $e) {
@@ -130,7 +130,7 @@ class VehicleController extends Controller
      */
     public function show($id)
     {
-        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','plants')
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','plants','gpsdevice','gpsdeviceattachments')
             ->where('id',$id)->orderBy('id', 'desc')->first();
     }
 
@@ -219,12 +219,37 @@ class VehicleController extends Controller
                 
                 DB::commit();
 
-                return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants')->where('id', $vehicle->id)->first();
+                return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $vehicle->id)->first();
             }
 
         } catch (Exception $e) {
             DB::rollBack();
         }
+    }
+
+    public function filterVehicle(Request $request){
+       
+        $date_today = Carbon::now()->format('Y-m-d');
+        $operator = $request->operator;
+        $gps = $request->filter_gps;
+        $base_truck_ids = $request->filter_based_trucks;
+
+        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
+                            ->when(!empty($operator), function ($query) use($operator,$date_today) {
+                                $query->where('validity_end_date',$operator,$date_today);
+                            })
+                            ->when(!empty($gps),function ($query) use ($gps){
+                                if($gps == 'Yes'){
+                                    $query->whereNotNull('gps_device_id');
+                                }elseif($gps == 'No'){
+                                    $query->whereNull('gps_device_id');
+                                }
+                            })
+                            ->when(isset($base_truck_ids), function ($query) use($base_truck_ids){
+                                $base_truck_ids_arr = explode(',',$base_truck_ids);
+                                $query->whereIn('based_truck_id',$base_truck_ids_arr);  
+                            }) 
+                            ->orderBy('id', 'desc')->get();
     }
 
     /**

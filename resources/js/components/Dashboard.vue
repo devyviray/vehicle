@@ -18,13 +18,48 @@
                                 </div> 
                                 <div class="col text-right" v-if="this.userLevel > 4">
                                     <a href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
-                                    <button :disabled="!downloadExcelbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
+                                    <button :disabled="!readyListbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
                                 </div>
                             </div>
                             <div class="row align-items-center">
-                                <div class="col-xl-4 mb-2 mt-3 float-right">
-                                    <input type="text" class="form-control" placeholder="Search" v-model="keywords" id="name">
+                                <div class="col-xl-4 mb-3 mt-3 float-right">
+                                    <input type="text" class="form-control" placeholder="Search (Plate Number)" v-model="keywords" id="name">
                                 </div> 
+                                <div class="col-xl-2 mb-2 mt-3 float-right">
+                                    <multiselect
+                                        v-model="filterStatus"
+                                        :options="statuses"
+                                        :multiple="false"
+                                        placeholder="Select Status"
+                                        id="selected_filter_status"
+                                    >
+                                    </multiselect>
+                                </div>
+                                <div class="col-xl-2 mb-2 mt-3 float-right">
+                                    <multiselect
+                                        v-model="filterGps"
+                                        :options="gpsStatuses"
+                                        :multiple="false"
+                                        placeholder="With GPS"
+                                        id="selected_filter_status"
+                                    >
+                                    </multiselect>
+                                </div> 
+                                <div class="col-xl-3 mb-2 mt-3 float-right">
+                                    <multiselect
+                                        v-model="filterBasedTruck"
+                                        :options="based_trucks"
+                                        :multiple="true"
+                                        track-by="id"
+                                        :custom-label="customLabelfilterBaseTruck"
+                                        placeholder="Select Based Trucks"
+                                        id="selected_filter_base_trucks"
+                                    >
+                                    </multiselect>
+                                </div>
+                                <div class="col-xl-1 mb-2 mt-3 float-right">
+                                    <button :disabled="!readyListbutton" class="btn btn-sm btn-primary" @click="fetchFilterVehicle"> Apply Filter</button>
+                                </div>
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -107,7 +142,7 @@
                             </div>
                             <div class="col-6 text-right">
                                 <span>{{ filteredQueues.length }} Filtered Vehicle(s)</span><br>
-                                <span>{{ vehicles.length }} Total Vehicle(s)</span>
+                                <span>{{ Object.keys(vehicles).length }} Total Vehicle(s)</span>
                             </div>
                         </div>
                     </div>
@@ -718,6 +753,11 @@ export default {
             currentPage: 0,
             itemsPerPage: 50,
             keywords: '',
+            filterBasedTruck: '',
+            filterGps: '',
+            filterStatus: '',
+            gpsStatuses: ['Yes','No'],
+            statuses: ['Active','Expired'],
             show_plant: false,
             show_plant_add: false,
             reassign_vehicle : '',
@@ -727,7 +767,7 @@ export default {
             loading: false,
             table_loading: false,
             old_plants: [],
-            downloadExcelbutton:false,
+            readyListbutton:false,
             formGPSData: new FormData(),
             assigned_gps:false,
             gps_device: [],
@@ -756,57 +796,39 @@ export default {
     },
     methods:{
         exportVehicle(){
+            let v = this;
             var vehicleData = [];
-            for (var i = 0; i < this.vehicles.length; i++) {
+            Object.entries(v.vehicles).forEach(([key, data]) => {
                 var has_gps = "";
                 var imei = "";
                 var sim_number = "";
-                var subcon_vendor = "";
-                var goods = "";
-                var allowed_total_weight = "";
-                var contract = "";
-
-                if(this.vehicles[i].gpsdevice){
+                if(data.gpsdevice){
                     has_gps = "Yes";
-                    imei = this.vehicles[i].gpsdevice.imei ? this.vehicles[i].gpsdevice.imei : "";
-                    sim_number = this.vehicles[i].gpsdevice.sim_number ? this.vehicles[i].gpsdevice.sim_number : "";
+                    imei = data.gpsdevice.imei ? data.gpsdevice.imei : "";
+                    sim_number = data.gpsdevice.sim_number ? data.gpsdevice.sim_number : "";
                 }else{
                     has_gps = "No";
                     imei = "";
                     sim_number = "";
                 }
-               
-                if(this.vehicles[i].subcon_vendor){
-                    subcon_vendor = this.vehicles[i].subcon_vendor.vendor_description_lfug;
-                }
-                if(this.vehicles[i].good){
-                    goods = this.vehicles[i].good.description;
-                }
-                if(this.vehicles[i].allowed_total_weight){
-                    allowed_total_weight = this.vehicles[i].allowed_total_weight;
-                }
-                if(this.vehicles[i].contract){
-                    contract = this.vehicles[i].contract.code;
-                }
-
                 vehicleData.push({
                     "GPS": has_gps,
                     "IMEI": imei,
                     "SIM NUMBER": sim_number,
-                    "CATEGORY": this.vehicles[i].category.description,
-                    "PLATE NUMBER": this.vehicles[i].plate_number,
-                    "PLANT INDICATOR": this.vehicles[i].indicator.description,
-                    "VENDOR":this.vehicles[i].vendor.vendor_description_lfug,
-                    "SUBCON VENDOR": subcon_vendor,
-                    "CAPACITY": this.vehicles[i].capacity.description,
-                    "GOODS":goods,
-                    "ALLOWED TOTAL WEIGHT (KG)": allowed_total_weight,
-                    "BASED TRUCKS":this.vehicles[i].based_truck.description,
-                    "REMARKS": this.vehicles[i].remarks,
-                    "VALIDITY START DATE": this.vehicles[i].validity_start_date,
-                    "VALIDITY END DATE": this.vehicles[i].validity_end_date,
+                    "CATEGORY": data.category.description,
+                    "PLATE NUMBER": data.plate_number,
+                    "PLANT INDICATOR": data.indicator.description,
+                    "VENDOR": data.vendor.vendor_description_lfug,
+                    "SUBCON VENDOR": data.subcon_vendor ? data.subcon_vendor.vendor_description_lfug : '',
+                    "CAPACITY": data.capacity.description,
+                    "GOODS": data.good ? data.good.description : '',
+                    "ALLOWED TOTAL WEIGHT (KG)": data.allowed_total_weight ? data.allowed_total_weight : '',
+                    "BASED TRUCKS":data.based_truck.description,
+                    "REMARKS": data.remarks,
+                    "VALIDITY START DATE": data.validity_start_date,
+                    "VALIDITY END DATE": data.validity_end_date,
                 });
-            }
+            });
 
             var exportedData  = XLSX.utils.json_to_sheet(vehicleData)
             var wb = XLSX.utils.book_new()
@@ -865,6 +887,9 @@ export default {
             this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
             this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
+        customLabelfilterBaseTruck (filterBasedTruck) {
+            return `${filterBasedTruck.description }`
+        },
         customLabelPlant (plant) {
             return `${plant.name }`
         },
@@ -887,7 +912,7 @@ export default {
             .then(response => { 
                 this.vehicles = response.data;
                 this.table_loading = false;
-                this.downloadExcelbutton = true;
+                this.readyListbutton = true;
             })
             .catch(error => { 
                 this.errors = error.response.data.error;
@@ -1156,7 +1181,6 @@ export default {
             this.gps_device.plate_number = this.vehicle_copied.plate_number; 
         },
         buttonAuth(){
-            console.log(this.role); 
             if(this.role == "GPS Custodian"){
                 this.btn_assign = true;
                 this.btn_edit = false;
@@ -1336,6 +1360,46 @@ export default {
             this.errors = [];
             this.gps_device = [];
             this.gps_device_attachments = [];
+        },
+        fetchFilterVehicle(){
+            this.formFilterData = new FormData();
+            this.vehicles = [];
+            this.loading = true;
+
+            if(this.filterGps){
+               this.formFilterData.append('filter_gps', this.filterGps);
+            }
+
+            if(this.filterStatus){
+             
+                if(this.filterStatus == "Active"){
+                    this.formFilterData.append('operator', '>');
+                }
+                if(this.filterStatus == "Expired"){
+                    this.formFilterData.append('operator', '<' );
+                }
+            }
+
+            if(this.filterBasedTruck){
+                var filteredTrucks = [];
+                this.filterBasedTruck.forEach(element => {
+                    filteredTrucks.push(element.id);
+                });
+                this.formFilterData.append('filter_based_trucks', filteredTrucks);
+            }
+            
+            this.formFilterData.append('_method', 'POST');
+
+            axios.post('/filter-vehicle', this.formFilterData)
+            .then(response => {
+                this.vehicles =  response.data;
+                this.errors = [];
+                this.loading = false;
+            })
+            .catch(error => {
+                this.errors = error.response.data.errors;
+                this.loading = false;
+            })
         },
         setPage(pageNumber) {
             this.currentPage = pageNumber;
