@@ -35,6 +35,9 @@ Route::group(['middleware' => 'auth'], function(){
     Route::get('/vehicle/vendors', 'VehicleController@getVendors');
     Route::get('/vehicle-specific/{id}', 'VehicleController@show');
 
+
+    Route::post('/filter-vehicle', 'VehicleController@filterVehicle');
+
     // Categories
     Route::get('/categories', 'CategoryController@index');
     Route::post('/category', 'CategoryController@store');
