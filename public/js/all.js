@@ -8587,6 +8587,93 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue_content_placeholders__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue-content-placeholders */ "./node_modules/vue-content-placeholders/index.js");
 /* harmony import */ var xlsx__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! xlsx */ "./node_modules/xlsx/xlsx.js");
 /* harmony import */ var xlsx__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(xlsx__WEBPACK_IMPORTED_MODULE_4__);
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance"); }
+
+function _iterableToArrayLimit(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -9261,14 +9348,21 @@ __webpack_require__.r(__webpack_exports__);
       currentPage: 0,
       itemsPerPage: 50,
       keywords: '',
+      filterBasedTruck: '',
+      filterGps: '',
+      filterStatus: '',
+      gpsStatuses: ['Yes', 'No'],
+      statuses: ['Active', 'Expired'],
       show_plant: false,
       show_plant_add: false,
+      reassign_vehicle: '',
+      reassign_vehicles: [],
       vehicle_added: false,
       vehicle_updated: false,
       loading: false,
       table_loading: false,
       old_plants: [],
-      downloadExcelbutton: false,
+      readyListbutton: false,
       formGPSData: new FormData(),
       assigned_gps: false,
       gps_device: [],
@@ -9296,46 +9390,45 @@ __webpack_require__.r(__webpack_exports__);
   },
   methods: {
     exportVehicle: function exportVehicle() {
+      var v = this;
       var vehicleData = [];
+      Object.entries(v.vehicles).forEach(function (_ref) {
+        var _ref2 = _slicedToArray(_ref, 2),
+            key = _ref2[0],
+            data = _ref2[1];
 
-      for (var i = 0; i < this.vehicles.length; i++) {
-        var subcon_vendor = "";
-        var goods = "";
-        var allowed_total_weight = "";
-        var contract = "";
+        var has_gps = "";
+        var imei = "";
+        var sim_number = "";
 
-        if (this.vehicles[i].subcon_vendor) {
-          subcon_vendor = this.vehicles[i].subcon_vendor.vendor_description_lfug;
-        }
-
-        if (this.vehicles[i].good) {
-          goods = this.vehicles[i].good.description;
-        }
-
-        if (this.vehicles[i].allowed_total_weight) {
-          allowed_total_weight = this.vehicles[i].allowed_total_weight;
-        }
-
-        if (this.vehicles[i].contract) {
-          contract = this.vehicles[i].contract.code;
+        if (data.gpsdevice) {
+          has_gps = "Yes";
+          imei = data.gpsdevice.imei ? data.gpsdevice.imei : "";
+          sim_number = data.gpsdevice.sim_number ? data.gpsdevice.sim_number : "";
+        } else {
+          has_gps = "No";
+          imei = "";
+          sim_number = "";
         }
 
         vehicleData.push({
-          "CATEGORY": this.vehicles[i].category.description,
-          "PLATE NUMBER": this.vehicles[i].plate_number,
-          "PLANT INDICATOR": this.vehicles[i].indicator.description,
-          "VENDOR": this.vehicles[i].vendor.vendor_description_lfug,
-          "SUBCON VENDOR": subcon_vendor,
-          "CAPACITY": this.vehicles[i].capacity.description,
-          "GOODS": goods,
-          "ALLOWED TOTAL WEIGHT (KG)": allowed_total_weight,
-          "BASED TRUCKS": this.vehicles[i].based_truck.description,
-          "REMARKS": this.vehicles[i].remarks,
-          "VALIDITY START DATE": this.vehicles[i].validity_start_date,
-          "VALIDITY END DATE": this.vehicles[i].validity_end_date
+          "GPS": has_gps,
+          "IMEI": imei,
+          "SIM NUMBER": sim_number,
+          "CATEGORY": data.category.description,
+          "PLATE NUMBER": data.plate_number,
+          "PLANT INDICATOR": data.indicator.description,
+          "VENDOR": data.vendor.vendor_description_lfug,
+          "SUBCON VENDOR": data.subcon_vendor ? data.subcon_vendor.vendor_description_lfug : '',
+          "CAPACITY": data.capacity.description,
+          "GOODS": data.good ? data.good.description : '',
+          "ALLOWED TOTAL WEIGHT (KG)": data.allowed_total_weight ? data.allowed_total_weight : '',
+          "BASED TRUCKS": data.based_truck.description,
+          "REMARKS": data.remarks,
+          "VALIDITY START DATE": data.validity_start_date,
+          "VALIDITY END DATE": data.validity_end_date
         });
-      }
-
+      });
       var exportedData = xlsx__WEBPACK_IMPORTED_MODULE_4___default.a.utils.json_to_sheet(vehicleData);
       var wb = xlsx__WEBPACK_IMPORTED_MODULE_4___default.a.utils.book_new();
       xlsx__WEBPACK_IMPORTED_MODULE_4___default.a.utils.book_append_sheet(wb, exportedData, 'Vehicle List');
@@ -9398,8 +9491,14 @@ __webpack_require__.r(__webpack_exports__);
       this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
       this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
     },
+    customLabelfilterBaseTruck: function customLabelfilterBaseTruck(filterBasedTruck) {
+      return "".concat(filterBasedTruck.description);
+    },
     customLabelPlant: function customLabelPlant(plant) {
       return "".concat(plant.name);
+    },
+    customLabelReassignVehicle: function customLabelReassignVehicle(reassign) {
+      return "".concat(reassign.plate_number);
     },
     getVehicleId: function getVehicleId(id) {
       this.errors = [];
@@ -9418,7 +9517,7 @@ __webpack_require__.r(__webpack_exports__);
       axios.get('/vehicle').then(function (response) {
         _this2.vehicles = response.data;
         _this2.table_loading = false;
-        _this2.downloadExcelbutton = true;
+        _this2.readyListbutton = true;
       }).catch(function (error) {
         _this2.errors = error.response.data.error;
       });
@@ -9534,7 +9633,7 @@ __webpack_require__.r(__webpack_exports__);
       this.errors = [];
       this.vehicle = [];
       this.show_plant = false;
-      document.getElementById('attachments').value = "";
+      document.getElementById('attachments').value = '';
       this.vehicle_added = false;
     },
     resetForm: function resetForm() {
@@ -9641,6 +9740,8 @@ __webpack_require__.r(__webpack_exports__);
 
         document.getElementById('edit_btn').disabled = false;
         _this13.loading = false;
+        _this13.attachments = [];
+        document.getElementById('attachments-edit').value = '';
       }).catch(function (error) {
         _this13.vehicle_updated = false;
         _this13.errors = error.response.data.errors;
@@ -9662,6 +9763,15 @@ __webpack_require__.r(__webpack_exports__);
         _this14.vehicles.splice(index, 1);
       }).catch(function (error) {
         _this14.errors = error.response.data.errors;
+      });
+    },
+    fetchReassignVehicle: function fetchReassignVehicle() {
+      var v = this;
+      v.reassign_vehicles = [];
+      this.vehicles.forEach(function (e) {
+        if (e.gpsdevice == null) {
+          v.reassign_vehicles.push(e);
+        }
       });
     },
     viewAssignGPS: function viewAssignGPS(vehicle, gps_device) {
@@ -9686,8 +9796,6 @@ __webpack_require__.r(__webpack_exports__);
       this.gps_device.plate_number = this.vehicle_copied.plate_number;
     },
     buttonAuth: function buttonAuth() {
-      console.log(this.role);
-
       if (this.role == "GPS Custodian") {
         this.btn_assign = true;
         this.btn_edit = false;
@@ -9729,12 +9837,58 @@ __webpack_require__.r(__webpack_exports__);
         this.fileSize = 0;
       }
     },
-    assignGPS: function assignGPS(gps_device) {
+    viewreassignGPS: function viewreassignGPS() {
+      this.reassign_vehicle = '';
+      this.fetchReassignVehicle();
+    },
+    reassignGPS: function reassignGPS() {
       var _this15 = this;
+
+      var v = this;
+      this.loading = true;
+      this.formGPSData = new FormData();
+      this.errors = [];
+
+      if (this.gps_device_id) {
+        this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
+        this.formGPSData.append('reassign_vehicle_id', this.reassign_vehicle.id);
+        this.formGPSData.append('gps_device_id', this.gps_device_id);
+        this.formGPSData.append('plate_number', this.reassign_vehicle.plate_number);
+        this.formGPSData.append('_method', 'PATCH');
+        axios.post("/reassign_gps_device/".concat(this.gps_device_id), this.formGPSData).then(function (response) {
+          var orginal_vehicle_index = _this15.vehicles.findIndex(function (item) {
+            return item.id == _this15.vehicle_copied.id;
+          });
+
+          var reassigned_vehicle_index = _this15.vehicles.findIndex(function (item) {
+            return item.id == _this15.reassign_vehicle.id;
+          });
+
+          response.data.forEach(function (data) {
+            if (v.vehicle_copied.id == data.id) {
+              v.vehicles.splice(orginal_vehicle_index, 1, data);
+            }
+
+            if (_this15.reassign_vehicle.id == data.id) {
+              _this15.vehicles.splice(reassigned_vehicle_index, 1, data);
+            }
+          });
+          _this15.loading = false;
+          $('#reassignGPSModal').modal('hide');
+          $('#assignGPSModal').modal('hide');
+          alert('GPS Device successfully reassigned');
+        }).catch(function (error) {
+          _this15.loading = false;
+          _this15.errors = error.response.data.errors;
+        });
+      }
+    },
+    assignGPS: function assignGPS(gps_device) {
+      var _this16 = this;
 
       this.formGPSData = new FormData();
       var index = this.vehicles.findIndex(function (item) {
-        return item.id == _this15.vehicle_copied.id;
+        return item.id == _this16.vehicle_copied.id;
       });
       this.loading = true;
       this.assigned_gps = false;
@@ -9748,19 +9902,19 @@ __webpack_require__.r(__webpack_exports__);
         this.formGPSData.append('_method', 'PATCH');
         axios.post("/gps_device/".concat(this.gps_device_id), this.formGPSData).then(function (response) {
           document.getElementById('gps_attachments').value = "";
-          _this15.gps_device_attachments = [];
-          _this15.loading = false;
-          _this15.assigned_gps = true;
+          _this16.gps_device_attachments = [];
+          _this16.loading = false;
+          _this16.assigned_gps = true;
 
-          _this15.vehicles.splice(index, 1, response.data);
+          _this16.vehicles.splice(index, 1, response.data);
 
-          _this15.vehicle_copied = Object.assign({}, response.data);
+          _this16.vehicle_copied = Object.assign({}, response.data);
 
-          _this15.gpsDeviceAttachmentButton();
+          _this16.gpsDeviceAttachmentButton();
         }).catch(function (error) {
-          _this15.loading = false;
-          _this15.assigned_gps = false;
-          _this15.errors = error.response.data.errors;
+          _this16.loading = false;
+          _this16.assigned_gps = false;
+          _this16.errors = error.response.data.errors;
         });
       } else {
         this.prepareGPSAttachmentFields();
@@ -9770,60 +9924,60 @@ __webpack_require__.r(__webpack_exports__);
         this.formGPSData.append('_method', 'POST');
         axios.post('/gps_device', this.formGPSData).then(function (response) {
           document.getElementById('gps_attachments').value = "";
-          _this15.gps_device_attachments = [];
-          _this15.loading = false;
-          _this15.assigned_gps = true;
-          _this15.gps_device_id = response.data.gps_device_id;
+          _this16.gps_device_attachments = [];
+          _this16.loading = false;
+          _this16.assigned_gps = true;
+          _this16.gps_device_id = response.data.gps_device_id;
 
-          _this15.vehicles.splice(index, 1, response.data);
+          _this16.vehicles.splice(index, 1, response.data);
 
-          _this15.vehicle_copied = Object.assign({}, response.data);
+          _this16.vehicle_copied = Object.assign({}, response.data);
 
-          _this15.gpsDeviceAttachmentButton();
+          _this16.gpsDeviceAttachmentButton();
         }).catch(function (error) {
-          _this15.loading = false;
-          _this15.assigned_gps = false;
-          _this15.errors = error.response.data.errors;
+          _this16.loading = false;
+          _this16.assigned_gps = false;
+          _this16.errors = error.response.data.errors;
         });
       }
     },
     deleteGPSDevice: function deleteGPSDevice() {
-      var _this16 = this;
+      var _this17 = this;
 
       this.loading = true;
       var index = this.vehicles.findIndex(function (item) {
-        return item.id == _this16.vehicle_copied.id;
+        return item.id == _this17.vehicle_copied.id;
       });
       axios.delete("/gps_device/".concat(this.gps_device_id)).then(function (response) {
         $('#deleteGPSModal').modal('hide');
         $('#assignGPSModal').modal('hide');
 
-        _this16.vehicles.splice(index, 1, response.data);
+        _this17.vehicles.splice(index, 1, response.data);
 
-        _this16.loading = false;
+        _this17.loading = false;
         alert('GPS Device successfully removed');
       }).catch(function (error) {
-        _this16.errors = error.response.data.errors;
+        _this17.errors = error.response.data.errors;
       });
     },
     deleteGPSAttachment: function deleteGPSAttachment($id) {
-      var _this17 = this;
+      var _this18 = this;
 
       var index = this.vehicles.findIndex(function (item) {
-        return item.id == _this17.vehicle_copied.id;
+        return item.id == _this18.vehicle_copied.id;
       });
 
       if (confirm("Do you really want to delete this GPS Device Attachment?")) {
         axios.delete("/delete-gps-attachment/".concat($id)).then(function (response) {
-          _this17.vehicles.splice(index, 1, response.data);
+          _this18.vehicles.splice(index, 1, response.data);
 
-          _this17.vehicle_copied = Object.assign({}, response.data);
+          _this18.vehicle_copied = Object.assign({}, response.data);
 
-          _this17.gpsDeviceAttachmentButton();
+          _this18.gpsDeviceAttachmentButton();
 
           alert('GPS Device Attachment successfully deleted');
         }).catch(function (error) {
-          _this17.errors = error.response.data.errors;
+          _this18.errors = error.response.data.errors;
         });
       }
     },
@@ -9831,6 +9985,45 @@ __webpack_require__.r(__webpack_exports__);
       this.errors = [];
       this.gps_device = [];
       this.gps_device_attachments = [];
+    },
+    fetchFilterVehicle: function fetchFilterVehicle() {
+      var _this19 = this;
+
+      this.formFilterData = new FormData();
+      this.vehicles = [];
+      this.loading = true;
+
+      if (this.filterGps) {
+        this.formFilterData.append('filter_gps', this.filterGps);
+      }
+
+      if (this.filterStatus) {
+        if (this.filterStatus == "Active") {
+          this.formFilterData.append('operator', '>');
+        }
+
+        if (this.filterStatus == "Expired") {
+          this.formFilterData.append('operator', '<');
+        }
+      }
+
+      if (this.filterBasedTruck) {
+        var filteredTrucks = [];
+        this.filterBasedTruck.forEach(function (element) {
+          filteredTrucks.push(element.id);
+        });
+        this.formFilterData.append('filter_based_trucks', filteredTrucks);
+      }
+
+      this.formFilterData.append('_method', 'POST');
+      axios.post('/filter-vehicle', this.formFilterData).then(function (response) {
+        _this19.vehicles = response.data;
+        _this19.errors = [];
+        _this19.loading = false;
+      }).catch(function (error) {
+        _this19.errors = error.response.data.errors;
+        _this19.loading = false;
+      });
     },
     setPage: function setPage(pageNumber) {
       this.currentPage = pageNumber;
@@ -9847,11 +10040,11 @@ __webpack_require__.r(__webpack_exports__);
   },
   computed: {
     filteredVehicles: function filteredVehicles() {
-      var _this18 = this;
+      var _this20 = this;
 
       var self = this;
       return Object.values(self.vehicles).filter(function (vehicle) {
-        return vehicle.plate_number.toLowerCase().includes(_this18.keywords.toLowerCase());
+        return vehicle.plate_number.toLowerCase().includes(_this20.keywords.toLowerCase());
       });
     },
     totalPages: function totalPages() {
@@ -48439,7 +48632,7 @@ var render = function() {
                             staticStyle: {
                               "background-color": "rgb(4, 112, 62)"
                             },
-                            attrs: { disabled: !_vm.downloadExcelbutton },
+                            attrs: { disabled: !_vm.readyListbutton },
                             on: {
                               click: function($event) {
                                 return _vm.exportVehicle()
@@ -48453,7 +48646,7 @@ var render = function() {
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "row align-items-center" }, [
-                  _c("div", { staticClass: "col-xl-4 mb-2 mt-3 float-right" }, [
+                  _c("div", { staticClass: "col-xl-4 mb-3 mt-3 float-right" }, [
                     _c("input", {
                       directives: [
                         {
@@ -48466,7 +48659,7 @@ var render = function() {
                       staticClass: "form-control",
                       attrs: {
                         type: "text",
-                        placeholder: "Search",
+                        placeholder: "Search (Plate Number)",
                         id: "name"
                       },
                       domProps: { value: _vm.keywords },
@@ -48479,6 +48672,89 @@ var render = function() {
                         }
                       }
                     })
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "col-xl-2 mb-2 mt-3 float-right" },
+                    [
+                      _c("multiselect", {
+                        attrs: {
+                          options: _vm.statuses,
+                          multiple: false,
+                          placeholder: "Select Status",
+                          id: "selected_filter_status"
+                        },
+                        model: {
+                          value: _vm.filterStatus,
+                          callback: function($$v) {
+                            _vm.filterStatus = $$v
+                          },
+                          expression: "filterStatus"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "col-xl-2 mb-2 mt-3 float-right" },
+                    [
+                      _c("multiselect", {
+                        attrs: {
+                          options: _vm.gpsStatuses,
+                          multiple: false,
+                          placeholder: "With GPS",
+                          id: "selected_filter_status"
+                        },
+                        model: {
+                          value: _vm.filterGps,
+                          callback: function($$v) {
+                            _vm.filterGps = $$v
+                          },
+                          expression: "filterGps"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "col-xl-3 mb-2 mt-3 float-right" },
+                    [
+                      _c("multiselect", {
+                        attrs: {
+                          options: _vm.based_trucks,
+                          multiple: true,
+                          "track-by": "id",
+                          "custom-label": _vm.customLabelfilterBaseTruck,
+                          placeholder: "Select Based Trucks",
+                          id: "selected_filter_base_trucks"
+                        },
+                        model: {
+                          value: _vm.filterBasedTruck,
+                          callback: function($$v) {
+                            _vm.filterBasedTruck = $$v
+                          },
+                          expression: "filterBasedTruck"
+                        }
+                      })
+                    ],
+                    1
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "col-xl-1 mb-2 mt-3 float-right" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-sm btn-primary",
+                        attrs: { disabled: !_vm.readyListbutton },
+                        on: { click: _vm.fetchFilterVehicle }
+                      },
+                      [_vm._v(" Apply Filter")]
+                    )
                   ])
                 ])
               ]),
@@ -48609,7 +48885,8 @@ var render = function() {
                             _c("td", [
                               vehicle.gpsdevice
                                 ? _c("i", {
-                                    staticClass: "fas fa-location-arrow"
+                                    staticClass: "fas fa-location-arrow",
+                                    attrs: { title: "GPS Device: Yes" }
                                   })
                                 : _vm._e()
                             ]),
@@ -48741,7 +49018,8 @@ var render = function() {
                       _vm._v(" "),
                       _c("span", [
                         _vm._v(
-                          _vm._s(_vm.vehicles.length) + " Total Vehicle(s)"
+                          _vm._s(Object.keys(_vm.vehicles).length) +
+                            " Total Vehicle(s)"
                         )
                       ])
                     ])
@@ -50186,7 +50464,7 @@ var render = function() {
                           attrs: {
                             type: "file",
                             multiple: "multiple",
-                            id: "attachments",
+                            id: "attachments-edit",
                             placeholder: "Attach file"
                           },
                           on: { change: _vm.uploadFileChange }
@@ -50465,12 +50743,6 @@ var render = function() {
         },
         [
           _c(
-            "span",
-            { staticClass: "closed", attrs: { "data-dismiss": "modal" } },
-            [_vm._v("×")]
-          ),
-          _vm._v(" "),
-          _c(
             "div",
             {
               staticClass: "modal-dialog modal-dialog-centered modal-lg",
@@ -50743,6 +51015,27 @@ var render = function() {
                     ? _c(
                         "button",
                         {
+                          staticClass: "btn btn-warning btn-round btn-fill",
+                          attrs: {
+                            id: "assign_btn",
+                            type: "button",
+                            "data-toggle": "modal",
+                            "data-target": "#reassignGPSModal"
+                          },
+                          on: {
+                            click: function($event) {
+                              return _vm.viewreassignGPS(_vm.gps_device)
+                            }
+                          }
+                        },
+                        [_vm._v("Re-Assign")]
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _vm.gps_device_id
+                    ? _c(
+                        "button",
+                        {
                           staticClass: "btn btn-danger btn-round btn-fill",
                           attrs: {
                             id: "assign_btn",
@@ -50754,6 +51047,96 @@ var render = function() {
                         [_vm._v("Remove")]
                       )
                     : _vm._e()
+                ])
+              ])
+            ]
+          )
+        ]
+      ),
+      _vm._v(" "),
+      _c(
+        "div",
+        {
+          staticClass: "modal fade",
+          attrs: {
+            id: "reassignGPSModal",
+            tabindex: "-1",
+            role: "dialog",
+            "aria-labelledby": "exampleModalLabel",
+            "aria-hidden": "true",
+            "data-backdrop": "static"
+          }
+        },
+        [
+          _c(
+            "div",
+            {
+              staticClass: "modal-dialog modal-dialog-centered modal-lg",
+              attrs: { role: "document" }
+            },
+            [
+              _c("div", { staticClass: "modal-content" }, [
+                _vm._m(14),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-body" }, [
+                  _c("div", { staticClass: "row" }, [
+                    _c("div", { staticClass: "col-md-12" }, [
+                      _c(
+                        "div",
+                        { staticClass: "form-group" },
+                        [
+                          _c("label", { attrs: { for: "role" } }, [
+                            _vm._v("Select Vehicle to Re-assign GPS Device")
+                          ]),
+                          _vm._v(" "),
+                          _c("multiselect", {
+                            attrs: {
+                              options: _vm.reassign_vehicles,
+                              multiple: false,
+                              "track-by": "id",
+                              "custom-label": _vm.customLabelReassignVehicle,
+                              placeholder: "Select Vehicle",
+                              id: "selected_reassign_vehicle"
+                            },
+                            model: {
+                              value: _vm.reassign_vehicle,
+                              callback: function($$v) {
+                                _vm.reassign_vehicle = $$v
+                              },
+                              expression: "reassign_vehicle"
+                            }
+                          }),
+                          _vm._v(" "),
+                          _vm.errors.reassign_vehicles
+                            ? _c("span", { staticClass: "text-danger" }, [
+                                _vm._v(_vm._s(_vm.errors.reassign_vehicles[0]))
+                              ])
+                            : _vm._e()
+                        ],
+                        1
+                      )
+                    ])
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "modal-footer" }, [
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-success",
+                      on: { click: _vm.reassignGPS }
+                    },
+                    [_vm._v("Re-Assign")]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "button",
+                    {
+                      staticClass: "btn btn-secondary",
+                      attrs: { "data-dismiss": "modal" }
+                    },
+                    [_vm._v("Close")]
+                  )
                 ])
               ])
             ]
@@ -50789,9 +51172,9 @@ var render = function() {
             },
             [
               _c("div", { staticClass: "modal-content" }, [
-                _vm._m(14),
-                _vm._v(" "),
                 _vm._m(15),
+                _vm._v(" "),
+                _vm._m(16),
                 _vm._v(" "),
                 _c("div", { staticClass: "modal-footer" }, [
                   _c(
@@ -51093,6 +51476,31 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", { attrs: { scope: "col" } }, [_vm._v("Action")])
       ])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "modal-header" }, [
+      _c(
+        "h5",
+        { staticClass: "modal-title", attrs: { id: "addCompanyLabel" } },
+        [_vm._v("RE-ASSIGN GPS DEVICE")]
+      ),
+      _vm._v(" "),
+      _c(
+        "button",
+        {
+          staticClass: "close",
+          attrs: {
+            type: "button",
+            "data-dismiss": "modal",
+            "aria-label": "Close"
+          }
+        },
+        [_c("span", { attrs: { "aria-hidden": "true" } }, [_vm._v("×")])]
+      )
     ])
   },
   function() {
