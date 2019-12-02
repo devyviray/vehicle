@@ -79,13 +79,13 @@ class VehicleController extends Controller
         try {
 
             if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
-                $attachments = $request->file('attachments');   
-                foreach($attachments as $attachment){
-                    $filename = $attachment->getClientOriginalName();
-                    $path = Storage::disk('public')->put('document', $attachment);
-                    // $path = $attachment->store('document');
-    
-                    $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+                $attachments = $request->file('attachments');
+                if(!empty($attachments)){   
+                    foreach($attachments as $attachment){
+                        $filename = $attachment->getClientOriginalName();
+                        $path = Storage::disk('public')->put('document', $attachment);
+                        $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+                    }
                 }
                  
                 $vehicle->plants()->sync(explode(",",$request->plants));
@@ -183,16 +183,18 @@ class VehicleController extends Controller
         try {
 
             if($vehicle->update(['user_id' => Auth::user()->id] + $request->all())){
-                if($request->has('attachments')){
-                    $attachments = $request->file('attachments');   
-                    foreach($attachments as $attachment){
-                        $filename = $attachment->getClientOriginalName();
-                        $path = Storage::disk('public')->put('document', $attachment);
-                        // $path = $attachment->store('document');
-        
-                        $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+
+                    $attachments = $request->file('attachments');
+                    // return $attachments;
+                    if(!empty($attachments)){
+                        foreach($attachments as $attachment){
+                            $filename = $attachment->getClientOriginalName();
+                            $path = Storage::disk('public')->put('document', $attachment);
+                            $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
+                        }
                     }
-                }
+                
+
                 $plantVehicles = PlantVehicle::where('vehicle_id', $vehicle->id)->whereNotIn('plant_id', explode(",",$request->plants))->get();
                 
                 foreach($plantVehicles as $plantVehicle){                             
