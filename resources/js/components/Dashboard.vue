@@ -471,7 +471,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Document</label> 
-                                    <input type="file" multiple="multiple" id="attachments" class="attachments-edit" placeholder="Attach file" @change="uploadFileChange"><br>
+                                    <input type="file" multiple="multiple" id="attachments-edit" class="attachments-edit" placeholder="Attach file" @change="uploadFileChange"><br>
                                     <span class="text-danger" v-if="errors.attachments">The attachment field is required</span>
                                 </div>
                             </div>
@@ -1031,7 +1031,7 @@ export default {
             this.errors = [];
             this.vehicle = [];
             this.show_plant = false;
-            document.getElementById('attachments').value = "";
+            document.getElementById('attachments').value = '';
             this.vehicle_added = false;
             
         },
@@ -1130,6 +1130,9 @@ export default {
                 this.vehicles.splice(index,1,response.data);
                 document.getElementById('edit_btn').disabled = false;
                 this.loading = false;
+
+                this.attachments = [];
+                document.getElementById('attachments-edit').value = '';
             })
             .catch(error => {
                 this.vehicle_updated = false;
