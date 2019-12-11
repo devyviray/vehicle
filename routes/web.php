@@ -21,6 +21,8 @@ Route::get('logout', function(){
     return redirect('/');
 });
 
+Route::get('/vehicle-gps/{plate_number}', 'VehicleController@getVehicleGps');
+
 Auth::routes();
 
 Route::get('/home', 'HomeController@index')->name('home');
