@@ -260,10 +260,27 @@ class VehicleController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+
+
     public function destroy(Vehicle $vehicle)
     {
         if($vehicle->delete()){
             return $vehicle;
         }
+    }
+
+    public function getVehicleGps($plate_number){
+        $vehicle =  Vehicle::with('gpsdevice')->where('plate_number',$plate_number)->first();
+        $vehicle_data = [];
+        if($vehicle){
+            $vehicle_data['plate_number'] = $vehicle->plate_number;
+            if($vehicle->gpsdevice){
+                $vehicle_data['with_gps'] = "Yes";
+            }else{
+                $vehicle_data['with_gps'] = "No";
+            }
+        }
+        return $vehicle_data;
     }
 }
