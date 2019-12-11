@@ -270,8 +270,13 @@ class VehicleController extends Controller
         }
     }
 
-    public function getVehicleGps($plate_number){
-        $vehicle =  Vehicle::with('gpsdevice')->where('plate_number',$plate_number)->first();
+    public function getVehicleGps(Request $request){
+
+        $this->validate($request,[
+            'plate_number' => 'required'
+        ]);
+
+        $vehicle =  Vehicle::with('gpsdevice')->where('plate_number',$request->input('plate_number'))->first();
         $vehicle_data = [];
         if($vehicle){
             $vehicle_data['plate_number'] = $vehicle->plate_number;
@@ -281,6 +286,8 @@ class VehicleController extends Controller
                 $vehicle_data['with_gps'] = "No";
             }
         }
+
         return $vehicle_data;
+
     }
 }

@@ -21,7 +21,8 @@ Route::get('logout', function(){
     return redirect('/');
 });
 
-Route::get('/vehicle-gps/{plate_number}', 'VehicleController@getVehicleGps');
+// determine if truck has a gps
+Route::post('/vehicle-gps', 'VehicleController@getVehicleGps');
 
 Auth::routes();
 
