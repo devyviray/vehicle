@@ -37,6 +37,7 @@ Route::group(['middleware' => 'auth'], function(){
 
 
     Route::post('/filter-vehicle', 'VehicleController@filterVehicle');
+    Route::get('/vehicle-gps/{plate_number}', 'VehicleController@getVehicleGps');
 
     // Categories
     Route::get('/categories', 'CategoryController@index');
