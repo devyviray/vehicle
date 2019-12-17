@@ -132,7 +132,7 @@ class GpsDevicesController extends Controller
                 $api_assign_id = $this->send_api_assign_gps($data);
 
                 if($api_assign_id){
-                    GpsDevice::whereId($gps_device->id)->update(['device_id' => $api_assign_id]);
+                    $gps_device->update(['device_id' => $api_assign_id]);
                     DB::commit();
                 }else{
                     DB::rollBack();
