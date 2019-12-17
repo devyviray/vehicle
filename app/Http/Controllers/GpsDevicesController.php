@@ -19,7 +19,7 @@ class GpsDevicesController extends Controller
 {
 
     private function get_user_api_hash(){
-        return '$2y$10$cgtB39dh3RjWI411T6MwjuYUHrRTv/4iUC.A7RSTktZQrjJ5UWl1W';
+        return '$2y$10$AfIsvH9nfXgNDRxMnJR9Hewa5R9ZSTId/c9pXssd0nJjjcvGyYwoq';
     }
 
     public function index(){
@@ -282,8 +282,6 @@ class GpsDevicesController extends Controller
             
             Vehicle::whereId($request->vehicle_id)->update(['gps_device_id' => null]);
             Vehicle::whereId($request->reassign_vehicle_id)->update(['gps_device_id' => $gps_device->id]);
-            
-            // DB::commit();
 
             $data=array();
             $data['gps_device_id'] = $gps_device->id;
