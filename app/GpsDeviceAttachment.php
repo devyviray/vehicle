@@ -4,7 +4,9 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class GpsDeviceAttachment extends Model
+use OwenIt\Auditing\Contracts\Auditable;
+
+class GpsDeviceAttachment extends Model implements Auditable
 {
-    //
+    use \OwenIt\Auditing\Auditable;
 }

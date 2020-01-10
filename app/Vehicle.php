@@ -32,6 +32,7 @@ class Vehicle extends Model implements Auditable
         'user_id',
         'validity_start_date',
         'validity_end_date',
+        'previous_plate_number',
         'date',
         'time'
     ];

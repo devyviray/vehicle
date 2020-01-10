@@ -3,17 +3,18 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+
 use OwenIt\Auditing\Contracts\Auditable;
 
-class GpsDevice extends Model implements Auditable
+class GpsDeviceCheckUp extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
     
     protected $fillable = [
+        'gps_device_id',
         'vehicle_id',
-        'imei',
-        'sim_number',
-        'date_of_installation',
+        'check_up_date',
+        'remarks',
     ];
 
 }

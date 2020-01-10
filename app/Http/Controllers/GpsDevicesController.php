@@ -6,21 +6,20 @@ use Illuminate\Http\Request;
 use App\{
     GpsDevice,
     Vehicle,
-    GpsDeviceAttachment
+    GpsDeviceAttachment,
+    GpsDeviceCheckUp,
 };
 use DB;
 use Storage;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 
+use Config;
+
 
 
 class GpsDevicesController extends Controller
 {
-
-    private function get_user_api_hash(){
-        return '$2y$10$AfIsvH9nfXgNDRxMnJR9Hewa5R9ZSTId/c9pXssd0nJjjcvGyYwoq';
-    }
 
     public function index(){
         return GpsDevice::orderBy('id','desc')->get();
@@ -39,7 +38,6 @@ class GpsDevicesController extends Controller
             'imei' => 'required|unique:gps_devices,imei',
             'sim_number' => 'required|unique:gps_devices,sim_number'
         ]);
-
         DB::beginTransaction();
         try {
             
@@ -149,18 +147,8 @@ class GpsDevicesController extends Controller
     public function send_api_assign_gps($data=array()){
    
         $client = new Client();
-        $user_api_hash = $this->get_user_api_hash();
-
-        $default_headers = [
-            'cache-control' => 'no-cache',
-            'Connection' => 'keep-alive',
-            'Content-Length' => '961',
-            'Accept-Encoding' => 'gzip, deflate',
-            'Host' => 'gpstracker.lafilgroup.com',
-            'Cache-Control' => 'no-cache',
-            'Accept' => '*/*',
-            'content-type' => 'application/x-www-form-urlencoded',
-        ];
+        $user_api_hash = Config::get('constants.api.gps_hash');
+        $default_headers = Config::get('constants.api.gps_headers');
 
         $default_params = [
             'name'=> $data['name'],
@@ -197,7 +185,7 @@ class GpsDevicesController extends Controller
 
     private function destroy_api_gps($device_id){
         $client = new Client();
-        $user_api_hash = $this->get_user_api_hash();
+        $user_api_hash = Config::get('constants.api.gps_hash');
 
        
         try{
@@ -213,18 +201,16 @@ class GpsDevicesController extends Controller
     {
         DB::beginTransaction();
         try{
-            
-            $destroy_api = $this->destroy_api_gps($gps_device->device_id);
-            
-            $destroy_gps_attachments = GpsDeviceAttachment::where('vehicle_id', $gps_device->vehicle_id)->delete();
-
-            if($destroy_api == "Success"){
-                Vehicle::whereId($gps_device->vehicle_id)->update(['gps_device_id' => null]);
-                if($gps_device->delete()){
+            Vehicle::whereId($gps_device->vehicle_id)->update(['gps_device_id' => null]);
+            if($gps_device->delete()){
+                $destroy_api = $this->destroy_api_gps($gps_device->device_id);
+                if($destroy_api == "Success"){
                     DB::commit();
-                    $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $gps_device->vehicle_id)->first();
-                    return $vehicle;
+                }else{
+                    DB::rollBack();  
                 }
+                $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $gps_device->vehicle_id)->first();
+                return $vehicle;
             }else{
                 DB::rollBack();
                 $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $gps_device->vehicle_id)->first();
@@ -235,7 +221,6 @@ class GpsDevicesController extends Controller
             $response = $e->getResponse();
             return $response;
         }
-        
     }
 
     public function downloadGPSAttachment($fileId)
@@ -265,50 +250,112 @@ class GpsDevicesController extends Controller
             $response = $e->getResponse();
             return $response;
         }
-        
     }
 
     public function reassign_gps_device(Request $request,GpsDevice $gps_device){
 
-       
         $request->validate([
             'reassign_vehicle_id' => 'required',
         ]);
 
         DB::beginTransaction();
         try {
-            $gps_device->update(['vehicle_id' => $request->reassign_vehicle_id]);
-            GpsDeviceAttachment::where('gps_device_id', '=', $gps_device->id)->update(['vehicle_id' => $request->reassign_vehicle_id]);
+            GpsDevice::where('id', '=', $gps_device->id)->update(['vehicle_id' => $request->reassign_vehicle_id]);
+            // GpsDeviceAttachment::where('gps_device_id', '=', $gps_device->id)->update(['vehicle_id' => $request->reassign_vehicle_id]);
             
             Vehicle::whereId($request->vehicle_id)->update(['gps_device_id' => null]);
             Vehicle::whereId($request->reassign_vehicle_id)->update(['gps_device_id' => $gps_device->id]);
 
-            $data=array();
-            $data['gps_device_id'] = $gps_device->id;
-            $data['device_id'] = $gps_device->device_id;
-            $data['name'] = $request->plate_number;
-            $data['imei'] = $gps_device->imei;
-            $data['sim_number'] = $gps_device->sim_number;
-            $data['method'] = 'edit';
+            $client = new Client();
+            $user_api_hash = Config::get('constants.api.gps_hash');
+            $default_headers = Config::get('constants.api.gps_headers');
 
-            $api_assign_id = $this->send_api_assign_gps($data);
+            $default_params = [
+                'name'=> $request->plate_number,
+                'plate_number'=> $request->plate_number,
+                'icon_id'=>'0',
+                'fuel_measurement_id'=>'1',
+                'tail_length'=>'0',
+                'min_moving_speed'=>'1',
+                'min_fuel_fillings'=>'1',
+                'min_fuel_thefts'=>'1',
+                'device_id'=> $gps_device->device_id
+            ];
+  
+            try {
+                $response = $client->post('http://gpstracker.lafilgroup.com/api/edit_device?user_api_hash='.$user_api_hash, [
+                    'headers' => $default_headers,
+                    'form_params'=>  $default_params    
+                ]); 
 
-            if($api_assign_id){
+                $device_data = $response->getBody();
+                $device_data = json_decode($device_data);
+
                 DB::commit();
-            }else{
-                DB::rollBack();
-            }
+                return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->whereIn('id', [$request->reassign_vehicle_id,$request->vehicle_id])->get();
 
-            return $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->whereIn('id', [$request->reassign_vehicle_id,$request->vehicle_id])->get();
-        
+            }catch (BadResponseException $ex) {
+                $response = $ex->getResponse()->getBody();
+                // return json_decode($response, true);
+                DB::rollBack();
+                return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->whereIn('id', [$request->reassign_vehicle_id,$request->vehicle_id])->get();
+            }
         }
         catch (HttpException $ex) {
             DB::rollBack();
-            return $vehicle;
+            return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->whereIn('id', [$request->reassign_vehicle_id,$request->vehicle_id])->get();
         }
         
-        return $vehicle;
         // dd($vehicle);
+    }
+
+    public function storeCheckUp(Request $request){
+
+        $request->validate([
+            'check_up_date' => 'required',
+        ]);
+
+        $get_check_ups = GpsDeviceCheckUp::where('gps_device_id',$request->gps_device_id)->get();
+        DB::beginTransaction();
+        try {
+            if(GpsDeviceCheckUp::create($request->all())){
+                DB::commit(); 
+            }else{
+                DB::rollBack(); 
+            }
+            return GpsDeviceCheckUp::where('gps_device_id' , $request->gps_device_id)->get();
+        }
+        catch (HttpException $ex){
+            DB::rollBack();
+            return $get_check_ups;
+        }
+    }
+
+    public function checkUpLogs($vehicle_id){
+        return GpsDeviceCheckUp::where('vehicle_id' , $vehicle_id)->get();
+    }
+    public function gpsAttachments($vehicle_id){
+        return GpsDeviceAttachment::where('vehicle_id' , $vehicle_id)->get();
+    }
+
+    public function deleteGPSCheckup(GpsDeviceCheckUp $check_up){
+
+        $check_up_id = $check_up->vehicle_id;
+        DB::beginTransaction();
+        try{
+            if($check_up->delete()){
+                DB::commit();
+                $check_up_log = GpsDeviceCheckUp::where('vehicle_id' , $check_up_id)->first();
+                return $check_up_log;
+            }else{
+                DB::rollBack();
+                return $check_up;
+            }
+        }catch (NotFoundHttpException $e) {
+            DB::rollBack();
+            $response = $e->getResponse();
+            return $check_up;
+        }
     }
 
 }

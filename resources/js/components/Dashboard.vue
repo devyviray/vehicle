@@ -23,7 +23,7 @@
                             </div>
                             <div class="row align-items-center">
                                 <div class="col-xl-4 mb-3 mt-3 float-right">
-                                    <input type="text" class="form-control" placeholder="Search (Plate Number)" v-model="keywords" id="name">
+                                    <input type="text" class="form-control" placeholder="Search (Plate Number,Vendor)" v-model="keywords" id="name">
                                 </div> 
                                 <div class="col-xl-2 mb-2 mt-3 float-right">
                                     <multiselect
@@ -491,6 +491,22 @@
                                     <span class="text-danger" v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
                                 </div>
                             </div>
+
+                             <div class="col-md-4">
+                                <label>Previous Plate Number</label>
+                                <input type="text" id="previous_plate_number" disabled class="form-control" v-model="vehicle_fetch.previous_plate_number">
+                            </div>
+                        </div>
+                        <div v-if="changePlateNumberVisible" style="border:1px solid #CAD1D7;border-radius:5px;padding:10px 10px 10px 10px;">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h3>Change Plate Number<small> (*For Category "Temporary" only)</small></h3> 
+                                </div>
+                                <div class="col-md-6">
+                                    <label>Enter Plate Number</label>
+                                    <input type="text" id="enter_plate_number" placeholder="New Plate Number" class="form-control" v-model="vehicle_fetch.enter_plate_number">
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -599,9 +615,20 @@
                                 </div>
                             </div>
 
-                             <div class="col-md-6">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="role">Attachment(s)</label> 
+                                    <label for="role">INSTALLATION DATE</label> 
+                                    <input type="date" id="date_of_installation" class="form-control" v-model="gps_device.date_of_installation">
+                                    <span class="text-danger" v-if="errors.date_of_installation">{{ errors.date_of_installation[0] }}</span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <h4>Attachment(s)</h4>
+                            </div>
+
+                            <div class="col-md-12">
+                                <div class="form-group">
                                     <input type="file" multiple="multiple" id="gps_attachments" class="gps-attachments-edit" placeholder="Attach file" @change="uploadGPSFileChange" v-if="isUploadGPSAttachment"><br>
                                     <span class="text-danger" v-if="errors.gps_attachments">The attachment field is required</span>
                                 </div>
@@ -616,7 +643,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(attachment, d) in this.vehicle_copied.gpsdeviceattachments" v-bind:key="d">
+                                    <tr v-for="(attachment, d) in gps_device_vehicle_attachments" v-bind:key="d">
                                         <td>{{ d + 1 }}</td>
                                         <td>{{ attachment.file_name }}</td>
                                         <td>
@@ -627,12 +654,56 @@
                                     </tr>
                                 </tbody>
                             </table>
+
+                           
+
+                            <div class="col-md-12">
+                                <h4>Check Up Logs</h4>
+                            </div>
+                        
+                            <div class="col-md-5" v-if="gps_device_id">
+                                <div class="form-group">
+                                    <input type="date" id="check_up_date" class="form-control" v-model="check_up_log.check_up_date">
+                                    <span class="text-danger" v-if="errors.check_up_date">{{ errors.check_up_date[0] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-5" v-if="gps_device_id">
+                                <div class="form-group">
+                                    <input type="text" id="check_up_remarks" placeholder="Remarks" class="form-control" v-model="check_up_log.check_up_remarks">
+                                    <span class="text-danger" v-if="errors.check_up_remarks">{{ errors.check_up_remarks[0] }}</span>
+                                </div>
+                            </div>
+                                <div class="col-md-1" v-if="gps_device_id">
+                                <button  @click="saveCheckUpLog" class="btn btn-sm btn-primary"> Add Check Up</button>
+                            </div>
+                         
+                            <div class="col-md-12">
+                                <table class="table align-items-center table-flush">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th scope="col">#</th>
+                                            <th scope="col">Check Up Date</th>
+                                            <th scope="col">Remarks</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                            <tr v-for="(check_up, d) in this.check_up_logs" v-bind:key="d">
+                                            <td>{{ d + 1 }}</td>
+                                            <td>{{ check_up.check_up_date }}</td>
+                                            <td>{{ check_up.remarks }}</td>
+                                            <td><span style="text-decoration: none; color: red; background-color: transparent; cursor: pointer;" title="Delete" @click="deleteGPSCheckup(check_up.id)">Delete</span></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="assign_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="assignGPS(gps_device)">Assign</button>
-                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#reassignGPSModal" class="btn btn-warning btn-round btn-fill" @click="viewreassignGPS(gps_device)" v-if="gps_device_id">Re-Assign</button>
-                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#deleteGPSModal" class="btn btn-danger btn-round btn-fill" v-if="gps_device_id">Remove</button>
+                        <button id="assign_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="assignGPS(gps_device)">Assign GPS</button>
+                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#reassignGPSModal" class="btn btn-warning btn-round btn-fill" @click="viewreassignGPS(gps_device)" v-if="gps_device_id">Re-Assign GPS</button>
+                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#deleteGPSModal" class="btn btn-danger btn-round btn-fill" v-if="gps_device_id">Remove GPS Device</button>
                     </div>
                 </div>
             </div>  
@@ -696,14 +767,14 @@
                    <div class="row">
                         <div class="col-md-12">
                             <div class="form-group">
-                                Are you sure you want to remove this GPS Device?
+                                Are you sure you want to remove this GPS Device from this Vehicle ({{vehicle_copied.plate_number}})?
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
-                    <button class="btn btn-warning" @click="deleteGPSDevice">Remove</button>
+                    <button class="btn btn-warning" @click="deleteGPSDevice">Yes, Remove</button>
                 </div>
                 </div>
             </div>
@@ -778,7 +849,10 @@ export default {
             btn_assign: false,
             btn_edit: false,
             btn_view: false,
-
+            check_up_log : [],
+            check_up_logs : [],
+            gps_device_vehicle_attachments : [],
+            changePlateNumberVisible : false,
         }
     },
     created(){
@@ -854,6 +928,8 @@ export default {
                 $('#editVehicleModal').modal('show');
                 this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
                 this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+
+                this.vehicle_fetch.category_id == 2 ? this.changePlateNumberVisible = true : this.changePlateNumberVisible = false;
                 if(this.userLevel < 5){
                     this.disabledEdit();
                 }
@@ -1122,11 +1198,14 @@ export default {
             this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
             this.formData.append('plants', plantIds ? plantIds : '');
             this.formData.append('old_plants', oldPlants ? oldPlants : '');
+            this.formData.append('new_plate_number', vehicle.enter_plate_number ? vehicle.enter_plate_number :  '');
             this.formData.append('_method', 'PATCH');
 
             axios.post(`/vehicle/${vehicle.id}`, this.formData)
             .then(response => {
                 this.vehicle_updated = true;
+                this.vehicle_fetch = response.data;
+                this.vehicle_fetch.category_id == 2 ? this.changePlateNumberVisible = true : this.changePlateNumberVisible = false;
                 this.vehicles.splice(index,1,response.data);
                 document.getElementById('edit_btn').disabled = false;
                 this.loading = false;
@@ -1170,18 +1249,44 @@ export default {
             this.resetAssignGPS();
             this.vehicle_copied = Object.assign({}, vehicle);
             this.gpsDeviceAttachmentButton();
+            this.gps_device_attachments = [];
+            this.check_up_logs = [];
+            this.check_up_log = [];
+
             if(gps_device){
                 this.gps_device_id = gps_device.id;
                 this.gps_device.imei = gps_device.imei;
                 this.gps_device.sim_number = gps_device.sim_number;
+                this.gps_device.date_of_installation = gps_device.date_of_installation;
             }else{
                 this.gps_device_id = null;
                 this.gps_device.imei = null;
                 this.gps_device.sim_number = null;
-                this.gps_device_attachments = [];
+                this.gps_device.date_of_installation = null;
             }
 
+            this.fetchGPSDeviceCheckUpLogs(this.vehicle_copied.id);
+            this.fetchGPSDeviceAttachments(this.vehicle_copied.id);
+
             this.gps_device.plate_number = this.vehicle_copied.plate_number; 
+        },
+        fetchGPSDeviceCheckUpLogs(vehicle_id){
+                axios.get('/gps_check_up_logs/' + vehicle_id)
+                .then(response => { 
+                    this.check_up_logs = response.data;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                })
+        },
+        fetchGPSDeviceAttachments(vehicle_id){
+                axios.get('/gps_attachments/' + vehicle_id)
+                .then(response => { 
+                    this.gps_device_vehicle_attachments = response.data;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                })
         },
         buttonAuth(){
             if(this.role == "GPS Custodian"){
@@ -1285,6 +1390,9 @@ export default {
                 this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
                 this.formGPSData.append('imei', gps_device.imei);
                 this.formGPSData.append('sim_number', gps_device.sim_number);
+                if(gps_device.date_of_installation){
+                    this.formGPSData.append('date_of_installation', gps_device.date_of_installation);
+                }
                 this.formGPSData.append('_method', 'PATCH');
 
                 axios.post(`/gps_device/${this.gps_device_id}`, this.formGPSData)
@@ -1296,6 +1404,7 @@ export default {
                     this.vehicles.splice(index,1,response.data);
                     this.vehicle_copied = Object.assign({}, response.data);
                     this.gpsDeviceAttachmentButton();
+                    this.fetchGPSDeviceAttachments(this.vehicle_copied.id);
                 })
                 .catch(error => {
                     this.loading = false;
@@ -1309,6 +1418,9 @@ export default {
                 this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
                 this.formGPSData.append('imei', gps_device.imei);
                 this.formGPSData.append('sim_number', gps_device.sim_number);
+                if(gps_device.date_of_installation){
+                    this.formGPSData.append('date_of_installation', gps_device.date_of_installation);
+                }
                 this.formGPSData.append('_method', 'POST');
 
                 axios.post('/gps_device', this.formGPSData)    
@@ -1321,6 +1433,7 @@ export default {
                     this.vehicles.splice(index,1,response.data);
                     this.vehicle_copied = Object.assign({}, response.data);
                     this.gpsDeviceAttachmentButton();
+                    this.fetchGPSDeviceAttachments(this.vehicle_copied.id);
                 })
                 .catch(error => {
                     this.loading = false;
@@ -1352,6 +1465,7 @@ export default {
                      this.vehicles.splice(index,1,response.data);
                      this.vehicle_copied = Object.assign({}, response.data);
                      this.gpsDeviceAttachmentButton();
+                     this.fetchGPSDeviceAttachments(this.vehicle_copied.id);
                      alert('GPS Device Attachment successfully deleted');
                 })
                 .catch(error => {
@@ -1404,6 +1518,55 @@ export default {
                 this.loading = false;
             })
         },
+        saveCheckUpLog(){
+
+            this.formFilterData = new FormData();
+            this.loading = true;
+            this.loading = false;
+
+            if(this.check_up_log){
+
+                this.formFilterData.append('vehicle_id', this.vehicle_copied.id);
+                this.formFilterData.append('gps_device_id', this.gps_device_id);
+
+                if(this.check_up_log.check_up_date){
+                    this.formFilterData.append('check_up_date', this.check_up_log.check_up_date);
+                }
+                if(this.check_up_log.check_up_date){
+                    this.formFilterData.append('remarks', this.check_up_log.check_up_remarks);
+                }
+
+                this.formFilterData.append('_method', 'POST');
+                
+                axios.post('/check_up', this.formFilterData)
+                .then(response => {
+                    this.check_up_log.check_up_date = '';
+                    this.check_up_log.check_up_remarks = '';
+                    this.errors = [];
+                    this.loading = false;
+                    this.fetchGPSDeviceCheckUpLogs(this.vehicle_copied.id);
+                    alert('Check up log has been saved!');
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                    this.loading = false;
+                })
+            }else{
+                this.loading = false;
+            }
+        },
+        deleteGPSCheckup(check_up_id){  
+            if(confirm("Are you sure you want to delete this GPS device check up log?")){
+                axios.delete(`/delete-gps-check-up/` + check_up_id)
+                .then(response => {
+                    this.fetchGPSDeviceCheckUpLogs(this.vehicle_copied.id);
+                    alert('GPS device check up log successfully deleted');
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                })
+            }
+        },
         setPage(pageNumber) {
             this.currentPage = pageNumber;
         },
@@ -1424,7 +1587,7 @@ export default {
         filteredVehicles(){
             let self = this;
             return Object.values(self.vehicles).filter(vehicle => {
-                return vehicle.plate_number.toLowerCase().includes(this.keywords.toLowerCase())
+                return vehicle.plate_number.toLowerCase().includes(this.keywords.toLowerCase()) ||  vehicle.vendor.vendor_description_lfug.toLowerCase().includes(this.keywords.toLowerCase()) ||  vehicle.vendor.vendor_description_pfmc.toLowerCase().includes(this.keywords.toLowerCase()) 
             });
         },
         totalPages() {

@@ -113,6 +113,14 @@ Route::group(['middleware' => 'auth'], function(){
    
     Route::patch('/reassign_gps_device/{gps_device}', 'GpsDevicesController@reassign_gps_device');
 
+    Route::post('/check_up', 'GpsDevicesController@storeCheckUp');
+
+    Route::get('/gps_check_up_logs/{vehicle_id}', 'GpsDevicesController@checkUpLogs');
+    Route::get('/gps_attachments/{vehicle_id}', 'GpsDevicesController@gpsAttachments');
+
+    Route::delete('/delete-gps-check-up/{check_up}', 'GpsDevicesController@deleteGPSCheckup');
+    
+
     // Roles
     Route::get('/roles', 'RoleController@index');
 

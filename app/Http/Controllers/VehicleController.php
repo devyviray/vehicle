@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\{
     Vehicle,
+    GpsDevice,
     Document,
     PlantVehicle,
     PlantVehicleDeleted,
@@ -12,9 +13,14 @@ use App\{
 };
 use App\Rules\ValidityRule;
 use Carbon\Carbon;
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+
 use Auth;
 use DB;
 use Storage;
+use Config;
 
 class VehicleController extends Controller
 {
@@ -143,7 +149,9 @@ class VehicleController extends Controller
      */
     public function update(Request $request, Vehicle $vehicle)
     {
+
         if($request->category_id == 2){
+
             $request->validate([
                 'plate_number' =>  ['required','max:20','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Edit',$vehicle->id)],
                 'category_id' => 'required',
@@ -181,11 +189,20 @@ class VehicleController extends Controller
         
         DB::beginTransaction();
         try {
+            $vehicle_request_data = $request->all();
+            if(isset($request->new_plate_number) && !empty($request->new_plate_number)){
+                if(empty($vehicle->previous_plate_number)){
+                    $vehicle_request_data['previous_plate_number'] = $vehicle->plate_number;
+                    $vehicle_request_data['plate_number'] = $request->new_plate_number;
+                }else{
+                    $vehicle_request_data['plate_number'] = $request->new_plate_number;
+                }
+                unset($vehicle_request_data['new_plate_number']);
 
-            if($vehicle->update(['user_id' => Auth::user()->id] + $request->all())){
-
+                $vehicle_request_data['category_id'] = '1';
+            }
+            if($vehicle->update(['user_id' => Auth::user()->id] + $vehicle_request_data)){
                     $attachments = $request->file('attachments');
-                    // return $attachments;
                     if(!empty($attachments)){
                         foreach($attachments as $attachment){
                             $filename = $attachment->getClientOriginalName();
@@ -193,8 +210,7 @@ class VehicleController extends Controller
                             $uploadedFile = $this->uploadFiles($vehicle->id, $path, $filename);
                         }
                     }
-                
-
+            
                 $plantVehicles = PlantVehicle::where('vehicle_id', $vehicle->id)->whereNotIn('plant_id', explode(",",$request->plants))->get();
                 
                 foreach($plantVehicles as $plantVehicle){                             
@@ -219,9 +235,33 @@ class VehicleController extends Controller
                     ]);
                 }
                 
-                DB::commit();
+                $vehicle_data =  Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $vehicle->id)->first();
 
-                return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $vehicle->id)->first();
+                if(isset($request->new_plate_number) && !empty($request->new_plate_number)){
+
+                    $gps_device = GpsDevice::where('id',$vehicle->gps_device_id)->first();
+                   
+                    if($gps_device){
+                        $data=array();
+                        $data['device_id'] = $gps_device->device_id;
+                        $data['name'] = $vehicle_request_data['plate_number'];
+                        $data['method'] = 'edit';
+
+                        $api_assign_id = $this->update_gps_details($data);
+                        if($api_assign_id){
+                            DB::commit();
+                        }else{
+                            DB::rollBack();
+                        }   
+                    }{
+                        DB::commit();
+                    }
+                    return $vehicle_data;
+                }
+                else{
+                    DB::commit(); 
+                    return $vehicle_data;
+                }
             }
 
         } catch (Exception $e) {
@@ -288,6 +328,42 @@ class VehicleController extends Controller
         }
 
         return $vehicle_data;
+
+    }
+
+    private function update_gps_details($data=array()){
+
+        $client = new Client();
+        $user_api_hash = Config::get('constants.api.gps_hash');
+        $default_headers = Config::get('constants.api.gps_headers');
+
+        $default_params = [
+            'name'=> $data['name'],
+            'plate_number'=> $data['name'],
+            'icon_id'=>'0',
+            'fuel_measurement_id'=>'1',
+            'tail_length'=>'0',
+            'min_moving_speed'=>'1',
+            'min_fuel_fillings'=>'1',
+            'min_fuel_thefts'=>'1',
+            'device_id'=> $data['device_id']
+        ];
+
+        try {
+            $response = $client->post('http://gpstracker.lafilgroup.com/api/'.$data['method'].'_device?user_api_hash='.$user_api_hash, [
+                'headers' => $default_headers,
+                'form_params'=>  $default_params    
+            ]); 
+
+            $device_data = $response->getBody();
+            $device_data = json_decode($device_data);
+
+            return $device_data->id;
+
+        }catch (BadResponseException $ex) {
+            $response = $ex->getResponse()->getBody();
+            return json_decode($response, true);
+        }
 
     }
 }
