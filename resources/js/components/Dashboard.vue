@@ -20,6 +20,9 @@
                                     <a href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
                                     <button :disabled="!readyListbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
                                 </div>
+                                <div class="col text-right" v-if="this.role === 'GPS Custodian'">
+                                    <button :disabled="!readyListbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
+                                </div>
                             </div>
                             <div class="row align-items-center">
                                 <div class="col-xl-4 mb-3 mt-3 float-right">

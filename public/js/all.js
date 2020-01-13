@@ -9382,6 +9382,9 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
+//
+//
 
 
 
@@ -48794,6 +48797,27 @@ var render = function() {
                           [_vm._v("Add Vehicle")]
                         ),
                         _vm._v(" "),
+                        _c(
+                          "button",
+                          {
+                            staticClass: "btn btn-sm btn-primary",
+                            staticStyle: {
+                              "background-color": "rgb(4, 112, 62)"
+                            },
+                            attrs: { disabled: !_vm.readyListbutton },
+                            on: {
+                              click: function($event) {
+                                return _vm.exportVehicle()
+                              }
+                            }
+                          },
+                          [_vm._v("Download Excel")]
+                        )
+                      ])
+                    : _vm._e(),
+                  _vm._v(" "),
+                  this.role === "GPS Custodian"
+                    ? _c("div", { staticClass: "col text-right" }, [
                         _c(
                           "button",
                           {
