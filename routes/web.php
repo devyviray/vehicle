@@ -124,6 +124,19 @@ Route::group(['middleware' => 'auth'], function(){
     // Roles
     Route::get('/roles', 'RoleController@index');
 
+    //Trucker Maintenance
+    Route::post('/trucker', 'VehicleController@trucker_store');
+    Route::patch('/trucker/{trucker}', 'VehicleController@trucker_update');
+    Route::delete('/delete-trucker/{trucker}', 'VehicleController@deleteTrucker');
+
+    //SAP LFUG
+    Route::get('/sap-lfug', 'VehicleController@get_sap_lfug');
+
+    //SAP PFMC
+    Route::get('/sap-pfmc', 'VehicleController@get_sap_pfmc');
+
+    
+
 });
 
 

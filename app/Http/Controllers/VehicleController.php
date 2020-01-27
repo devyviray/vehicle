@@ -9,7 +9,8 @@ use App\{
     Document,
     PlantVehicle,
     PlantVehicleDeleted,
-    PlantVehicleAdded
+    PlantVehicleAdded,
+    Trucker
 };
 use App\Rules\ValidityRule;
 use Carbon\Carbon;
@@ -170,7 +171,7 @@ class VehicleController extends Controller
             ]);
         }else{
             $request->validate([
-                'plate_number' => ['required','max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Edit',$vehicle->id)],
+                'plate_number' => ['required','max:20','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Edit',$vehicle->id)],
                 'category_id' => 'required',
                 'capacity_id' => 'required',
                 'vendor_id' => 'required',
@@ -190,17 +191,58 @@ class VehicleController extends Controller
         DB::beginTransaction();
         try {
             $vehicle_request_data = $request->all();
-            if(isset($request->new_plate_number) && !empty($request->new_plate_number)){
-                if(empty($vehicle->previous_plate_number)){
-                    $vehicle_request_data['previous_plate_number'] = $vehicle->plate_number;
-                    $vehicle_request_data['plate_number'] = $request->new_plate_number;
-                }else{
-                    $vehicle_request_data['plate_number'] = $request->new_plate_number;
-                }
-                unset($vehicle_request_data['new_plate_number']);
 
-                $vehicle_request_data['category_id'] = '1';
+            if(isset($request->new_plate_number) && !empty($request->new_plate_number)){
+                
+                $vehicle_data = Vehicle::with('plants')->where('id',$vehicle->id)->first();
+                $new_vehicle_data = [];
+                $new_vehicle_data['plate_number'] = $request->new_plate_number;
+                $new_vehicle_data['category_id'] = '1';
+                $new_vehicle_data['capacity_id'] = $vehicle_data['capacity_id'];
+                $new_vehicle_data['vendor_id'] = $vehicle_data['vendor_id'];
+                $new_vehicle_data['subcon_vendor_id'] = $vehicle_data['subcon_vendor_id'];
+                $new_vehicle_data['indicator_id'] = $vehicle_data['indicator_id'];
+                $new_vehicle_data['good_id'] = $vehicle_data['good_id'];
+                $new_vehicle_data['allowed_total_weight'] = $vehicle_data['allowed_total_weight'];
+                $new_vehicle_data['remarks'] = $vehicle_data['remarks'];
+                $new_vehicle_data['based_truck_id'] = $vehicle_data['based_truck_id'];
+                $new_vehicle_data['contract_id'] = $vehicle_data['contract_id'];
+                $new_vehicle_data['user_id'] = Auth::user()->id;
+                $new_vehicle_data['validity_start_date'] = $vehicle_data['validity_start_date'];
+                $new_vehicle_data['validity_end_date'] = $vehicle_data['validity_end_date'];
+                $new_vehicle_data['gps_device_id'] = $vehicle_data['gps_device_id'];
+                $new_vehicle_data['previous_plate_number'] = $vehicle_data['plate_number'];
+                unset($new_vehicle_data['new_plate_number']);
+
+                $plant_data_ids = [];
+                if($vehicle_data['plants']){
+                    $plants = [];
+                    foreach($vehicle_data['plants'] as $plant){
+                        $plants[] = $plant->id;
+                    }
+                    $plant_data_ids = implode(",",$plants);
+                }
+
+                if($new_vehicle = Vehicle::create($new_vehicle_data)){
+                    if($plant_data_ids){
+                        $new_vehicle->plants()->sync(explode(",",$plant_data_ids));
+
+                        foreach(explode(",",$plant_data_ids) as $plant_data_id){
+                            $plantVehicle = PlantVehicle::where('vehicle_id', $new_vehicle->id)->where('plant_id', $plant_data_id)->first();
+                            PlantVehicleAdded::create(['plant_vehicle_id' => $plantVehicle->id, 
+                                'plant_id' => $plant_data_id, 
+                                'vehicle_id'=> $new_vehicle->id,
+                                'user_id' => Auth::user()->id
+                            ]);
+                        }
+                    }
+                }
+                
+                $vehicle_request_data['gps_device_id'] = "";
+                $vehicle_request_data['change_plate_number_status'] = "Yes";
             }
+
+
             if($vehicle->update(['user_id' => Auth::user()->id] + $vehicle_request_data)){
                     $attachments = $request->file('attachments');
                     if(!empty($attachments)){
@@ -239,12 +281,12 @@ class VehicleController extends Controller
 
                 if(isset($request->new_plate_number) && !empty($request->new_plate_number)){
 
-                    $gps_device = GpsDevice::where('id',$vehicle->gps_device_id)->first();
+                    $gps_device = GpsDevice::where('id',$new_vehicle['gps_device_id'])->first();
                    
                     if($gps_device){
                         $data=array();
                         $data['device_id'] = $gps_device->device_id;
-                        $data['name'] = $vehicle_request_data['plate_number'];
+                        $data['name'] = $request->new_plate_number;
                         $data['method'] = 'edit';
 
                         $api_assign_id = $this->update_gps_details($data);
@@ -256,11 +298,11 @@ class VehicleController extends Controller
                     }{
                         DB::commit();
                     }
-                    return $vehicle_data;
+                    return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $vehicle->id)->first();
                 }
                 else{
                     DB::commit(); 
-                    return $vehicle_data;
+                    return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $vehicle->id)->first();
                 }
             }
 
@@ -350,6 +392,7 @@ class VehicleController extends Controller
         ];
 
         try {
+
             $response = $client->post('http://gpstracker.lafilgroup.com/api/'.$data['method'].'_device?user_api_hash='.$user_api_hash, [
                 'headers' => $default_headers,
                 'form_params'=>  $default_params    
@@ -364,6 +407,77 @@ class VehicleController extends Controller
             $response = $ex->getResponse()->getBody();
             return json_decode($response, true);
         }
-
     }
+
+
+    public function trucker_store(Request $request){
+        $trucker_data = $request->all();
+
+        $this->validate($request,[
+            'vendor_description_lfug' => 'required',
+            'vendor_description_pfmc' => 'required'
+        ]);
+
+        DB::beginTransaction();
+        try {
+            if($trucker = Trucker::create($trucker_data)){
+                DB::commit();
+                return Trucker::all();
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return Trucker::all();
+        }
+    }
+
+    public function trucker_update(Request $request, Trucker $trucker){
+        $trucker_data = $request->all();
+
+        $this->validate($request,[
+            'vendor_description_lfug' => 'required',
+            'vendor_description_pfmc' => 'required'
+        ]);
+       
+        DB::beginTransaction();
+        try {
+            if($trucker->update($trucker_data)){
+                DB::commit();
+                return Trucker::all();
+            }
+        } catch (Exception $e) {
+            DB::rollBack();
+            return Trucker::all();
+        }
+    }
+
+    public function deleteTrucker(Trucker $trucker){
+        if($trucker->delete()){
+            return $trucker;
+        }
+    }
+
+    public function get_sap_lfug(){
+
+        $client = new Client();
+        $connection = Config::get('constants.sap_api.connection_lfug');
+        $table = Config::get('constants.sap_api.table');
+
+        $response = $client->request('GET', 'http://10.96.4.39:8012/api/read-table', 
+                        ['query' => ['connection' => $connection,'table' => $table]]);
+        
+        return json_decode($response->getBody(), true);
+    }
+
+    public function get_sap_pfmc(){
+
+        $client = new Client();
+        $connection = Config::get('constants.sap_api.connection_pfmc');
+        $table = Config::get('constants.sap_api.table');
+
+        $response = $client->request('GET', 'http://10.96.4.39:8012/api/read-table', 
+                        ['query' => ['connection' => $connection,'table' => $table]]);
+        
+        return json_decode($response->getBody(), true);
+    }
+
 }

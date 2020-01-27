@@ -19,6 +19,7 @@
                                 <div class="col text-right" v-if="this.userLevel > 4">
                                     <a href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
                                     <button :disabled="!readyListbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
+                                    <a href="javascript.void(0)" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#viewTruckersModal" @click="fetchTruckers()">View Truckers</a>
                                 </div>
                                 <div class="col text-right" v-if="this.role === 'GPS Custodian'">
                                     <button :disabled="!readyListbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
@@ -28,7 +29,7 @@
                                 <div class="col-xl-4 mb-3 mt-3 float-right">
                                     <input type="text" class="form-control" placeholder="Search (Plate Number,Vendor)" v-model="keywords" id="name">
                                 </div> 
-                                <div class="col-xl-2 mb-2 mt-3 float-right">
+                                <div class="col-xl-2 mb-2 mt-3 float-right ">
                                     <multiselect
                                         v-model="filterStatus"
                                         :options="statuses"
@@ -44,7 +45,7 @@
                                         :options="gpsStatuses"
                                         :multiple="false"
                                         placeholder="With GPS"
-                                        id="selected_filter_status"
+                                        id="selected_filter_gps"
                                     >
                                     </multiselect>
                                 </div> 
@@ -182,7 +183,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Plate Number*</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle.plate_number" style="text-transform:uppercase">
+                                    <input type="text" id="edit_plate_number" class="form-control" v-model="vehicle.plate_number" style="text-transform:uppercase">
                                     <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
                                 </div>
                             </div>
@@ -599,7 +600,7 @@
                              <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="role">PLATE NUMBER</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="gps_device.plate_number" disabled>
+                                    <input type="text" id="gps_plate_number" class="form-control" v-model="gps_device.plate_number" disabled>
                                 </div>
                             </div>
 
@@ -783,7 +784,141 @@
             </div>
         </div>
 
+        <!-- Truckers List Modal -->
+        <div class="modal fade" id="viewTruckersModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+            <span class="closed" data-dismiss="modal">&times;</span>
+            <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
+                <div class="modal-content">
+                    <div>
+                        <button type="button" class="close mt-2 mr-2" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-header">
+                        <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Truckers List</h2>
+                    </div>
+                    <div class="modal-body">
 
+                        <div class="row align-items-center">
+                            <div class="col text-right" v-if="this.userLevel > 4">
+                                <button class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);"  @click="addTrucker" data-toggle="modal" data-target="#addTruckerModal">Add Trucker</button>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <input type="text" class="form-control" placeholder="Search Trucker" v-model="trucker_keywords" id="trucker_name">
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="table-responsive">
+                                <table class="table align-items-center table-flush">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th></th>
+                                            <th scope="col">LFUG</th>
+                                            <th scope="col">PFMC</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="(trucker, v) in filteredTruckerQueues" v-bind:key="v">
+                                            <td class="text-left">
+                                                <div class="dropdown">
+                                                    <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </a>
+                                                    <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
+                                                        <a class="dropdown-item" style="cursor: pointer" @click="deleteTrucker(trucker)">Delete</a>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>{{ trucker.vendor_description_lfug }}</td>
+                                            <td>{{ trucker.vendor_description_pfmc }}</td>                                              
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="row mb-3 mt-3 ml-1" v-if="filteredTruckerQueues.length ">
+                                <div class="col-6">
+                                    <button :disabled="!truckershowPreviousLink()" class="btn btn-default btn-sm btn-fill" v-on:click="truckersetPage(truckercurrentPage - 1)"> Previous </button>
+                                        <span class="text-dark">Page {{ truckercurrentPage + 1 }} of {{ truckertotalPages }}</span>
+                                    <button :disabled="!truckershowNextLink()" class="btn btn-default btn-sm btn-fill" v-on:click="truckersetPage(truckercurrentPage + 1)"> Next </button>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <span>{{ filteredTruckerQueues.length }} Filtered Trucker(s)</span><br>
+                                    <span>{{ Object.keys(truckers).length }} Total Trucker(s)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        
+                        <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- The Modal -->
+        <div id="addTruckerModal" class="modal truckerModal" role="dialog" data-backdrop="false">
+            <!-- Modal content -->
+            <div class="modal-content-trucker">
+                <div>
+                    <button type="button" class="close mt-2 mr-2" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-header">
+                    <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Trucker</h2>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+
+                        <div class="col-xl-12 mb-2 mt-3 float-right ">
+                            <multiselect
+                                v-model="SapLfugVendor"
+                                :options="lfug_vendors"
+                                :multiple="false"
+                                 track-by="vendor_number"
+                                :custom-label="customLabelPfmcVendor"
+                                placeholder="Select LFUG Vendor"
+                                id="selected_lfug_vendor"
+                            >
+                            </multiselect>
+                            <span class="text-danger" v-if="errors.vendor_description_lfug">{{ errors.vendor_description_lfug[0] }}</span>
+
+
+                        </div>
+
+                        <div class="col-xl-12 mb-2 mt-3 float-right">
+                            <multiselect
+                                v-model="SapPfmcVendor"
+                                :options="pfmc_vendors"
+                                :multiple="false"
+                                track-by="vendor_number"
+                                :custom-label="customLabelPfmcVendor"
+                                placeholder="Select PFMC Vendor"
+                                id="selected_pfmc_vendor"
+                            >
+                            </multiselect>
+                            <span class="text-danger" v-if="errors.vendor_description_pfmc">{{ errors.vendor_description_pfmc[0] }}</span>
+
+                        </div> 
+                
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" @click="storeTrucker">Save</button>
+                </div>
+                
+            </div>
+        </div>
+
+    
     </div>
 </template>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
@@ -856,6 +991,17 @@ export default {
             check_up_logs : [],
             gps_device_vehicle_attachments : [],
             changePlateNumberVisible : false,
+
+            truckercurrentPage: 0,
+            truckeritemsPerPage: 10,
+            trucker_keywords : '',
+            trucker_data : [],
+            SapPfmcVendor : [],
+            SapLfugVendor : [],
+            lfug_vendors : [],
+            pfmc_vendors : [],
+
+
         }
     },
     created(){
@@ -870,8 +1016,35 @@ export default {
         this.fetchTruckers();
         this.fetchPlants();
         this.buttonAuth();
+
+        this.fetchLfugVendor();
+        this.fetchPfmcVendor();
     },
     methods:{
+        fetchLfugVendor(){
+            axios.get('/sap-lfug')
+            .then(response => { 
+                this.lfug_vendors = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        fetchPfmcVendor(){
+             axios.get('/sap-pfmc')
+            .then(response => { 
+                this.pfmc_vendors = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        customLabelLfugVendor (LfugVendor) {
+            return `${LfugVendor.vendor_code  +  ' ' + LfugVendor.vendor_name }`
+        },
+        customLabelPfmcVendor (PfmcVendor) {
+            return `${PfmcVendor.vendor_name }`
+        },
         exportVehicle(){
             let v = this;
             var vehicleData = [];
@@ -932,7 +1105,14 @@ export default {
                 this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
                 this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
 
-                this.vehicle_fetch.category_id == 2 ? this.changePlateNumberVisible = true : this.changePlateNumberVisible = false;
+                if(this.vehicle_fetch.change_plate_number_status == "Yes"){
+                    this.changePlateNumberVisible = false;
+                }else{
+                    if(this.vehicle_fetch.change_plate_number_status != "Yes" && this.vehicle_fetch.category_id == "2"){
+                        this.changePlateNumberVisible = true;
+                    }
+                }
+
                 if(this.userLevel < 5){
                     this.disabledEdit();
                 }
@@ -1208,7 +1388,14 @@ export default {
             .then(response => {
                 this.vehicle_updated = true;
                 this.vehicle_fetch = response.data;
-                this.vehicle_fetch.category_id == 2 ? this.changePlateNumberVisible = true : this.changePlateNumberVisible = false;
+              
+               if(this.vehicle_fetch.change_plate_number_status == "Yes"){
+                    this.changePlateNumberVisible = false;
+                }else{
+                    if(this.vehicle_fetch.change_plate_number_status != "Yes" && this.vehicle_fetch.category_id == "2"){
+                        this.changePlateNumberVisible = true;
+                    }
+                }
                 this.vehicles.splice(index,1,response.data);
                 document.getElementById('edit_btn').disabled = false;
                 this.loading = false;
@@ -1584,7 +1771,68 @@ export default {
 
         showNextLink() {
             return this.currentPage == (this.totalPages - 1) ? false : true;
-        }   
+        },
+        //Trucker Module
+        storeTrucker(){
+            this.formTrucker = new FormData();
+            this.errors = [];
+
+            if(this.SapLfugVendor){
+                this.formTrucker.append('vendor_code_lfug', this.SapLfugVendor.vendor_number ? this.SapLfugVendor.vendor_number : '');
+                this.formTrucker.append('vendor_description_lfug', this.SapLfugVendor.vendor_name ? this.SapLfugVendor.vendor_name : '');
+
+            }
+            if(this.SapPfmcVendor){
+                this.formTrucker.append('vendor_code_pfmc', this.SapPfmcVendor.vendor_number ? this.SapPfmcVendor.vendor_number : '');
+                this.formTrucker.append('vendor_description_pfmc', this.SapPfmcVendor.vendor_name ? this.SapPfmcVendor.vendor_name : '');
+            }
+            
+          
+            this.formTrucker.append('_method', 'POST');
+            axios.post('/trucker', this.formTrucker)
+            .then(response => {
+                alert('Trucker has been saved!');
+                $('#addTruckerModal').hide();
+                this.fetchTruckers();
+                this.SapPfmcVendor = [];
+                this.SapLfugVendor = [];
+            })
+            .catch(error => {
+                this.errors = error.response.data.errors;
+                alert('Error occured! Cannot Saved Trucker!');
+            })
+            
+        },
+        deleteTrucker(trucker_vendor_data){
+            if(confirm("Do you really want to delete this Trucker?")){
+                axios.delete(`/delete-trucker/${trucker_vendor_data.id}`)
+                .then(response => {
+                     this.fetchTruckers();
+                     alert('Trucker successfully deleted');
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                })
+            }
+        },
+        addTrucker(){
+            this.trucker_data = [];
+            this.SapPfmcVendor.vendor_number = "";
+            this.SapLfugVendor.vendor_number = "";
+            this.trucker_data.method = "add";
+        },
+        truckersetPage(pageNumber) {
+            this.truckercurrentPage = pageNumber;
+        },
+        truckerresetStartRow() {
+            this.truckercurrentPage = 0;
+        },
+        truckershowPreviousLink() {
+            return this.truckercurrentPage == 0 ? false : true;
+        },
+        truckershowNextLink() {
+            return this.truckercurrentPage == (this.truckertotalPages - 1) ? false : true;
+        },
     },
     computed:{
         filteredVehicles(){
@@ -1610,6 +1858,82 @@ export default {
 
             return queues_array;
         },
+
+        filteredTruckers(){
+            let self = this;
+            return Object.values(self.truckers).filter(trucker => {
+                return trucker.vendor_description_lfug.toLowerCase().includes(this.trucker_keywords.toLowerCase()) ||  trucker.vendor_description_pfmc.toLowerCase().includes(this.trucker_keywords.toLowerCase()) 
+            });
+        },
+        truckertotalPages() {
+            return Math.ceil(Object.values(this.truckers).length / this.truckeritemsPerPage)
+        },
+        filteredTruckerQueues() {
+            
+            var index = this.truckercurrentPage * this.truckeritemsPerPage;
+            var queues_array = this.filteredTruckers.slice(index, index + this.truckeritemsPerPage);
+            
+            if(this.truckercurrentPage >= this.truckertotalPages) {
+                this.truckercurrentPage = this.truckertotalPages - 1
+            }
+
+            if(this.truckercurrentPage == -1) {
+                this.truckercurrentPage = 0;
+            }
+
+            return queues_array;
+
+        },
+
     }
 }
 </script>
+
+<style>
+    /* The Modal (background) */
+    .truckerModal {
+        display: none; /* Hidden by default */
+        position: fixed; /* Stay in place */
+        z-index: 10000;
+        left: 0;
+        top: 0;
+        width: 100%; /* Full width */
+        height: 100%; /* Full height */
+        overflow: auto; /* Enable scroll if needed */
+        background-color: rgb(0,0,0); /* Fallback color */
+        background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    }
+
+    /* Modal Content/Box */
+    .modal-content-trucker {
+        background-color: #fefefe;
+        margin: 15% auto; /* 15% from the top and centered */
+        padding: 20px;
+        border: 1px solid #888;
+        width:  55%; /* Could be more or less, depending on screen size */
+        border-radius: 7px;
+        box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
+        animation-name: animatetop;
+        animation-duration: 0.4s
+    }
+
+    /* The Close Button */
+    .closeTruckerModal {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    .closeTruckerModal:hover,.closeTruckerModal:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    /* Add Animation */
+    @keyframes animatetop {
+    from {top: -300px; opacity: 0}
+    to {top: 0; opacity: 1}
+    }
+</style>

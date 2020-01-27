@@ -33,6 +33,8 @@ class Vehicle extends Model implements Auditable
         'validity_start_date',
         'validity_end_date',
         'previous_plate_number',
+        'change_plate_number_status',
+        'gps_device_id',
         'date',
         'time'
     ];
