@@ -13,6 +13,7 @@ class GpsDevice extends Model implements Auditable
         'vehicle_id',
         'imei',
         'sim_number',
+        'device_id',
     ];
 
 }
