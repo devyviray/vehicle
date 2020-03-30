@@ -171,6 +171,9 @@ class GpsDevicesController extends Controller
             'min_moving_speed'=>'1',
             'min_fuel_fillings'=>'1',
             'min_fuel_thefts'=>'1',
+            'icon_stopped'=>'yellow',
+            'icon_offline'=>'red',
+            'icon_moving'=>'green',
             'sim_number'=> $data['sim_number'],
             'plate_number'=> $data['name'],
             'device_id'=> isset($data['device_id']) ? $data['device_id'] : '' 
