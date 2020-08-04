@@ -16,9 +16,9 @@
                                 <div class="col">
                                     <h3 class="mb-0">Vehicle List</h3>
                                 </div> 
-                                <div class="col text-right" v-if="this.userLevel > 4">
-                                    <a href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
-                                    <button :disabled="!readyListbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
+                                <div class="col text-right" >
+                                    <a v-if="this.userLevel > 4" href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
+                                    <button v-if="this.role == 'ALC DOM' || this.role == 'Vehicle Custodian'" :disabled="!readyListbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
                                 </div>
                             </div>
                             <div class="row align-items-center">

@@ -214,27 +214,28 @@ class GpsDevicesController extends Controller
 
     public function destroy(GpsDevice $gps_device)
     {
-        DB::beginTransaction();
+        // DB::beginTransaction();
         try{
             
-            $destroy_api = $this->destroy_api_gps($gps_device->device_id);
-            
-            $destroy_gps_attachments = GpsDeviceAttachment::where('vehicle_id', $gps_device->vehicle_id)->delete();
+            $vehicle = Vehicle::where('id',$gps_device->vehicle_id)->first();
+            $vehicle->update(['gps_device_id' => ""]);
 
+            $destroy_api = $this->destroy_api_gps($gps_device->device_id);
+            $destroy_gps_attachments = GpsDeviceAttachment::where('vehicle_id', $gps_device->vehicle_id)->delete();
             if($destroy_api == "Success"){
-                Vehicle::whereId($gps_device->vehicle_id)->update(['gps_device_id' => null]);
+                
                 if($gps_device->delete()){
-                    DB::commit();
+                    // DB::commit();
                     $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $gps_device->vehicle_id)->first();
                     return $vehicle;
                 }
             }else{
-                DB::rollBack();
+                // DB::rollBack();
                 $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $gps_device->vehicle_id)->first();
                 return $vehicle;
             }
         }catch (NotFoundHttpException $e) {
-            DB::rollBack();
+            // DB::rollBack();
             $response = $e->getResponse();
             return $response;
         }

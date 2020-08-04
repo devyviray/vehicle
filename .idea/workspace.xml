@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="0463939f-22df-445a-90b4-3fc59a617934" name="Default Changelist" comment="Api">
+    <list default="true" id="0463939f-22df-445a-90b4-3fc59a617934" name="Default Changelist" comment="convert CSS link to local">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/GpsDevicesController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/GpsDevicesController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/Http/Controllers/VehicleController.php" beforeDir="false" afterPath="$PROJECT_DIR$/app/Http/Controllers/VehicleController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/resources/js/components/Dashboard.vue" beforeDir="false" afterPath="$PROJECT_DIR$/resources/js/components/Dashboard.vue" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -261,13 +264,13 @@
     <option name="LAST_COMMIT_MESSAGE" value="Id setup and mail adjustment" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="190" y="115" width="1144" height="893" key="CommitChangelistDialog2" timestamp="1584416961216">
+    <state x="585" y="117" key="CommitChangelistDialog2" timestamp="1596515213833">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="190" y="115" width="1144" height="893" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1584416961216" />
-    <state x="184" y="91" width="1536" height="859" key="DiffContextDialog" timestamp="1584411638009">
+    <state x="585" y="117" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1596515213833" />
+    <state x="672" y="236" key="MultipleFileMergeDialog" timestamp="1596515201171">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="184" y="91" width="1536" height="859" key="DiffContextDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1584411638009" />
+    <state x="672" y="236" key="MultipleFileMergeDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1596515201171" />
   </component>
 </project>
