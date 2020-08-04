@@ -48602,9 +48602,9 @@ var render = function() {
                 _c("div", { staticClass: "row align-items-center" }, [
                   _vm._m(1),
                   _vm._v(" "),
-                  this.userLevel > 4
-                    ? _c("div", { staticClass: "col text-right" }, [
-                        _c(
+                  _c("div", { staticClass: "col text-right" }, [
+                    this.userLevel > 4
+                      ? _c(
                           "a",
                           {
                             staticClass: "btn btn-sm btn-primary",
@@ -48623,9 +48623,11 @@ var render = function() {
                             }
                           },
                           [_vm._v("Add Vehicle")]
-                        ),
-                        _vm._v(" "),
-                        _c(
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    this.role == "ALC DOM" || this.role == "Vehicle Custodian"
+                      ? _c(
                           "button",
                           {
                             staticClass: "btn btn-sm btn-primary",
@@ -48641,8 +48643,8 @@ var render = function() {
                           },
                           [_vm._v("Download Excel")]
                         )
-                      ])
-                    : _vm._e()
+                      : _vm._e()
+                  ])
                 ]),
                 _vm._v(" "),
                 _c("div", { staticClass: "row align-items-center" }, [
