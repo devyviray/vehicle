@@ -105,6 +105,10 @@
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
                                                     <a class="dropdown-item" style="cursor: pointer" data-toggle="modal" data-target="#assignGPSModal" @click="viewAssignGPS(vehicle,vehicle.gpsdevice)" v-if="btn_assign">Assign GPS</a>
+                                                    <div v-if="!vehicle.gpsdevice">
+                                                        <a class="dropdown-item" style="cursor: pointer" data-toggle="modal" data-target="#checkGPSModal" @click="checkAssignGPS(vehicle)" v-if="btn_assign">Check GPS</a>
+                                                    </div>
+
                                                     <a class="dropdown-item" style="cursor: pointer" @click="getVehicle(vehicle.id)" v-if="btn_edit">Edit</a>
                                                     <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#viewDocumentsModal" @click="copyObject(vehicle)" v-if="btn_view">View Document</a>
                                                 </div>
@@ -710,6 +714,61 @@
         </div>
 
 
+         <!-- Check Vehicle GPS Modal -->
+        <div class="modal fade" id="checkGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+            <span class="closed" data-dismiss="modal">&times;</span>
+            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCompanyLabel">Check GPS Vehicle</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                   <div class="row">
+                        <div class="col-md-12">
+                            <button class="btn btn-primary" :disabled="vehicle_check_gps_loading" @click="getVehicleGPSPortal">{{vehicle_check_gps.plate_number + " - " + vehicle_check_gps_loading_label}}</button>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="role">ID</label> 
+                                    <input type="text" id="id" class="form-control" v-model="vehicle_check_gps_data.id" readonly>
+                                </div>
+                                <div class="form-group">
+                                    <label for="role">PLATE NUMBER</label> 
+                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_check_gps_data.name" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="role">IMEI</label> 
+                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_check_gps_data.imei" readonly>
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="role">SIM NUMBER</label> 
+                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_check_gps_data.sim_number" readonly>
+                                </div>
+                            </div>
+                       
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div v-if="vehicle_check_gps_data.id">
+                        <button class="btn btn-success" :disabled="vehicle_check_gps_loading" @click="vehicleCheckAssignGPS">Assign GPS</button>
+                    </div>
+
+                    <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
+                </div>
+                </div>
+            </div>
+        </div>
+
+
     </div>
 </template>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
@@ -778,6 +837,15 @@ export default {
             btn_assign: false,
             btn_edit: false,
             btn_view: false,
+            vehicle_check_gps_loading : false,
+            vehicle_check_gps_loading_label : "Check",
+            vehicle_check_gps : [],
+            vehicle_check_gps_data : {
+                id:'',
+                name:'',
+                imei:'',
+                sim_number:'',
+            }
 
         }
     },
@@ -795,6 +863,63 @@ export default {
         this.buttonAuth();
     },
     methods:{
+        vehicleCheckAssignGPS(){
+            let v = this;
+            axios.post('/vehicle-check-assign-gps',{
+                vehicle_id: v.vehicle_check_gps.id,
+                device_id: v.vehicle_check_gps_data.id,
+                imei: v.vehicle_check_gps_data.imei,
+                sim_number: v.vehicle_check_gps_data.sim_number
+            })
+            .then(response => {
+                if(response.data == 'saved'){
+                    alert('Successfully assigned gps.');
+                    $('#checkGPSModal').modal('hide');
+                    this.fetchVehicles();
+                }else if(response.data == 'exist'){
+                    alert('Warning: GPS exist and cannot assigned.');
+                }else{
+                    alert('Error: GPS cannot assigned.');
+                }
+            })
+            .catch(error => {
+                 if(error.response){
+                    this.errors = error.response.data.errors;
+                }
+                alert('Error: GPS cannot assigned.');
+            });
+        },
+        getVehicleGPSPortal(){
+            let v = this;
+            v.vehicle_check_gps_loading = true;
+            v.vehicle_check_gps_loading_label = "Checking... Please Wait...";
+            axios.get(`/get-vehicle-gps?plate_number=`+ v.vehicle_check_gps.plate_number)
+            .then(response => {
+                v.vehicle_check_gps_data.id = response.data.id;
+                v.vehicle_check_gps_data.name = response.data.name;
+                v.vehicle_check_gps_data.imei = response.data.device_data.imei;
+                v.vehicle_check_gps_data.sim_number = response.data.device_data.sim_number;  
+                v.vehicle_check_gps_loading_label = "Check";
+                v.vehicle_check_gps_loading = false;  
+            })
+            .catch(error => {
+                if(error.response){
+                    this.errors = error.response.data.errors;
+                     alert('No GPS Found!');
+                }
+                v.vehicle_check_gps_loading_label = "Check";
+                v.vehicle_check_gps_loading = false;  
+            })
+
+        },
+        checkAssignGPS(vehicle){
+            let v = this;
+            v.vehicle_check_gps = vehicle;
+            v.vehicle_check_gps_data.id = "";
+            v.vehicle_check_gps_data.name = "";
+            v.vehicle_check_gps_data.imei = "";
+            v.vehicle_check_gps_data.sim_number = "";
+        },
         exportVehicle(){
             let v = this;
             var vehicleData = [];

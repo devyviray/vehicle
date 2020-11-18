@@ -315,4 +315,24 @@ class GpsDevicesController extends Controller
         // dd($vehicle);
     }
 
+
+    public function vehicleCheckAssignGPS(Request $request){
+        $gps_data = $request->all();
+
+        $validate_gps_device = GpsDevice::where('imei',$gps_data['imei'])->where('sim_number',$gps_data['sim_number'])->first();
+
+        if(empty($validate_gps_device)){
+            //Create GPS Device
+            if($gps_device = GpsDevice::create($gps_data)){
+                //Update Vehicle
+                Vehicle::whereId($gps_data['vehicle_id'])->update(['gps_device_id' => $gps_device->id]);
+                return 'saved';
+            }else{
+                return 'error';
+            }
+        }else{
+            return 'exist';
+        }
+    }
+
 }

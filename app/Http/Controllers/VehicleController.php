@@ -16,6 +16,9 @@ use Auth;
 use DB;
 use Storage;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+
 class VehicleController extends Controller
 {
     /**
@@ -289,5 +292,48 @@ class VehicleController extends Controller
 
         return $vehicle_data;
 
+    }
+
+
+    public function vehicleGPS(Request $request){
+        $plate_number = $request->plate_number;
+
+        $client = new Client();
+        $user_api_hash = '$2y$10$uk.Vyi6TLWYEDqkQUdQAcuWWvCC1.DQShR36GmUZeOuir602xiVq2';
+
+        $default_headers = [
+            'cache-control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'Content-Length' => '961',
+            'Accept-Encoding' => 'gzip, deflate',
+            'Host' => 'gpstracker.lafilgroup.com',
+            'Cache-Control' => 'no-cache',
+            'Accept' => '*/*',
+            'content-type' => 'application/x-www-form-urlencoded',
+        ];
+
+        try {
+
+            $response = $client->get('http://gpstracker.lafilgroup.com/api/get_devices?user_api_hash='.$user_api_hash); 
+
+            $device_data = $response->getBody();
+            $device_data = json_decode($device_data, true);
+            
+            $gps_details_arr = [];
+            foreach($device_data as $gps_detail){
+
+                foreach($gps_detail['items'] as $item){
+                    if($item['name'] == $plate_number){
+                        $gps_details_arr = $item;
+                    }
+                }
+            }
+
+            return $gps_details_arr;
+
+        }catch (BadResponseException $ex) {
+            $response = $ex->getResponse()->getBody();
+            return json_decode($response, true);
+        }
     }
 }

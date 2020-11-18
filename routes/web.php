@@ -116,6 +116,11 @@ Route::group(['middleware' => 'auth'], function(){
     // Roles
     Route::get('/roles', 'RoleController@index');
 
+
+    // Vehicle GPS checker
+    Route::get('/get-vehicle-gps', 'VehicleController@vehicleGPS');
+    Route::post('/vehicle-check-assign-gps', 'GpsDevicesController@vehicleCheckAssignGPS');
+
 });
 
 
