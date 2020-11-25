@@ -9370,6 +9370,28 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -9791,6 +9813,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       this.prepareFields();
       this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number.toUpperCase() : '');
       this.formData.append('category_id', vehicle.category_id ? vehicle.category_id : '');
+      this.formData.append('vehicle_type', vehicle.vehicle_type ? vehicle.vehicle_type : '');
       this.formData.append('capacity_id', vehicle.capacity_id ? vehicle.capacity_id : '');
       this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
       this.formData.append('subcon_vendor_id', vehicle.subcon_vendor ? vehicle.subcon_vendor.id : '');
@@ -9846,6 +9869,7 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
       this.prepareFields();
       this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number.toUpperCase() : '');
       this.formData.append('category_id', vehicle.category_id ? vehicle.category_id : '');
+      this.formData.append('vehicle_type', vehicle.vehicle_type ? vehicle.vehicle_type : '');
       this.formData.append('capacity_id', vehicle.capacity_id ? vehicle.capacity_id : '');
       this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
       this.formData.append('subcon_vendor_id', vehicle.subcon_vendor ? vehicle.subcon_vendor.id : '');
@@ -49294,6 +49318,67 @@ var render = function() {
                     _c("div", { staticClass: "col-md-4" }, [
                       _c("div", { staticClass: "form-group" }, [
                         _c("label", { attrs: { for: "role" } }, [
+                          _vm._v("Vehicle Type")
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.vehicle.vehicle_type,
+                                expression: "vehicle.vehicle_type"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.vehicle,
+                                  "vehicle_type",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c("option", { attrs: { value: "" } }, [
+                              _vm._v("Choose Type")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "SALES" } }, [
+                              _vm._v("SALES")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "HAULER" } }, [
+                              _vm._v("HAULER")
+                            ])
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _vm.errors.vehicle_type
+                          ? _c("span", { staticClass: "text-danger" }, [
+                              _vm._v("The vehicle type field is required.")
+                            ])
+                          : _vm._e()
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-4" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "role" } }, [
                           _vm._v("Plate Number*")
                         ]),
                         _vm._v(" "),
@@ -50063,6 +50148,67 @@ var render = function() {
                         _vm.errors.category_id
                           ? _c("span", { staticClass: "text-danger" }, [
                               _vm._v("The category field is required")
+                            ])
+                          : _vm._e()
+                      ])
+                    ]),
+                    _vm._v(" "),
+                    _c("div", { staticClass: "col-md-4" }, [
+                      _c("div", { staticClass: "form-group" }, [
+                        _c("label", { attrs: { for: "role" } }, [
+                          _vm._v("Vehicle Type")
+                        ]),
+                        _vm._v(" "),
+                        _c(
+                          "select",
+                          {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.vehicle_fetch.vehicle_type,
+                                expression: "vehicle_fetch.vehicle_type"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            on: {
+                              change: function($event) {
+                                var $$selectedVal = Array.prototype.filter
+                                  .call($event.target.options, function(o) {
+                                    return o.selected
+                                  })
+                                  .map(function(o) {
+                                    var val = "_value" in o ? o._value : o.value
+                                    return val
+                                  })
+                                _vm.$set(
+                                  _vm.vehicle_fetch,
+                                  "vehicle_type",
+                                  $event.target.multiple
+                                    ? $$selectedVal
+                                    : $$selectedVal[0]
+                                )
+                              }
+                            }
+                          },
+                          [
+                            _c("option", { attrs: { value: "" } }, [
+                              _vm._v("Choose Type")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "SALES" } }, [
+                              _vm._v("SALES")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "HAULER" } }, [
+                              _vm._v("HAULER")
+                            ])
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _vm.errors.vehicle_type
+                          ? _c("span", { staticClass: "text-danger" }, [
+                              _vm._v("The vehicle type field is required.")
                             ])
                           : _vm._e()
                       ])

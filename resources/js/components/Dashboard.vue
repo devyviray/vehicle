@@ -182,6 +182,17 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
+                                    <label for="role">Vehicle Type</label> 
+                                    <select class="form-control" v-model="vehicle.vehicle_type">
+                                        <option value="">Choose Type</option>
+                                        <option value="SALES">SALES</option>
+                                        <option value="HAULER">HAULER</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.vehicle_type">The vehicle type field is required.</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
                                     <label for="role">Plate Number*</label> 
                                     <input type="text" id="plate_number" class="form-control" v-model="vehicle.plate_number" style="text-transform:uppercase">
                                     <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
@@ -352,6 +363,17 @@
                                         <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
                                     </select>
                                     <span class="text-danger" v-if="errors.category_id">The category field is required</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Vehicle Type</label> 
+                                    <select class="form-control" v-model="vehicle_fetch.vehicle_type">
+                                        <option value="">Choose Type</option>
+                                        <option value="SALES">SALES</option>
+                                        <option value="HAULER">HAULER</option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.vehicle_type">The vehicle type field is required.</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -1184,6 +1206,7 @@ export default {
             this.prepareFields();
             this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number.toUpperCase() : '');
             this.formData.append('category_id', vehicle.category_id ? vehicle.category_id : '');
+            this.formData.append('vehicle_type', vehicle.vehicle_type ? vehicle.vehicle_type : '');
             this.formData.append('capacity_id', vehicle.capacity_id ? vehicle.capacity_id : '');
             this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
             this.formData.append('subcon_vendor_id', vehicle.subcon_vendor ? vehicle.subcon_vendor.id : '');
@@ -1234,6 +1257,7 @@ export default {
             this.prepareFields();
             this.formData.append('plate_number', vehicle.plate_number ? vehicle.plate_number.toUpperCase() : '');
             this.formData.append('category_id', vehicle.category_id ? vehicle.category_id : '');
+            this.formData.append('vehicle_type', vehicle.vehicle_type ? vehicle.vehicle_type : '');
             this.formData.append('capacity_id', vehicle.capacity_id ? vehicle.capacity_id : '');
             this.formData.append('vendor_id', vehicle.vendor ? vehicle.vendor.id : '');
             this.formData.append('subcon_vendor_id', vehicle.subcon_vendor ? vehicle.subcon_vendor.id : '');
