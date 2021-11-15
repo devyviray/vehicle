@@ -20,6 +20,7 @@ class CreateTruckersTable extends Migration
             $table->string('vendor_description_lfug');
             $table->string('vendor_description_pfmc');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

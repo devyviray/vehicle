@@ -80,7 +80,7 @@ class Vehicle extends Model implements Auditable
     }
 
     public function vendor(){
-        return $this->belongsTo(Trucker::Class, 'vendor_id');
+        return $this->belongsTo(Trucker::Class, 'vendor_id')->withTrashed();
     }
 
     public function subconVendor(){
