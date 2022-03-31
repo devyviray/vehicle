@@ -54,8 +54,12 @@ class GpsDevicesController extends Controller
                         $uploadedFile = $this->uploadFiles($gps_device->id,$request->vehicle_id, $path, $filename);
                     }    
                 }
+                $update_vehicle = [
+                    'gps_device_id' => $gps_device->id,
+                    'relation_updated_at'=> date('Y-m-d')
+                ];
 
-                Vehicle::whereId($request->vehicle_id)->update(['gps_device_id' => $gps_device->id]);
+                Vehicle::whereId($request->vehicle_id)->update($update_vehicle);
         
                 $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $request->vehicle_id)->first();
         
@@ -285,7 +289,12 @@ class GpsDevicesController extends Controller
             GpsDeviceAttachment::where('gps_device_id', '=', $gps_device->id)->update(['vehicle_id' => $request->reassign_vehicle_id]);
             
             Vehicle::whereId($request->vehicle_id)->update(['gps_device_id' => null]);
-            Vehicle::whereId($request->reassign_vehicle_id)->update(['gps_device_id' => $gps_device->id]);
+
+            $update_vehicle = [
+                'gps_device_id' => $gps_device->id,
+                'relation_updated_at'=> date('Y-m-d')
+            ];
+            Vehicle::whereId($request->reassign_vehicle_id)->update($update_vehicle);
 
             $data=array();
             $data['gps_device_id'] = $gps_device->id;
@@ -325,7 +334,11 @@ class GpsDevicesController extends Controller
             //Create GPS Device
             if($gps_device = GpsDevice::create($gps_data)){
                 //Update Vehicle
-                Vehicle::whereId($gps_data['vehicle_id'])->update(['gps_device_id' => $gps_device->id]);
+                $update_vehicle = [
+                    'gps_device_id' => $gps_device->id,
+                    'relation_updated_at'=> date('Y-m-d')
+                ];
+                Vehicle::whereId($gps_data['vehicle_id'])->update($update_vehicle);
                 return 'saved';
             }else{
                 return 'error';

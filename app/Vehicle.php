@@ -34,7 +34,8 @@ class Vehicle extends Model implements Auditable
         'validity_end_date',
         'date',
         'time',
-        'gps_device_id'
+        'gps_device_id',
+        'relation_updated_at'
     ];
 
     public function category(){
