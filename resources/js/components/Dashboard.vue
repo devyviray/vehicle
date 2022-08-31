@@ -319,6 +319,14 @@
                                     <span class="text-danger" v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
                                 </div>
                             </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" v-model="vehicle.asc_extended">
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Is ASC Exctended?
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -493,6 +501,14 @@
                                     <label for="role">Validity End Date*</label> 
                                     <input type="date" id="validity_end_date-edit" class="form-control" v-model="vehicle_fetch.validity_end_date">
                                     <span class="text-danger" v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" v-model="vehicle_fetch.asc_extended">
+                                    <label class="form-check-label" for="flexCheckDefault">
+                                        Is ASC Exctended?
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -1196,6 +1212,7 @@ export default {
             this.formData.append('validity_start_date', vehicle.validity_start_date ? vehicle.validity_start_date : '');
             this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
             this.formData.append('plants', plantIds ? plantIds : '');
+            this.formData.append('asc_extended', vehicle.asc_extended ? vehicle.asc_extended : '');
 
             axios.post('/vehicle', this.formData)
             .then(response =>{
@@ -1247,6 +1264,7 @@ export default {
             this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
             this.formData.append('plants', plantIds ? plantIds : '');
             this.formData.append('old_plants', oldPlants ? oldPlants : '');
+            this.formData.append('asc_extended', vehicle.asc_extended ? vehicle.asc_extended : '');
             this.formData.append('_method', 'PATCH');
 
             axios.post(`/vehicle/${vehicle.id}`, this.formData)
