@@ -15,7 +15,7 @@ class ApiController extends Controller
 
     public function vehicles(Trucker $trucker){
         $date_now = date('Y-m-d');
-        return $response = Vehicle::select('id','plate_number','capacity_id')
+        return $response = Vehicle::select('id','plate_number','capacity_id','asc_extended','validity_end_date')
                                     ->with('capacity')
                                     ->where('based_truck_id',$trucker->id)
                                     ->where('asc_extended','true')
