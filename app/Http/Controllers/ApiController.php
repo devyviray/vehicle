@@ -18,7 +18,7 @@ class ApiController extends Controller
         return $response = Vehicle::select('id','plate_number','capacity_id','asc_extended','validity_end_date')
                                     ->with('capacity')
                                     ->where('vendor_id',$trucker->id)
-                                    // ->where('asc_extended','true')
+                                    ->where('asc_extended','true')
                                     ->where('validity_end_date','>=',$date_now)
                                     ->orderBy('plate_number','ASC')
                                     ->get();
