@@ -39,7 +39,7 @@ class User extends Authenticatable implements Auditable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'email_verified_at' => 'date:Y-m-d',
     ];
 
     public function basedTrucks(){
