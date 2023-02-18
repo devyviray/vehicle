@@ -42,6 +42,17 @@ class User extends Authenticatable implements Auditable
         'email_verified_at' => 'date:Y-m-d',
     ];
 
+
+    protected $dateFormat = 'Y-m-d H:i';
+
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'email_verified_at'
+    ];
+
     public function basedTrucks(){
         return $this->belongsToMany(BasedTruck::class);
     }

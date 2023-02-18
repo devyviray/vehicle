@@ -37,6 +37,16 @@ class Vehicle extends Model implements Auditable
         'gps_device_id'
     ];
 
+    protected $dateFormat = 'Y-m-d H:i';
+
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'deleted_at',
+        'email_verified_at'
+    ];
+    
     public function category(){
         return $this->belongsTo(Category::Class);
     }
