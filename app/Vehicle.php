@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
+use DateTimeInterface;
 
 class Vehicle extends Model implements Auditable
 {
@@ -46,12 +47,6 @@ class Vehicle extends Model implements Auditable
         'time',
         'gps_device_id'
     ];
-
-
-    public function getDateFormat()
-    {
-         return 'Y-m-d H:i:s';
-    }
     
     public function category(){
         return $this->belongsTo(Category::Class);
@@ -105,5 +100,10 @@ class Vehicle extends Model implements Auditable
 
     public function plants() {
         return $this->belongsToMany(Plant::Class)->withTimestamps();
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 }

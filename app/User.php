@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use OwenIt\Auditing\Contracts\Auditable;
 use jeremykenedy\LaravelRoles\Traits\HasRoleAndPermission;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DateTimeInterface;
 
 class User extends Authenticatable implements Auditable
 {
@@ -34,7 +35,7 @@ class User extends Authenticatable implements Auditable
     ];
 
     protected $connection  = 'sqlsrv';
-    protected $dateFormat = 'Y-m-d H:i:s';
+    // protected $dateFormat = 'Y-m-d H:i:s';
     protected $dates = [
         'email_verified_at',
         'created_at',
@@ -51,12 +52,12 @@ class User extends Authenticatable implements Auditable
     //     'email_verified_at' => 'date:Y-m-d',
     // ];
 
-    public function getDates()
-    {
-        return [];
-    }
-
     public function basedTrucks(){
         return $this->belongsToMany(BasedTruck::class);
+    }
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
     }
 }

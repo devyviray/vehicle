@@ -4,21 +4,18 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
+use DateTimeInterface;
 
 class BasedTruck extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
     
     protected $connection  = 'sqlsrv';
-    // protected $dateFormat = 'Y-m-d H:i:s';
 
-    protected $dates = [
-        'created_at',
-        'updated_at',
-    ];
-    
-    public function getDateFormat()
+    protected function serializeDate(DateTimeInterface $date)
     {
-         return 'Y-m-d H:i:s';
+        return $date->format('Y-m-d H:i:s');
     }
+
+
 }
