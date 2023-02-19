@@ -29,9 +29,10 @@ class VehicleController extends Controller
     public function index()
     {   
         return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
-            ->when(Auth::user()->level() < 4, function ($query){
-                $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
-            })->orderBy('id', 'desc')->get();
+            // ->when(Auth::user()->level() < 4, function ($query){
+            //     $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
+            // })
+            ->orderBy('id', 'desc')->get();
     }
 
     /**
@@ -234,7 +235,7 @@ class VehicleController extends Controller
 
     public function filterVehicle(Request $request){
        
-        $date_today = Carbon::now();
+        $date_today = Carbon::now()->format('Y-m-d');
         $operator = $request->operator;
         $gps = $request->filter_gps;
         $base_truck_ids = $request->filter_based_trucks;
