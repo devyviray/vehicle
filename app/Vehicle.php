@@ -11,7 +11,7 @@ class Vehicle extends Model implements Auditable
     use \OwenIt\Auditing\Auditable;
 
     use SoftDeletes;
-
+    protected $dateFormat = 'Y-m-d H:i:s';
     protected $casts = [
         'validity_end_date' => 'date:Y-m-d',
     ];
@@ -89,5 +89,10 @@ class Vehicle extends Model implements Auditable
 
     public function plants() {
         return $this->belongsToMany(Plant::Class)->withTimestamps();
+    }
+    
+    public function getDates()
+    {
+        return [];
     }
 }
