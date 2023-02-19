@@ -35,7 +35,14 @@ class User extends Authenticatable implements Auditable
 
     protected $connection  = 'sqlsrv';
     protected $dateFormat = ' Y-m-d H:i:s';
+    protected $dates = [
+        'LocalTime',
+    ];
 
+    public function getDates(){
+        return [];
+    }
+    
     /**
      * The attributes that should be cast to native types.
      *

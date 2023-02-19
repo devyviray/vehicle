@@ -11,6 +11,14 @@ class PlantVehicleDeleted extends Model implements Auditable
 
     protected $connection  = 'sqlsrv';
     protected $dateFormat = ' Y-m-d H:i:s';
+    protected $dates = [
+        'LocalTime',
+    ];
+
+    public function getDates(){
+        return [];
+    }
+
     protected $table = 'plant_vehicle_deleteds';
 
     protected $fillable = [

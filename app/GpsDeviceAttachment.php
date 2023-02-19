@@ -8,4 +8,11 @@ class GpsDeviceAttachment extends Model
 {
     protected $connection  = 'sqlsrv';
     protected $dateFormat = ' Y-m-d H:i:s';
+    protected $dates = [
+        'LocalTime',
+    ];
+
+    public function getDates(){
+        return [];
+    }
 }

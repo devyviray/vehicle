@@ -14,6 +14,9 @@ class Vehicle extends Model implements Auditable
 
     protected $connection  = 'sqlsrv';
     protected $dateFormat = ' Y-m-d H:i:s';
+    protected $dates = [
+        'LocalTime',
+    ];
 
     // protected $casts = [
     //     'validity_end_date' => 'date:Y-m-d',
@@ -39,6 +42,11 @@ class Vehicle extends Model implements Auditable
         'time',
         'gps_device_id'
     ];
+
+
+    public function getDates(){
+        return [];
+    }
     
     public function category(){
         return $this->belongsTo(Category::Class);
