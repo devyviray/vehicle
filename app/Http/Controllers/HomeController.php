@@ -26,8 +26,8 @@ class HomeController extends Controller
     {
         session([
             'header_text' => 'Vehicles',
-            'level' => Auth::user()->level(),
-            'role-name' => Auth::user()->roles[0]->name
+            'level' => 1,
+            'role-name' => 'IT'
         ]);
         
         
