@@ -41,9 +41,9 @@ class User extends Authenticatable implements Auditable
      *
      * @var array
      */
-    protected $casts = [
-        'email_verified_at' => 'date:Y-m-d',
-    ];
+    // protected $casts = [
+    //     'email_verified_at' => 'date:Y-m-d',
+    // ];
 
     public function basedTrucks(){
         return $this->belongsToMany(BasedTruck::class);
