@@ -8,7 +8,7 @@ use OwenIt\Auditing\Contracts\Auditable;
 class BasedTruck extends Model implements Auditable
 {
     protected $dateFormat = 'Y-m-d H:i:s';
-    
+
     use \OwenIt\Auditing\Auditable;
 
     public function getDates()
@@ -16,7 +16,7 @@ class BasedTruck extends Model implements Auditable
         return [];
     }
 
-    protected $hidden = [
-        'created_at','updated_at'
-    ];
+    // protected $hidden = [
+    //     'created_at','updated_at'
+    // ];
 }
