@@ -10,6 +10,7 @@ class Document extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
     use SoftDeletes;
-
+    
+    protected $connection  = 'sqlsrv';
     protected $dateFormat = 'Y-m-d H:i:s';
 }

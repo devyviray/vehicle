@@ -33,6 +33,7 @@ class User extends Authenticatable implements Auditable
         'password', 'remember_token',
     ];
 
+    protected $connection  = 'sqlsrv';
     protected $dateFormat = 'Y-m-d H:i:s';
 
     /**
