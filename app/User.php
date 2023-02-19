@@ -34,7 +34,7 @@ class User extends Authenticatable implements Auditable
     ];
 
     protected $connection  = 'sqlsrv';
-    protected $dateFormat = 'Y-m-d H:i';
+    protected $dateFormat = 'Y-m-d H:i:s';
     protected $dates = [
         'email_verified_at',
         'created_at',
