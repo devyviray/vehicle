@@ -9,6 +9,11 @@ class BasedTruck extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
 
+    public function getDates()
+    {
+        return [];
+    }
+    
     protected $hidden = [
         'created_at','updated_at'
     ];

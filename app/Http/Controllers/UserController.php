@@ -15,6 +15,7 @@ class UserController extends Controller
      */
     public function index()
     {
+        return User::all();
         session(['header_text' => 'Users']);
 
         return view('user.index');
