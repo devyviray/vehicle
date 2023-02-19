@@ -24,22 +24,23 @@ class User extends Authenticatable implements Auditable
         'name', 'email', 'password',
     ];
 
+    protected static $logAttributes = [
+        'name',
+        'email'
+    ];
+
+    public function getDates()
+    {
+        return [];
+    }
+
     /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
-    ];
-
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
+        'password', 'remember_token','created_at','updated_at'
     ];
 
     public function basedTrucks(){
