@@ -15,7 +15,11 @@ class Vehicle extends Model implements Auditable
     protected $connection  = 'sqlsrv';
     protected $dateFormat = ' Y-m-d H:i:s';
     protected $dates = [
-        'LocalTime',
+        'validity_start_date',
+        'validity_end_date',
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
     // protected $casts = [

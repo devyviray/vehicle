@@ -36,7 +36,9 @@ class User extends Authenticatable implements Auditable
     protected $connection  = 'sqlsrv';
     protected $dateFormat = ' Y-m-d H:i:s';
     protected $dates = [
-        'LocalTime',
+        'created_at',
+        'updated_at',
+        'deleted_at',
     ];
 
     public function getDates(){
