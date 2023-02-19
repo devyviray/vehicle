@@ -11,5 +11,8 @@ class PlantVehicle extends Model implements Auditable
     
     protected $connection  = 'sqlsrv';
     protected $table = 'plant_vehicle';
-    protected $dateFormat = 'M j Y h:i:s:000A';
+    public function getDateFormat()
+    {
+        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
+    }
 }

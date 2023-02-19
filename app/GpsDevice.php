@@ -16,5 +16,8 @@ class GpsDevice extends Model implements Auditable
         'sim_number',
         'device_id'
     ];
-    protected $dateFormat = 'M j Y h:i:s:000A';
+    public function getDateFormat()
+    {
+        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
+    }
 }
