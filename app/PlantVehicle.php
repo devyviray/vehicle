@@ -10,9 +10,10 @@ class PlantVehicle extends Model implements Auditable
     use \OwenIt\Auditing\Auditable;
     
     protected $connection  = 'sqlsrv';
+    protected $dateFormat = 'Y-m-d H:i:s';
     protected $table = 'plant_vehicle';
-    public function getDateFormat()
+    public function getDates()
     {
-        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
+        return [];
     }
 }

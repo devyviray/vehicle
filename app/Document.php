@@ -12,8 +12,9 @@ class Document extends Model implements Auditable
     use SoftDeletes;
     
     protected $connection  = 'sqlsrv';
-    public function getDateFormat()
+    protected $dateFormat = 'Y-m-d H:i:s';
+    public function getDates()
     {
-        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
+        return [];
     }
 }

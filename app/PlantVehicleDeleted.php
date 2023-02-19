@@ -10,6 +10,7 @@ class PlantVehicleDeleted extends Model implements Auditable
     use \OwenIt\Auditing\Auditable;
 
     protected $connection  = 'sqlsrv';
+    protected $dateFormat = 'Y-m-d H:i:s';
     protected $table = 'plant_vehicle_deleteds';
     protected $fillable = [
         'plant_vehicle_id',
@@ -17,8 +18,8 @@ class PlantVehicleDeleted extends Model implements Auditable
         'vehicle_id',
         'user_id'
     ];
-    public function getDateFormat()
+    public function getDates()
     {
-        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
+        return [];
     }
 }

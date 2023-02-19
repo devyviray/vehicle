@@ -13,6 +13,7 @@ class Vehicle extends Model implements Auditable
     use SoftDeletes;
 
     protected $connection  = 'sqlsrv';
+    protected $dateFormat = 'Y-m-d H:i:s';
     // protected $casts = [
     //     'validity_end_date' => 'date:Y-m-d',
     // ];
@@ -92,8 +93,8 @@ class Vehicle extends Model implements Auditable
         return $this->belongsToMany(Plant::Class)->withTimestamps();
     }
 
-    public function getDateFormat()
+    public function getDates()
     {
-        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
+        return [];
     }
 }

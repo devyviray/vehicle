@@ -33,7 +33,8 @@ class User extends Authenticatable implements Auditable
         'password', 'remember_token',
     ];
 
-    protected $connection  = 'sqlsrv';    
+    protected $connection  = 'sqlsrv';   
+    protected $dateFormat = 'Y-m-d H:i:s'; 
     /**
      * The attributes that should be cast to native types.
      *
@@ -47,8 +48,8 @@ class User extends Authenticatable implements Auditable
         return $this->belongsToMany(BasedTruck::class);
     }
 
-    public function getDateFormat()
+    public function getDates()
     {
-        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
+        return [];
     }
 }
