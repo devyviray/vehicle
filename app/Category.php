@@ -10,5 +10,5 @@ class Category extends Model implements Auditable
     use \OwenIt\Auditing\Auditable;
 
     protected $connection  = 'sqlsrv';
-    protected $dateFormat = 'Y-m-d H:i:s';
+    protected $dateFormat = ' Y-m-d H:i:s';
 }

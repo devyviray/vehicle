@@ -13,7 +13,7 @@ class Vehicle extends Model implements Auditable
     use SoftDeletes;
 
     protected $connection  = 'sqlsrv';
-    protected $dateFormat = 'Y-m-d H:i:s';
+    protected $dateFormat = ' Y-m-d H:i:s';
 
     // protected $casts = [
     //     'validity_end_date' => 'date:Y-m-d',
