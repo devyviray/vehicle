@@ -82,7 +82,7 @@ class VehicleController extends Controller
         DB::beginTransaction();
         try {
 
-            if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
+            if($vehicle = Vehicle::create(['user_id' => 1] + $request->all())){
                 $attachments = $request->file('attachments');
                 if(!empty($attachments)){   
                     foreach($attachments as $attachment){
@@ -99,7 +99,7 @@ class VehicleController extends Controller
                     PlantVehicleAdded::create(['plant_vehicle_id' => $plantVehicle->id, 
                         'plant_id' => $newPlant, 
                         'vehicle_id'=> $vehicle->id,
-                        'user_id' => Auth::user()->id
+                        'user_id' => 1
                     ]);
                 }
 
@@ -186,7 +186,7 @@ class VehicleController extends Controller
         DB::beginTransaction();
         try {
 
-            if($vehicle->update(['user_id' => Auth::user()->id] + $request->all())){
+            if($vehicle->update(['user_id' => 1] + $request->all())){
 
                     $attachments = $request->file('attachments');
                     // return $attachments;
@@ -206,7 +206,7 @@ class VehicleController extends Controller
                     PlantVehicleDeleted::create(['plant_vehicle_id' => $plantVehicle['id'], 
                         'plant_id' => $plantVehicle['plant_id'], 
                         'vehicle_id'=> $plantVehicle['vehicle_id'],
-                        'user_id' => Auth::user()->id
+                        'user_id' => 1
                     ]);
                 }
     
@@ -219,7 +219,7 @@ class VehicleController extends Controller
                     PlantVehicleAdded::create(['plant_vehicle_id' => $plantVehicle->id, 
                         'plant_id' => $newPlant, 
                         'vehicle_id'=> $vehicle->id,
-                        'user_id' => Auth::user()->id
+                        'user_id' => 1
                     ]);
                 }
                 
