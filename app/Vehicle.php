@@ -12,6 +12,8 @@ class Vehicle extends Model implements Auditable
 
     use SoftDeletes;
 
+    protected $dateFormat = 'Y-m-d H:i:s';
+
     protected $casts = [
         'validity_end_date' => 'date:Y-m-d',
     ];
@@ -35,16 +37,6 @@ class Vehicle extends Model implements Auditable
         'date',
         'time',
         'gps_device_id'
-    ];
-
-    protected $dateFormat = 'Y-m-d H:i';
-
-
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'deleted_at',
-        'email_verified_at'
     ];
     
     public function category(){

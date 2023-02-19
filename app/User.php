@@ -33,6 +33,8 @@ class User extends Authenticatable implements Auditable
         'password', 'remember_token',
     ];
 
+    protected $dateFormat = 'Y-m-d H:i:s';
+
     /**
      * The attributes that should be cast to native types.
      *
@@ -40,17 +42,6 @@ class User extends Authenticatable implements Auditable
      */
     protected $casts = [
         'email_verified_at' => 'date:Y-m-d',
-    ];
-
-
-    protected $dateFormat = 'Y-m-d H:i';
-
-
-    protected $dates = [
-        'created_at',
-        'updated_at',
-        'deleted_at',
-        'email_verified_at'
     ];
 
     public function basedTrucks(){

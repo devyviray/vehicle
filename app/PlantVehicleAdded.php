@@ -8,7 +8,8 @@ use OwenIt\Auditing\Contracts\Auditable;
 class PlantVehicleAdded extends Model implements Auditable
 {
     use \OwenIt\Auditing\Auditable;
-
+    
+    protected $dateFormat = 'Y-m-d H:i:s';
     protected $table = 'plant_vehicle_addeds';
 
     protected $fillable = [
