@@ -18,7 +18,7 @@ class PlantVehicleAdded extends Model implements Auditable
 
     public function getDateFormat()
     {
-         return 'Y-m-d H:i:s.u';
+         return 'Y-m-d H:i:s';
     }
 
     protected $table = 'plant_vehicle_addeds';
