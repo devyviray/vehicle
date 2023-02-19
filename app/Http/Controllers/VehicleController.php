@@ -234,7 +234,7 @@ class VehicleController extends Controller
 
     public function filterVehicle(Request $request){
        
-        $date_today = Carbon::now()->format('Y-m-d');
+        $date_today = Carbon::now();
         $operator = $request->operator;
         $gps = $request->filter_gps;
         $base_truck_ids = $request->filter_based_trucks;
