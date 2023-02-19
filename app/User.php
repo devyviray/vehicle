@@ -34,7 +34,8 @@ class User extends Authenticatable implements Auditable
     ];
 
     protected $connection  = 'sqlsrv';   
-    protected $dateFormat = 'Y-m-d H:i:s'; 
+    protected $dateFormat = 'Y-m-d H:i:s';
+    protected $table  = 'users';    
     /**
      * The attributes that should be cast to native types.
      *
