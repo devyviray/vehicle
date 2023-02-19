@@ -26,7 +26,7 @@ class HomeController extends Controller
     {
         session([
             'header_text' => 'Vehicles',
-            'level' => 1,
+            'level' => 6,
             'role-name' => 'IT'
         ]);
         
