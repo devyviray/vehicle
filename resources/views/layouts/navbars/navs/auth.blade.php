@@ -14,7 +14,7 @@
                 <a class="nav-link pr-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <div class="media align-items-center">
                         <div class="media-body ml-2 d-none d-lg-block">
-                            <span class="mb-0 text-sm  font-weight-bold">{{ auth()->user()->name }}</span>
+                            {{-- <span class="mb-0 text-sm  font-weight-bold">{{ auth()->user()->name }}</span> --}}
                         </div>
                     </div>
                 </a>
@@ -23,12 +23,12 @@
                         <h6 class="text-overflow m-0">{{ __('Welcome!') }}</h6>
                     </div>
                     <div class="dropdown-divider"></div>
-                    @if(Auth::user()->hasRole('it'))
+                    {{-- @if(Auth::user()->hasRole('it'))
                     <a href="{{ route('users') }}" class="dropdown-item">
                         <i class="ni ni-user-run"></i>
                         <span>{{ __('User') }}</span>
                     </a>
-                    @endif
+                    @endif --}}
                     <a href="{{ route('logout') }}" class="dropdown-item" onclick="event.preventDefault();
                     document.getElementById('logout-form').submit();">
                         <i class="ni ni-user-run"></i>
