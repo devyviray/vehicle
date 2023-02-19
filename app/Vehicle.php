@@ -13,7 +13,7 @@ class Vehicle extends Model implements Auditable
     use SoftDeletes;
 
     protected $connection  = 'sqlsrv';
-    protected $dateFormat = 'Y-m-d H:i:s';
+    // protected $dateFormat = 'Y-m-d H:i:s';
     protected $dates = [
         'validity_start_date',
         'validity_end_date',
@@ -48,8 +48,9 @@ class Vehicle extends Model implements Auditable
     ];
 
 
-    public function getDates(){
-        return [];
+    public function getDateFormat()
+    {
+         return 'Y-m-d H:i:s.u';
     }
     
     public function category(){

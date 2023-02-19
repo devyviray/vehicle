@@ -34,7 +34,7 @@ class User extends Authenticatable implements Auditable
     ];
 
     protected $connection  = 'sqlsrv';
-    protected $dateFormat = 'Y-m-d H:i:s';
+    // protected $dateFormat = 'Y-m-d H:i:s';
     protected $dates = [
         'email_verified_at',
         'created_at',
@@ -42,8 +42,9 @@ class User extends Authenticatable implements Auditable
         'deleted_at',
     ];
 
-    public function getDates(){
-        return [];
+    public function getDateFormat()
+    {
+         return 'Y-m-d H:i:s.u';
     }
     
     /**
