@@ -11,9 +11,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements Auditable
 {
-    use \OwenIt\Auditing\Auditable;
+    protected $connection  = 'sqlsrv';   
+    // protected $dateFormat = 'Y-m-d H:i:s';
+    protected $table  = 'users';    
 
+    use \OwenIt\Auditing\Auditable;
     use Notifiable, HasRoleAndPermission, SoftDeletes;
+    
 
     /**
      * The attributes that are mass assignable.
@@ -33,9 +37,6 @@ class User extends Authenticatable implements Auditable
         'password', 'remember_token',
     ];
 
-    protected $connection  = 'sqlsrv';   
-    protected $dateFormat = 'Y-m-d H:i:s';
-    protected $table  = 'users';    
     /**
      * The attributes that should be cast to native types.
      *
@@ -49,8 +50,8 @@ class User extends Authenticatable implements Auditable
         return $this->belongsToMany(BasedTruck::class);
     }
 
-    public function getDates()
-    {
-        return [];
-    }
+    // public function getDates()
+    // {
+    //     return [];
+    // }
 }
