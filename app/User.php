@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements Auditable
 {
+    protected $dateFormat = 'Y-m-d H:i:s';
+    
     use \OwenIt\Auditing\Auditable;
 
     use Notifiable, HasRoleAndPermission, SoftDeletes;
