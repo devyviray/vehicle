@@ -8,7 +8,6 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use OwenIt\Auditing\Contracts\Auditable;
 use jeremykenedy\LaravelRoles\Traits\HasRoleAndPermission;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use DateTimeInterface;
 
 class User extends Authenticatable implements Auditable
 {
@@ -48,8 +47,5 @@ class User extends Authenticatable implements Auditable
         return $this->belongsToMany(BasedTruck::class);
     }
 
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format('Y-m-d H:i:s');
-    }
+    protected $dateFormat = 'M j Y h:i:s:000A';
 }

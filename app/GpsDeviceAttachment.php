@@ -3,14 +3,9 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
-use DateTimeInterface;
 
 class GpsDeviceAttachment extends Model
 {
     protected $connection  = 'sqlsrv';
-    
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format('Y-m-d H:i:s');
-    }
+    protected $dateFormat = 'M j Y h:i:s:000A';
 }

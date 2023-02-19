@@ -5,7 +5,6 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use OwenIt\Auditing\Contracts\Auditable;
-use DateTimeInterface;
 
 class Vehicle extends Model implements Auditable
 {
@@ -17,6 +16,7 @@ class Vehicle extends Model implements Auditable
     // protected $casts = [
     //     'validity_end_date' => 'date:Y-m-d',
     // ];
+    protected $dateFormat = 'M j Y h:i:s:000A';
 
     protected $fillable = [
         'plate_number',

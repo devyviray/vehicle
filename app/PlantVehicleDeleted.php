@@ -4,7 +4,6 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use OwenIt\Auditing\Contracts\Auditable;
-use DateTimeInterface;
 
 class PlantVehicleDeleted extends Model implements Auditable
 {
@@ -18,9 +17,5 @@ class PlantVehicleDeleted extends Model implements Auditable
         'vehicle_id',
         'user_id'
     ];
-
-    protected function serializeDate(DateTimeInterface $date)
-    {
-        return $date->format('Y-m-d H:i:s');
-    }
+    protected $dateFormat = 'M j Y h:i:s:000A';
 }
