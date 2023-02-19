@@ -16,6 +16,4 @@ class BasedTruck extends Model implements Auditable
     {
         return $date->format('Y-m-d H:i:s');
     }
-
-
 }

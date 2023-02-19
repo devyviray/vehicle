@@ -34,15 +34,7 @@ class User extends Authenticatable implements Auditable
         'password', 'remember_token',
     ];
 
-    protected $connection  = 'sqlsrv';
-    // protected $dateFormat = 'Y-m-d H:i:s';
-    protected $dates = [
-        'email_verified_at',
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
-    
+    protected $connection  = 'sqlsrv';    
     /**
      * The attributes that should be cast to native types.
      *
