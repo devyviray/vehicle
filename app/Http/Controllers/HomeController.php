@@ -23,7 +23,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        session(['header_text' => 'Vehicles']);
+        session([
+            'header_text' => 'Vehicles',
+            'level' => Auth::user()->level(),
+            'role-name' => Auth::user()->roles[0]->name
+        ]);
+        
         
         return view('home');
     }

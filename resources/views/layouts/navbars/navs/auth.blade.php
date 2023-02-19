@@ -23,12 +23,12 @@
                         <h6 class="text-overflow m-0">{{ __('Welcome!') }}</h6>
                     </div>
                     <div class="dropdown-divider"></div>
-                    {{-- @if(Auth::user()->hasRole('it'))
+                    @if(session('role-name') == 'IT')
                     <a href="{{ route('users') }}" class="dropdown-item">
                         <i class="ni ni-user-run"></i>
                         <span>{{ __('User') }}</span>
                     </a>
-                    @endif --}}
+                    @endif
                     <a href="{{ route('logout') }}" class="dropdown-item" onclick="event.preventDefault();
                     document.getElementById('logout-form').submit();">
                         <i class="ni ni-user-run"></i>

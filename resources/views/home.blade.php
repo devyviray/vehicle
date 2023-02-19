@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-    <dashboard :user-level="{{ Auth::user()->level() }}" role="{{ Auth::user()->roles[0]->name }}" ></dashboard>
+    <dashboard :user-level="{{ session('level') }}" role="{{ session('role-name') }}" ></dashboard>
 @endsection
 
 @push('js')

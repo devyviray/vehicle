@@ -10,14 +10,13 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 // Route::get('/', function () {
 //     return view('welcome');
 // });
 Route::get('/', function () {
     return redirect('/login');
 });
-
-
 Route::get('logout', function(){
     return redirect('/');
 });
@@ -26,10 +25,6 @@ Route::get('logout', function(){
 Route::post('/vehicle-gps', 'VehicleController@getVehicleGps');
 
 Auth::routes();
-
-Route::get('/sample', function () {
-    dd(Auth::user()->roles[0]->name);
-});
 
 Route::get('/home', 'HomeController@index')->name('home');
 
