@@ -48,4 +48,8 @@ class User extends Authenticatable implements Auditable
     public function basedTrucks(){
         return $this->belongsToMany(BasedTruck::class);
     }
+
+    public function roles(){
+        return $this->belongsToMany(Role::class);
+    }
 }
