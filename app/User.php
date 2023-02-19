@@ -41,11 +41,6 @@ class User extends Authenticatable implements Auditable
         'updated_at',
         'deleted_at',
     ];
-
-    public function getDateFormat()
-    {
-         return 'Y-m-d H:i:s';
-    }
     
     /**
      * The attributes that should be cast to native types.
@@ -55,6 +50,9 @@ class User extends Authenticatable implements Auditable
     // protected $casts = [
     //     'email_verified_at' => 'date:Y-m-d',
     // ];
+     protected $casts = [
+        'email_verified_at' => 'datetime:Y-m-d H:i:s',
+    ];
 
     public function basedTrucks(){
         return $this->belongsToMany(BasedTruck::class);
