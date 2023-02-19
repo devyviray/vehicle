@@ -27,7 +27,7 @@ class UserController extends Controller
      */
     public function indexData()
     {
-        return User::with('roles','basedTrucks')->orderBy('id', 'desc')->get();
+        return User::all();
     }
 
     /**
