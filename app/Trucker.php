@@ -11,4 +11,8 @@ class Trucker extends Model implements Auditable
     use SoftDeletes,\OwenIt\Auditing\Auditable;
 
     protected $connection  = 'sqlsrv';
+    public function getDateFormat()
+    {
+        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
+    }
 }

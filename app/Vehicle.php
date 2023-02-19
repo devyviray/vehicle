@@ -16,7 +16,6 @@ class Vehicle extends Model implements Auditable
     // protected $casts = [
     //     'validity_end_date' => 'date:Y-m-d',
     // ];
-    protected $dateFormat = 'M j Y h:i:s:000A';
 
     protected $fillable = [
         'plate_number',
@@ -93,8 +92,8 @@ class Vehicle extends Model implements Auditable
         return $this->belongsToMany(Plant::Class)->withTimestamps();
     }
 
-    protected function serializeDate(DateTimeInterface $date)
+    public function getDateFormat()
     {
-        return $date->format('Y-m-d H:i:s');
+        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
     }
 }

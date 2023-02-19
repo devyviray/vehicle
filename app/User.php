@@ -47,5 +47,8 @@ class User extends Authenticatable implements Auditable
         return $this->belongsToMany(BasedTruck::class);
     }
 
-    protected $dateFormat = 'M j Y h:i:s:000A';
+    public function getDateFormat()
+    {
+        return str_replace(['.v', '.u'], '.000', parent::getDateFormat());
+    }
 }
