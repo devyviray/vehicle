@@ -134,7 +134,8 @@ class VehicleController extends Controller
     public function show($id)
     {
         return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','plants','gpsdevice','gpsdeviceattachments')
-            ->where('id',$id)->orderBy('id', 'desc')->first();
+            ->where('id',$id)
+            ->first();
     }
 
     /**
