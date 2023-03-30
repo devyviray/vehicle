@@ -17,4 +17,11 @@ class PlantVehicleAdded extends Model implements Auditable
         'vehicle_id',
         'user_id'
     ]; 
+
+    protected $dateFormat = 'Y-m-d H:i:s';
+
+    public function getDates()
+    {
+        return [];
+    }
 }
