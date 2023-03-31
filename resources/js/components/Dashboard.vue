@@ -943,7 +943,7 @@ export default {
                     "CATEGORY": data.category.description,
                     "PLATE NUMBER": data.plate_number,
                     "PLANT INDICATOR": data.indicator.description,
-                    "VENDOR": data.vendor ? data.vendor.vendor_description_lfug : data.vendor,
+                    "VENDOR": data.vendor.vendor_description_lfug,
                     "SUBCON VENDOR": data.subcon_vendor ? data.subcon_vendor.vendor_description_lfug : '',
                     "CAPACITY": data.capacity.description,
                     "GOODS": data.good ? data.good.description : '',
