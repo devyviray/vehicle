@@ -88,7 +88,7 @@ class Vehicle extends Model implements Auditable
     }
 
     public function plants() {
-        return $this->belongsToMany(Plant::Class)->withTimestamps();
+        return $this->belongsToMany(Plant::Class);
     }
 
     public function getDates()
