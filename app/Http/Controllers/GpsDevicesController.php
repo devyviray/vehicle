@@ -19,7 +19,7 @@ class GpsDevicesController extends Controller
 {
 
     private function get_user_api_hash(){
-        return env('GPS_API');
+        return '$2y$10$xFid8Bd8RxPAc4byePs2V.2Nd7RCQb9UwnRXcXcGsaVHHdkAWTwQi';
     }
 
     public function index(){
