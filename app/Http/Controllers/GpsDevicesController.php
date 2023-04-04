@@ -332,7 +332,7 @@ class GpsDevicesController extends Controller
             }
         }else{
             Vehicle::whereId($gps_data['vehicle_id'])->update(['gps_device_id' => $validate_gps_device->id]);
-            return 'exist';
+            return 'saved';
         }
     }
 
