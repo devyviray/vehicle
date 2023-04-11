@@ -66,16 +66,18 @@ class GpsDevicesController extends Controller
                 $data['sim_number'] = $request->sim_number;
                 $data['method'] = 'add';
                 
-                $api_assign_id = $this->send_api_assign_gps($data);
+                return $api_assign_id = $this->send_api_assign_gps($data);
 
                 if($api_assign_id){
                     GpsDevice::whereId($gps_device->id)->update(['device_id' => $api_assign_id]);
                     DB::commit();
+                    return $vehicle;
                 }else{
                     DB::rollBack();
+                    return $vehicle;
                 }
 
-                return $vehicle;
+                
             }
 
         } catch (HttpException $ex) {
@@ -192,8 +194,7 @@ class GpsDevicesController extends Controller
             return $device_data->id;
 
         }catch (BadResponseException $ex) {
-            $response = $ex->getResponse()->getBody();
-            return "";
+            return $response = $ex->getResponse()->getBody();
         }
     
     }
