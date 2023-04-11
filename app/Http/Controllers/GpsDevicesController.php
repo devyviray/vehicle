@@ -66,7 +66,7 @@ class GpsDevicesController extends Controller
                 $data['sim_number'] = $request->sim_number;
                 $data['method'] = 'add';
                 
-                return $api_assign_id = $this->send_api_assign_gps($data);
+                $api_assign_id = $this->send_api_assign_gps($data);
 
                 if($api_assign_id){
                     GpsDevice::whereId($gps_device->id)->update(['device_id' => $api_assign_id]);
