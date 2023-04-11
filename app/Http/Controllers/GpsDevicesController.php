@@ -193,7 +193,7 @@ class GpsDevicesController extends Controller
 
         }catch (BadResponseException $ex) {
             $response = $ex->getResponse()->getBody();
-            return json_decode($response, true);
+            return "";
         }
     
     }
