@@ -12,9 +12,9 @@ class Vehicle extends Model implements Auditable
 
     use SoftDeletes;
     protected $dateFormat = 'Y-m-d H:i:s';
-    protected $casts = [
-        'validity_end_date' => 'date:Y-m-d',
-    ];
+    // protected $casts = [
+    //     'validity_end_date' => 'date:Y-m-d',
+    // ];
 
     protected $fillable = [
         'plate_number',
