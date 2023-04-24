@@ -40,8 +40,7 @@ class ValidityRule implements Rule
         if($vehicles && $this->validityStartDate){
             foreach($vehicles as $vehicle){
                 $date = new DateTime();
-                $date->setTimestamp(intval($vehicle->validity_end_date));
-                dd($date);
+                dd($date->setTimestamp(intval($vehicle->validity_end_date)));
 
                 if($vehicle->validity_end_date >=  $this->validityStartDate){
                     $error = $error + 1;
