@@ -38,6 +38,11 @@ class ValidityRule implements Rule
         
         if($vehicles && $this->validityStartDate){
             foreach($vehicles as $vehicle){ 
+                $date_string = $vehicle->validity_end_date;
+                $date = trim($date_string, "12:00:00:AM");
+                $end_date = date('Y-m-d',strtotime($date));
+
+                dd($end_date);
                 if($vehicle->validity_end_date >=  $this->validityStartDate){
                     $error = $error + 1;
                 }
