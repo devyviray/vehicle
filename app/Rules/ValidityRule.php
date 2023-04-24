@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Rule;
 use App\{
     Vehicle
 };
+use Carbon\Carbon;
 
 class ValidityRule implements Rule
 {
@@ -37,7 +38,8 @@ class ValidityRule implements Rule
         $error = 0;
         
         if($vehicles && $this->validityStartDate){
-            foreach($vehicles as $vehicle){ 
+            foreach($vehicles as $vehicle){
+                dd(Carbon::parse($vehicle->validity_end_date)->format('Y-m-d'));
                 if($vehicle->validity_end_date >=  $this->validityStartDate){
                     $error = $error + 1;
                 }
