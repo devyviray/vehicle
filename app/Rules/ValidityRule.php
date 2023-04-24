@@ -39,9 +39,8 @@ class ValidityRule implements Rule
         
         if($vehicles && $this->validityStartDate){
             foreach($vehicles as $vehicle){
-                $end_date = Carbon::createFromFormat('Y-m-d H:i:s', $vehicle->validity_end_date)
-                                    ->format('m/d/Y');
-                dd($end_date);
+                $end_date = new DateTime($vehicle->validity_end_date);
+                dd($end_date->format('Y-m-d'));
                 if($vehicle->validity_end_date >=  $this->validityStartDate){
                     $error = $error + 1;
                 }
