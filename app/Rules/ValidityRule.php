@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Rule;
 use App\{
     Vehicle
 };
-use Carbon\Carbon;
+use DateTime;
 
 class ValidityRule implements Rule
 {
