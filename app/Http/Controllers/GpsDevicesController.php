@@ -19,7 +19,7 @@ class GpsDevicesController extends Controller
 {
 
     private function get_user_api_hash(){
-        return env('GPS_API');
+        return '$2y$10$xFid8Bd8RxPAc4byePs2V.2Nd7RCQb9UwnRXcXcGsaVHHdkAWTwQi';
     }
 
     public function index(){
@@ -71,11 +71,13 @@ class GpsDevicesController extends Controller
                 if($api_assign_id){
                     GpsDevice::whereId($gps_device->id)->update(['device_id' => $api_assign_id]);
                     DB::commit();
+                    return $vehicle;
                 }else{
                     DB::rollBack();
+                    return $vehicle;
                 }
 
-                return $vehicle;
+                
             }
 
         } catch (HttpException $ex) {
@@ -192,8 +194,7 @@ class GpsDevicesController extends Controller
             return $device_data->id;
 
         }catch (BadResponseException $ex) {
-            $response = $ex->getResponse()->getBody();
-            return json_decode($response, true);
+            return $response = $ex->getResponse()->getBody();
         }
     
     }
@@ -331,7 +332,8 @@ class GpsDevicesController extends Controller
                 return 'error';
             }
         }else{
-            return 'exist';
+            Vehicle::whereId($gps_data['vehicle_id'])->update(['gps_device_id' => $validate_gps_device->id]);
+            return 'saved';
         }
     }
 
