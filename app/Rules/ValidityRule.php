@@ -6,7 +6,6 @@ use Illuminate\Contracts\Validation\Rule;
 use App\{
     Vehicle
 };
-use DateTime;
 
 class ValidityRule implements Rule
 {
@@ -38,10 +37,7 @@ class ValidityRule implements Rule
         $error = 0;
         
         if($vehicles && $this->validityStartDate){
-            foreach($vehicles as $vehicle){
-                $date = new DateTime();
-                dd($date->setTimestamp(intval($vehicle->validity_end_date)));
-
+            foreach($vehicles as $vehicle){ 
                 if($vehicle->validity_end_date >=  $this->validityStartDate){
                     $error = $error + 1;
                 }
