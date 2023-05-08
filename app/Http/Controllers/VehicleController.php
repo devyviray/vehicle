@@ -246,11 +246,13 @@ class VehicleController extends Controller
                             })
                             ->when(!empty($gps),function ($query) use ($gps){
                                 if($gps == 'Yes'){
-                                    $query->whereNotNull('gps_device_id');
-                                    $query->where('gps_device_id' , '!=' , '0');
+                                    $query->whereHas('gpsdevice');
+                                    // $query->whereNotNull('gps_device_id');
+                                    // $query->where('gps_device_id' , '!=' , '0');
                                 }elseif($gps == 'No'){
-                                    $query->whereNull('gps_device_id');
-                                    $query->where('gps_device_id' , '==' , '0');
+                                    $query->doesntHave('gpsdevice');
+                                    // $query->whereNull('gps_device_id');
+                                    // $query->where('gps_device_id' , '==' , '0');
                                 }
                             })
                             ->when(isset($base_truck_ids), function ($query) use($base_truck_ids){
