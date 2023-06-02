@@ -10,7 +10,10 @@ use App\{
     PlantVehicleDeleted,
     PlantVehicleAdded
 };
-use App\Rules\ValidityRule;
+use App\Rules\{
+    ValidityRule,
+    PlantCheckingRule
+};
 use Carbon\Carbon;
 use Auth;
 use DB;
@@ -42,41 +45,23 @@ class VehicleController extends Controller
      */
     public function store(Request $request)
     {
-        if($request->category_id == 2){
-            $request->validate([
-                'plate_number' => ['required', 'max:20','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date,'Add')],
-                'category_id' => 'required',
-                'capacity_id' => 'required',
-                'vendor_id' => 'required',
-                'allowed_total_weight' => 'integer',
-                'subcon_vendor_id' => 'required_if:vendor_id,==,26',
-                'contract_id' => 'required_if:vendor_id,==,26',
-                'indicator_id' => 'required',
-                'remarks' => 'max:40',
-                'based_truck_id' => 'required',
-                'validity_start_date' => 'required',
-                'validity_end_date' => 'required|after_or_equal:validity_start_date',
-                'attachments' => 'required',
-                'plants' => 'required',
-            ]);
-        }else{
-            $request->validate([
-                'plate_number' => ['required','max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Add')],
-                'category_id' => 'required',
-                'capacity_id' => 'required',
-                'vendor_id' => 'required',
-                'allowed_total_weight' => 'integer',
-                'subcon_vendor_id' => 'required_if:vendor_id,==,26',
-                'contract_id' => 'required_if:vendor_id,==,26',
-                'indicator_id' => 'required',
-                'remarks' => 'max:40',
-                'based_truck_id' => 'required',
-                'validity_start_date' => 'required',
-                'validity_end_date' => 'required|after_or_equal:validity_start_date',
-                'attachments' => 'required',
-                'plants' => 'required',
-            ]);
-        }
+        $request->validate([
+            'plate_number' => ['required', ($request->category_id == 2) ? 'max:20' : 'max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date,'Add')],
+            'category_id' => 'required',
+            'capacity_id' => 'required',
+            'vendor_id' => ['required', new PlantCheckingRule($request->plants)],
+            'allowed_total_weight' => 'integer',
+            'subcon_vendor_id' => $request->vendor_id == '26' || $request->subcon_vendor_id ? ['required', new PlantCheckingRule($request->plants)] : '',
+            'contract_id' => 'required_if:vendor_id,==,26',
+            'indicator_id' => 'required',
+            'remarks' => 'max:40',
+            'based_truck_id' => 'required',
+            'validity_start_date' => 'required',
+            'validity_end_date' => 'required|after_or_equal:validity_start_date',
+            'attachments' => 'required',
+            'plants' => 'required',
+        ]);
+        
 
         DB::beginTransaction();
         try {
@@ -147,41 +132,22 @@ class VehicleController extends Controller
      */
     public function update(Request $request, Vehicle $vehicle)
     {
-        if($request->category_id == 2){
-            $request->validate([
-                'plate_number' =>  ['required','max:20','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Edit',$vehicle->id)],
-                'category_id' => 'required',
-                'capacity_id' => 'required',
-                'vendor_id' => 'required',
-                'allowed_total_weight' => 'integer',
-                'subcon_vendor_id' => 'required_if:vendor_id,==,26',
-                'contract_id' => 'required_if:vendor_id,==,26',
-                'indicator_id' => 'required',
-                'remarks' => 'max:40',
-                'based_truck_id' => 'required',
-                'validity_start_date' => 'required',
-                'validity_end_date' => 'required|after_or_equal:validity_start_date',
-                'plants' => 'required',
-                'old_plants' => 'required'
-            ]);
-        }else{
-            $request->validate([
-                'plate_number' => ['required','max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date, 'Edit',$vehicle->id)],
-                'category_id' => 'required',
-                'capacity_id' => 'required',
-                'vendor_id' => 'required',
-                'allowed_total_weight' => 'integer',
-                'subcon_vendor_id' => 'required_if:vendor_id,==,26',
-                'contract_id' => 'required_if:vendor_id,==,26',
-                'indicator_id' => 'required',
-                'remarks' => 'max:40',
-                'based_truck_id' => 'required',
-                'validity_start_date' => 'required',
-                'validity_end_date' => 'required|after_or_equal:validity_start_date',
-                'plants' => 'required',
-                'old_plants' => 'required'
-            ]);
-        }
+        $request->validate([
+            'plate_number' => ['required', ($request->category_id == 2) ? 'max:20' : 'max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date,'Edit',$vehicle->id)],
+            'category_id' => 'required',
+            'capacity_id' => 'required',
+            'vendor_id' => ['required', new PlantCheckingRule($request->plants)],
+            'allowed_total_weight' => 'integer',
+            'subcon_vendor_id' => $request->vendor_id == '26' || $request->subcon_vendor_id ? ['required', new PlantCheckingRule($request->plants)] : '',
+            'contract_id' => 'required_if:vendor_id,==,26',
+            'indicator_id' => 'required',
+            'remarks' => 'max:40',
+            'based_truck_id' => 'required',
+            'validity_start_date' => 'required',
+            'validity_end_date' => 'required|after_or_equal:validity_start_date',
+            'plants' => 'required',
+            'old_plants' => 'required'
+        ]);
         
         DB::beginTransaction();
         try {

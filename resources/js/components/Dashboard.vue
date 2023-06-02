@@ -177,7 +177,7 @@
                                     <select class="form-control" v-model="vehicle.category_id">
                                         <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.category_id">The category field is required.</span>
+                                    <span class="text-danger" v-if="errors.category_id">{{ errors.category_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -193,7 +193,7 @@
                                     <select class="form-control" v-model="vehicle.indicator_id" @change="plantChange">
                                         <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.indicator_id">The indicator field is required</span>
+                                    <span class="text-danger" v-if="errors.indicator_id">{{ errors.indicator_id[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -211,7 +211,7 @@
                                         id="selected_plant"
                                     >
                                     </multiselect>
-                                    <span class="text-danger" v-if="errors.plants">The plant field is required</span>
+                                    <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
                                 </div>  
                             </div>
                         </div> 
@@ -226,7 +226,7 @@
                                     track-by="id"
                                 >      
                                 </v-select>
-                                <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
+                                <span class="text-danger" v-if="errors.vendor_id">{{ errors.vendor_id[0] }}</span>
                             </div>
                             <div class="col-md-4">
                                 <label for="role">Subcon Vendor</label> 
@@ -238,7 +238,7 @@
                                     track-by="id"
                                 >
                                 </v-select>
-                                <span class="text-danger" v-if="errors.subcon_vendor_id">The Subcon vendor field is required</span>
+                                <span class="text-danger" v-if="errors.subcon_vendor_id">{{ errors.subcon_vendor_id[0] }}</span>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -246,7 +246,7 @@
                                     <select class="form-control" v-model="vehicle.capacity_id">
                                         <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.capacity_id">The capacity field is required.</span>
+                                    <span class="text-danger" v-if="errors.capacity_id">{{ errors.capacity_id[0] }}</span>
                                 </div>
                             </div>
                         </div> 
@@ -258,7 +258,7 @@
                                         <option></option>
                                         <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
+                                    <span class="text-danger" v-if="errors.good_id">{{ errors.good_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -274,7 +274,7 @@
                                     <select class="form-control" v-model="vehicle.based_truck_id" id="based_truck">
                                         <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.based_truck_id">The based truck is required</span>
+                                    <span class="text-danger" v-if="errors.based_truck_id">{{ errors.based_truck_id[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -286,7 +286,7 @@
                                         <option></option>
                                         <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.code + ' - ' + contract.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
+                                    <span class="text-danger" v-if="errors.contract_id">{{ errors.contract_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -300,7 +300,7 @@
                                 <div class="form-group">
                                     <label for="role">Document*</label>
                                     <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
-                                    <span class="text-danger" v-if="errors.attachments">The attachment is required</span>
+                                    <span class="text-danger" v-if="errors.attachments">{{ errors.attachments[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -309,7 +309,7 @@
                                 <div class="form-group">
                                     <label for="role">Validity Start Date*</label> 
                                     <input type="date" id="validity_start_date" class="form-control" v-model="vehicle.validity_start_date">
-                                    <span class="text-danger" v-if="errors.validity_start_date">The validity start date is required</span>
+                                    <span class="text-danger" v-if="errors.validity_start_date">{{ errors.validity_start_date[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -351,7 +351,7 @@
                                     <select class="form-control" v-model="vehicle_fetch.category_id" disabled>
                                         <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.category_id">The category field is required</span>
+                                    <span class="text-danger" v-if="errors.category_id">{{ errors.category_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -367,7 +367,7 @@
                                     <select class="form-control" v-model="vehicle_fetch.indicator_id" @change="plantChange">
                                         <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.indicator_id">The indicator field is required</span>
+                                    <span class="text-danger" v-if="errors.indicator_id">{{ errors.indicator_id[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -401,7 +401,7 @@
                                     disabled
                                 >      
                                 </v-select>
-                                <span class="text-danger" v-if="errors.vendor_id">The contract field is required</span>
+                                <span class="text-danger" v-if="errors.vendor_id">{{ errors.vendor_id[0] }}</span>
                             </div>
                             <div class="col-md-4">
                                 <label for="role">Subcon Vendor</label> 
@@ -414,7 +414,7 @@
                                     disabled
                                 >
                                 </v-select>
-                                <span class="text-danger" v-if="errors.subcon_vendor_id">The Subcon vendor field is required</span>
+                                <span class="text-danger" v-if="errors.subcon_vendor_id">{{ errors.subcon_vendor_id[0] }}</span>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
@@ -422,7 +422,7 @@
                                     <select class="form-control" v-model="vehicle_fetch.capacity_id" id="capacity-edit">
                                         <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.capacity_id">The capacity field is required</span>
+                                    <span class="text-danger" v-if="errors.capacity_id">{{ errors.capacity_id[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -434,7 +434,7 @@
                                         <option></option>
                                         <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.good_id">The goods field is required</span>
+                                    <span class="text-danger" v-if="errors.good_id">{{ errors.good_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -450,7 +450,7 @@
                                     <select class="form-control" v-model="vehicle_fetch.based_truck_id" id="based_truck-edit">
                                         <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.based_truck_id">The based truck field is required</span>
+                                    <span class="text-danger" v-if="errors.based_truck_id">{{ errors.based_truck_id[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -462,21 +462,21 @@
                                         <option></option>
                                         <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.contract_id">The contract field is required</span>
+                                    <span class="text-danger" v-if="errors.contract_id">{{ errors.contract_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Remarks</label> 
                                     <input type="text" id="remarks-edit" class="form-control" v-model="vehicle_fetch.remarks" maxlength="40">
-                                    <span class="text-danger" v-if="errors.good_id">The remarks field is required</span>
+                                    <span class="text-danger" v-if="errors.good_id">{{ errors.good_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Document</label> 
                                     <input type="file" multiple="multiple" id="attachments-edit" class="attachments-edit" placeholder="Attach file" @change="uploadFileChange"><br>
-                                    <span class="text-danger" v-if="errors.attachments">The attachment field is required</span>
+                                    <span class="text-danger" v-if="errors.attachments">{{ errors.attachments[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -484,8 +484,8 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Validity Start Date*</label> 
-                                    <input type="date" id="validity_start_date-edit" class="form-control" v-model="vehicle_fetch.validity_start_date">
-                                    <span class="text-danger" v-if="errors.validity_start_date">The validity start date field is required</span>
+                                    <input type="date" id="validity_start_date-edit" class="form-control" v-model="vehicle_fetch.validity_start_date" disabled>
+                                    <span class="text-danger" v-if="errors.validity_start_date">{{ errors.validity_start_date[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
