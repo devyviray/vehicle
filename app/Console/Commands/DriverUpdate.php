@@ -67,15 +67,18 @@ class DriverUpdate extends Command
 
         echo $dateFilter . ' || ****************************** ';
 
-        $drivers = Driverversions::with('drivers_info')->orderBy('id','desc')->limit(10)->get();
+        $drivers = Driverversions::with('drivers_info')
+            // ->where('updated_at', '>', $dateFilter)
+            ->orderBy('id','desc')->limit(10)
+            ->get();
 
         foreach ($drivers as $driver) {
-            echo $driver->plate_number . ' || ';
+            // echo $driver->plate_number . ' || ';
             $vehicles = Vehicle::where('plate_number', '=', $driver->plate_number);
             $checkVehicle = $vehicles->first();
             if ($checkVehicle) {
-                echo 'Validity Start : ' . date('Y-m-d', strtotime($driver->drivers_info->start_validity_date)) . ' || ';
-                echo 'Validity End : ' . date('Y-m-d', strtotime($driver->drivers_info->end_validity_date)) . ' || *********************** ';
+                /* echo 'Validity Start : ' . date('Y-m-d', strtotime($driver->drivers_info->start_validity_date)) . ' || ';
+                echo 'Validity End : ' . date('Y-m-d', strtotime($driver->drivers_info->end_validity_date)) . ' || *********************** '; */
                 $vehicles->update([
                     'validity_start_date' => date('Y-m-d', strtotime($driver->drivers_info->start_validity_date)),
                     'validity_end_date' => date('Y-m-d', strtotime($driver->drivers_info->end_validity_date)),
