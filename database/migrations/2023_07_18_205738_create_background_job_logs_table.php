@@ -19,6 +19,7 @@ class CreateBackgroundJobLogsTable extends Migration
             $table->datetime('start_time')->nullable();
             $table->datetime('end_time')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

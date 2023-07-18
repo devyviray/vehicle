@@ -43,7 +43,7 @@ class DriverUpdate extends Command
      */
     public function handle()
     {
-        $getBGJobs = BackgroundJobLogs::orderBy('id','desc')->first();
+        $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
 
         if (is_null($getBGJobs)) {
             BackgroundJobLogs::create([
@@ -52,7 +52,7 @@ class DriverUpdate extends Command
             ]);
             
         } elseif (!is_null($getBGJobs->end_time)) {
-            BackgroundJobLogs::create([
+            BackgroundJobLogs::where('name','update:driver')->create([
                 'name' => 'update:driver',
                 'start_time' => date('Y-m-d H:i:s'),
             ]);
@@ -61,11 +61,9 @@ class DriverUpdate extends Command
             $getBGJobs->save();
         }
 
-        $getBGJobs = BackgroundJobLogs::orderBy('id','desc')->first();
+        $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
 
         $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
-
-        // echo $dateFilter . ' || ****************************** ';
 
         $drivers = Driverversions::with('drivers_info')
             // ->where('updated_at', '>', $dateFilter)
@@ -76,19 +74,37 @@ class DriverUpdate extends Command
             // echo $driver->plate_number . ' || ';
             $vehicles = Vehicle::where('plate_number', '=', $driver->plate_number);
             $checkVehicle = $vehicles->first();
+            $driver_name = $driver->drivers_info->name;
+            $driver_name1 = str_replace('JR','',$driver_name);
+            $driver_name2 = str_replace('SR','',$driver_name1);
+            $driver_name3 = str_replace('.','',$driver_name2);
+            $final_driver_name = str_replace('III','',$driver_name3);
+
+            $explode_driver = explode(' ', $final_driver_name);
+
+            if (count($explode_driver) == 2) {
+                $firstname = substr($explode_driver[0], 0, 1);
+                $lastname = $explode_driver[1];
+            } else {
+                $firstname = substr($explode_driver[0], 0, 1);
+                for ($i=0; $i < count($explode_driver); $i++) {
+                    if (is_null($explode_driver[$i])) {
+                        break;
+                    }
+
+                    $lastname = $explode_driver[$i];
+                }
+            }
+
+            $name = $firstname . '. ' . $lastname;
+
             if ($checkVehicle) {
-                /* echo 'Validity Start : ' . date('Y-m-d', strtotime($driver->drivers_info->start_validity_date)) . ' || ';
-                echo 'Validity End : ' . date('Y-m-d', strtotime($driver->drivers_info->end_validity_date)) . ' || *********************** '; */
                 $vehicles->update([
-                    'validity_start_date' => date('Y-m-d', strtotime($driver->drivers_info->start_validity_date)),
-                    'validity_end_date' => date('Y-m-d', strtotime($driver->drivers_info->end_validity_date)),
+                    'driver_name' => $name,
+                    'driver_validity_start_date' => date('Y-m-d', strtotime($driver->drivers_info->start_validity_date)),
+                    'driver_validity_end_date' => date('Y-m-d', strtotime($driver->drivers_info->end_validity_date)),
                 ]);
-                /* $vehicles->validity_start_date = date('Y-m-d', strtotime($driver->drivers_info->start_validity_date));
-                $vehicles->validity_end_date = date('Y-m-d', strtotime($driver->drivers_info->end_validity_date));
-                $vehicles->save(); */
-            } /* else {
-                
-            } */
+            }
         }
 
         $getBGJobs->end_time = date('Y-m-d H:i:s');
