@@ -67,15 +67,15 @@ class DriverUpdate extends Command
 
             $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
         }
+
         $drivers = Driverversions::with('drivers_info')
             ->whereDate('updated_at', '>', $dateFilter)
-            // ->orderBy('id','desc')->limit(10)
             ->get();
 
         foreach ($drivers as $driver) {
-            // echo $driver->plate_number . ' || ';
-            $vehicles = Vehicle::where('plate_number', '=', $driver->plate_number);
+            $vehicles = Vehicle::where('plate_number', '=', $driver->plate_number)->whereDate('validity_end_date','>=', date('Y-m-d'));
             $checkVehicle = $vehicles->first();
+
             $driver_name = $driver->drivers_info->name;
             $driver_name1 = str_replace(' JR','',$driver_name);
             $driver_name2 = str_replace(' SR','',$driver_name1);
@@ -90,7 +90,7 @@ class DriverUpdate extends Command
             } else {
                 $firstname = substr($explode_driver[0], 0, 1);
                 for ($i=0; $i < count($explode_driver); $i++) {
-                    if (is_null($explode_driver[$i])) {
+                    if ($explode_driver[intval($i)] == '' || $explode_driver[intval($i)] == ' ') {
                         break;
                     }
 
