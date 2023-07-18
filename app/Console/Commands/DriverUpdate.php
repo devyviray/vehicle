@@ -50,24 +50,27 @@ class DriverUpdate extends Command
                 'name' => 'update:driver',
                 'start_time' => date('Y-m-d H:i:s'),
             ]);
-            
+            $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+            $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
         } elseif (!is_null($getBGJobs->end_time)) {
+            $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+            $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
+
             BackgroundJobLogs::where('name','update:driver')->create([
                 'name' => 'update:driver',
                 'start_time' => date('Y-m-d H:i:s'),
             ]);
         } else {
-            $getBGJobs->end_time = date('Y-m-d H:i:s');
-            $getBGJobs->save();
+            $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+            $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
         }
-
-        $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
-
-        $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
-
+        echo $dateFilter ;
         $drivers = Driverversions::with('drivers_info')
-            // ->where('updated_at', '>', $dateFilter)
-            ->orderBy('id','desc')->limit(10)
+            ->whereDate('updated_at', '>', $dateFilter)
+            // ->orderBy('id','desc')->limit(10)
             ->get();
 
         foreach ($drivers as $driver) {
@@ -75,10 +78,10 @@ class DriverUpdate extends Command
             $vehicles = Vehicle::where('plate_number', '=', $driver->plate_number);
             $checkVehicle = $vehicles->first();
             $driver_name = $driver->drivers_info->name;
-            $driver_name1 = str_replace('JR','',$driver_name);
-            $driver_name2 = str_replace('SR','',$driver_name1);
+            $driver_name1 = str_replace(' JR','',$driver_name);
+            $driver_name2 = str_replace(' SR','',$driver_name1);
             $driver_name3 = str_replace('.','',$driver_name2);
-            $final_driver_name = str_replace('III','',$driver_name3);
+            $final_driver_name = str_replace(' III','',$driver_name3);
 
             $explode_driver = explode(' ', $final_driver_name);
 
