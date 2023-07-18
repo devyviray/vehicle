@@ -77,6 +77,7 @@ class DriverUpdate extends Command
             $checkVehicle = $vehicles->first();
 
             $driver_name = $driver->drivers_info->name;
+            $driver_name1 = str_replace('  JR','',$driver_name);
             $driver_name1 = str_replace(' JR','',$driver_name);
             $driver_name2 = str_replace(' SR','',$driver_name1);
             $driver_name3 = str_replace('.','',$driver_name2);
