@@ -67,7 +67,6 @@ class DriverUpdate extends Command
 
             $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
         }
-        echo $dateFilter ;
         $drivers = Driverversions::with('drivers_info')
             ->whereDate('updated_at', '>', $dateFilter)
             // ->orderBy('id','desc')->limit(10)
