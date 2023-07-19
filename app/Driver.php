@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Driver extends Model
 {
+    protected $dateFormat = 'Y-m-d H:i:s';
     protected $connection = "sqlsrv2";
     protected $table = "drivers";
 
