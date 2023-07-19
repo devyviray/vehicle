@@ -134,12 +134,13 @@ class DriverUpdate extends Command
             }
         }
 
-        if ($getBGJobs->id == 1) {
+        /* if ($getBGJobs->id == 1) {
             $this->trucksJson();
-        }
+        } */
 
         $getBGJobs->end_time = date('Y-m-d H:i:s');
         $getBGJobs->save();
+        // $this->trucksJson();
     }
 
     public function trucksJson() {
