@@ -10,10 +10,10 @@ class DriverTruck extends Model
     protected $table = "driver_truck";
 
     public function drivers_info(){
-        return $this->morphOne(Driver::class, 'id', 'driver_id');
+        return $this->hasOne(Driver::class, 'id', 'driver_id');
     }
 
     public function trucks_info(){
-        return $this->morphOne(Truck::class, 'id', 'truck_id');
+        return $this->hasOne(Truck::class, 'id', 'truck_id');
     }
 }
