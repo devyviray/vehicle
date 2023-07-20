@@ -232,11 +232,16 @@ class DriverUpdate extends Command
                     $name = $firstname . '. ' . $lastname;
 
                     if ($checkVehicle) {
-                        $vehicles->update([
+                        /* $vehicles->update([
                             'driver_name' => $name,
                             'driver_validity_start_date' => date('Y-m-d', strtotime($driver->start_validity_date)),
                             'driver_validity_end_date' => date('Y-m-d', strtotime($driver->end_validity_date)),
-                        ]);
+                        ]); */
+
+                        $checkVehicle->driver_name = $name;
+                        $checkVehicle->driver_validity_start_date = date('Y-m-d', strtotime($driver->start_validity_date));
+                        $checkVehicle->driver_validity_end_date = date('Y-m-d', strtotime($driver->end_validity_date));
+                        $checkVehicle->save();
                     }
                 }
             }
