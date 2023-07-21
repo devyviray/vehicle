@@ -181,19 +181,15 @@ class DriverUpdate extends Command
 
         foreach ($data as $driver) {
             if ($driver->hasTrucks->trucks_info) {
+                $getLatestDriver = Driverversions::with('drivers_info')->where('plate_number', $driver->hasTrucks->trucks_info->plate_number)->orderBy('updated_at','desc')->first();
                 $vehicles = Vehicle::where('plate_number', $driver->hasTrucks->trucks_info->plate_number)->whereDate('validity_end_date','>=', date('Y-m-d'));
                 $checkVehicle = $vehicles->first();
 
-                if ($driver) {
-                    $driver_name = $driver->name;
+                if (isset($getLatestDriver->drivers_info)) {
+                    $driver_name = $getLatestDriver->drivers_info->name;
                     $final_driver_name = str_replace('.','',$driver_name);
-                    // $driver_name1 = str_replace('  JR','',$driver_name);
-                    // $driver_name1 = str_replace(' JR','',$driver_name);
-                    // $driver_name2 = str_replace(' SR','',$driver_name1);
-                    // $final_driver_name = str_replace(' III','',$driver_name3);
 
                     $explode_driver = explode(' ', $final_driver_name);
-                    // $firstNameFullText = '';
                     if (count($explode_driver) == 2) {
                         $firstname = substr($explode_driver[0], 0, 1);
                         $lastname = $explode_driver[1];
@@ -227,30 +223,27 @@ class DriverUpdate extends Command
                         }
                     }
 
-                    // str_replace('.','',$driver_name);
-
                     $name = $firstname . '. ' . $lastname;
 
                     if ($checkVehicle) {
-                        /* $vehicles->update([
-                            'driver_name' => $name,
-                            'driver_validity_start_date' => date('Y-m-d', strtotime($driver->start_validity_date)),
-                            'driver_validity_end_date' => date('Y-m-d', strtotime($driver->end_validity_date)),
-                        ]); */
-
-                        $checkVehicle->driver_name = $name;
-                        $checkVehicle->driver_validity_start_date = date('Y-m-d', strtotime($driver->start_validity_date));
-                        $checkVehicle->driver_validity_end_date = date('Y-m-d', strtotime($driver->end_validity_date));
-                        $checkVehicle->save();
+                        if ($checkVehicle->driver_name !== $name) {
+                            $checkVehicle->driver_name = $name;
+                            $checkVehicle->driver_validity_start_date = date('Y-m-d', strtotime($driver->start_validity_date));
+                            $checkVehicle->driver_validity_end_date = date('Y-m-d', strtotime($driver->end_validity_date));
+                            $checkVehicle->save();
+                        }
                     }
                 }
             }
-            
         }
 
         $getBGJobs->end_time = date('Y-m-d H:i:s');
         $getBGJobs->save();
     } 
+
+    public function getDeactivatedDrivers(){
+
+    }
 
     public function trucksJson() {
         $data = DriverTruck::with('drivers_info','trucks_info')
