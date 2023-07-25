@@ -35,54 +35,55 @@ class GpsDevicesController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'imei' => 'required|unique:gps_devices,imei',
-            'sim_number' => 'required|unique:gps_devices,sim_number'
-        ]);
+        
+        $validate = GpsDevice::where('imei',$request->imei)->where('sim_number',$request->sim_number)->first();
 
-        DB::beginTransaction();
-        try {
+        if(empty($validate)){
+
+            DB::beginTransaction();
+            try {
+                
+                if($gps_device = GpsDevice::create($request->all())){
+
+                    $attachments = $request->file('attachments');  
+                    
+                    if(!empty($attachments)){
+                        foreach($attachments as $attachment){
+                            $filename = $attachment->getClientOriginalName();
+                            $path = Storage::disk('public')->put('gps_attachments', $attachment);
+                            $uploadedFile = $this->uploadFiles($gps_device->id,$request->vehicle_id, $path, $filename);
+                        }    
+                    }
+
+                    Vehicle::whereId($request->vehicle_id)->update(['gps_device_id' => $gps_device->id]);
             
-            if($gps_device = GpsDevice::create($request->all())){
+                    $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $request->vehicle_id)->first();
+            
+                    $data=array();
+                    $data['gps_device_id'] = $gps_device->id;
+                    $data['name'] = $vehicle->plate_number;
+                    $data['imei'] = $request->imei;
+                    $data['sim_number'] = $request->sim_number;
+                    $data['method'] = 'add';
+                    
+                    $api_assign_id = $this->send_api_assign_gps($data);
 
-                $attachments = $request->file('attachments');  
-                
-                if(!empty($attachments)){
-                    foreach($attachments as $attachment){
-                        $filename = $attachment->getClientOriginalName();
-                        $path = Storage::disk('public')->put('gps_attachments', $attachment);
-                        $uploadedFile = $this->uploadFiles($gps_device->id,$request->vehicle_id, $path, $filename);
-                    }    
+                    if($api_assign_id){
+                        GpsDevice::whereId($gps_device->id)->update(['device_id' => $api_assign_id]);
+                        DB::commit();
+                        return $vehicle;
+                    }else{
+                        DB::rollBack();
+                        return $vehicle;
+                    }
                 }
 
-                Vehicle::whereId($request->vehicle_id)->update(['gps_device_id' => $gps_device->id]);
-        
-                $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $request->vehicle_id)->first();
-        
-                $data=array();
-                $data['gps_device_id'] = $gps_device->id;
-                $data['name'] = $vehicle->plate_number;
-                $data['imei'] = $request->imei;
-                $data['sim_number'] = $request->sim_number;
-                $data['method'] = 'add';
-                
-                $api_assign_id = $this->send_api_assign_gps($data);
-
-                if($api_assign_id){
-                    GpsDevice::whereId($gps_device->id)->update(['device_id' => $api_assign_id]);
-                    DB::commit();
-                    return $vehicle;
-                }else{
-                    DB::rollBack();
-                    return $vehicle;
-                }
-
-                
+            } catch (HttpException $ex) {
+                DB::rollBack();
+                return $vehicle;
             }
-
-        } catch (HttpException $ex) {
-            DB::rollBack();
-            return $vehicle;
+        }else{
+            return 'exist';
         }
 
     }
@@ -104,11 +105,10 @@ class GpsDevicesController extends Controller
     public function update(Request $request,GpsDevice $gps_device)
     {
         $request->validate([
-            'imei' => 'required|unique:gps_devices,imei,' . $gps_device->id,
-            'sim_number' => 'required|unique:gps_devices,sim_number,' . $gps_device->id
+            'imei' => 'required',
+            'sim_number' => 'required'
         ]);
 
-        
         DB::beginTransaction();
         try {
             if($gps_device->update($request->all())){
