@@ -179,12 +179,12 @@ class DriverUpdate extends Command
 
         foreach ($data as $driver) {
             if ($driver->hasTrucks->trucks_info) {
-                $getLatestDriver = Driverversions::with('drivers_info')->where('plate_number', $driver->hasTrucks->trucks_info->plate_number)->orderBy('updated_at','desc')->first();
+                // $getLatestDriver = Driverversions::with('drivers_info')->where('plate_number', $driver->hasTrucks->trucks_info->plate_number)->orderBy('updated_at','desc')->first();
                 $vehicles = Vehicle::where('plate_number', $driver->hasTrucks->trucks_info->plate_number)->whereDate('validity_end_date','>=', date('Y-m-d'));
                 $checkVehicle = $vehicles->first();
 
-                if (isset($getLatestDriver->drivers_info)) {
-                    $driver_name = $getLatestDriver->drivers_info->name;
+                // if (isset($getLatestDriver->drivers_info)) {
+                    $driver_name = $driver->name;
                     $final_driver_name = str_replace('.','',$driver_name);
 
                     $explode_driver = explode(' ', $final_driver_name);
@@ -231,14 +231,14 @@ class DriverUpdate extends Command
                             $checkVehicle->save();
                         }
                     }
-                }
+                // }
             }
         }
 
         $getBGJobs->end_time = date('Y-m-d H:i:s');
         $getBGJobs->save();
 
-        $this->getDeactivatedDrivers();
+        // $this->getDeactivatedDrivers();
     } 
 
     public function getDeactivatedDrivers() {
@@ -322,10 +322,6 @@ class DriverUpdate extends Command
             if ($driver->drivers_info) {
                 $driver_name = $driver->drivers_info->name;
                 $final_driver_name = str_replace('.','',$driver_name);
-                // $driver_name1 = str_replace('  JR','',$driver_name);
-                // $driver_name1 = str_replace(' JR','',$driver_name);
-                // $driver_name2 = str_replace(' SR','',$driver_name1);
-                // $final_driver_name = str_replace(' III','',$driver_name3);
 
                 $explode_driver = explode(' ', $final_driver_name);
                 // $firstNameFullText = '';
@@ -353,7 +349,6 @@ class DriverUpdate extends Command
 
                             if ($explode_driver[$i] == 'DE' || $explode_driver[$i] == 'DEL' || $explode_driver[$i] == 'DELOS' || $explode_driver[$i] == 'DE LOS' || $explode_driver[$i] == 'DELA' || $explode_driver[$i] == 'DELAS' || $explode_driver[$i] == 'DE LAS') {
                                 $multipleLastName = $explode_driver[$i] . ' ';
-                                
                             }
 
                             $lastname = $multipleLastName . $previousData . $suffix;

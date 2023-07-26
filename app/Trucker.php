@@ -10,7 +10,7 @@ class Trucker extends Model implements Auditable
 {
     use SoftDeletes,\OwenIt\Auditing\Auditable;
 
-    protected $dateFormat = 'Y-m-d H:i:s';
+    protected $dateFormat = 'Y-m-d H:i:s'; 
 
     public function getDates()
     {
