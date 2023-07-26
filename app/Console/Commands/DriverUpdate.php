@@ -294,6 +294,7 @@ class DriverUpdate extends Command
 
                     if ($checkVehicle) {
                         if ($checkVehicle->driver_name == $name) {
+                            echo $checkVehicle->driver_name . " == " . $name . " || ";
                             $checkVehicle->driver_name = null;
                             $checkVehicle->driver_validity_start_date = null;
                             $checkVehicle->driver_validity_end_date = null;
