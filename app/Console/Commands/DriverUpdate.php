@@ -145,6 +145,107 @@ class DriverUpdate extends Command
     }
 
     public function driversJson() {
+        /* $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+        if (is_null($getBGJobs)) {
+            BackgroundJobLogs::create([
+                'name' => 'update:driver',
+                'start_time' => date('Y-m-d H:i:s'),
+            ]);
+            $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+            $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
+            
+        } elseif (!is_null($getBGJobs->end_time)) {
+            $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+            $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
+
+            BackgroundJobLogs::where('name','update:driver')->create([
+                'name' => 'update:driver',
+                'start_time' => date('Y-m-d H:i:s'),
+            ]);
+        } else {
+            $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+            $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
+        } */
+
+        $data =  Driver::with('hasTrucks.trucks_info')
+        ->has('hasTrucks')
+        ->where('availability',1)
+        ->orderBy('updated_at','ASC')
+        ->get();
+
+        foreach ($data as $driver) {
+            if ($driver->hasTrucks->trucks_info) {
+                $vehicles = Vehicle::where('plate_number', $driver->hasTrucks->trucks_info->plate_number)->whereDate('validity_end_date','>=', date('Y-m-d'));
+                $checkVehicle = $vehicles->first();
+
+                /* $trucksAssigned = DriverTruck::where('truck_id',$driver->hasTrucks->truck_id)->get();
+                $lastDriverAssignedToTruck = "";
+                
+                foreach ($trucksAssigned as $ad) {
+                    $lastDriverAssignedToTruck = $ad->driver_id;
+                } */
+
+                $driver_name = $driver->name;
+                $final_driver_name = str_replace('.','',$driver_name);
+
+                $explode_driver = explode(' ', $final_driver_name);
+                if (count($explode_driver) == 2) {
+                    $firstname = substr($explode_driver[0], 0, 1);
+                    $lastname = $explode_driver[1];
+                } else {
+                    $firstname = substr($explode_driver[0], 0, 1);
+                    $suffix = '';
+                    $previousData = '';
+                    $multipleLastName = '';
+                    
+                    for ($i=0; $i < count($explode_driver); $i++) {
+                        if ($explode_driver[$i] == '' || $explode_driver[$i] == ' ') {
+                            if (str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III')) {
+                                $suffix = ' ' . $explode_driver[$i];
+                            }
+                            break;
+                        } else {
+                            if (str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III')) {
+                                $suffix = ' ' . $explode_driver[$i];
+                            } elseif ($previousData != $explode_driver[$i]) {
+                                $previousData = $explode_driver[$i];
+                            }
+
+                            if ($explode_driver[$i] == 'STA' || $explode_driver[$i] == 'DE' || $explode_driver[$i] == 'DEL' || $explode_driver[$i] == 'DELOS' || $explode_driver[$i] == 'DE LOS' || $explode_driver[$i] == 'DELA' || $explode_driver[$i] == 'DELAS' || $explode_driver[$i] == 'DE LAS') {
+                                $multipleLastName = $explode_driver[$i] . ' ';
+                                
+                            }
+
+                            $lastname = $multipleLastName . $previousData . $suffix;
+                        }
+                        
+                    }
+                }
+
+                $name = $firstname . '. ' . $lastname;
+                
+                // if ($lastDriverAssignedToTruck == $driver->id) {
+                    if ($checkVehicle) {
+                        if ($checkVehicle->driver_name !== $name) {
+                            $checkVehicle->driver_name = $name;
+                            $checkVehicle->driver_validity_start_date = date('Y-m-d', strtotime($driver->start_validity_date));
+                            $checkVehicle->driver_validity_end_date = date('Y-m-d', strtotime($driver->end_validity_date));
+                            $checkVehicle->save();
+                        }
+                    }
+                // }
+                
+            }
+        }
+
+        $this->getDeactivatedDrivers();
+    } 
+
+    public function driversJson3() {
         $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
 
         if (is_null($getBGJobs)) {
