@@ -17,4 +17,8 @@ class Driver extends Model
     public function hasTrucks(){
         return $this->hasOne(DriverTruck::class, 'driver_id','id');
     }
+
+    public function driverversions(){
+        return $this->hasOne(Driverversions::class, 'driver_id','id');
+    }
 }
