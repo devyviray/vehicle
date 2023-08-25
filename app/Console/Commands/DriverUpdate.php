@@ -145,6 +145,8 @@ class DriverUpdate extends Command
     }
 
     public function driversJson() {
+        $this->getDeactivatedDrivers();
+        
         $data =  Driver::with('hasTrucks.trucks_info')
         ->has('hasTrucks')
         ->where('availability',1)
@@ -216,8 +218,6 @@ class DriverUpdate extends Command
                 
             }
         }
-
-        // $this->getDeactivatedDrivers();
     } 
 
     public function driversJson3() {
