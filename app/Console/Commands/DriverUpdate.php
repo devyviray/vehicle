@@ -327,7 +327,8 @@ class DriverUpdate extends Command
         foreach ($data as $d) {
             $platenum[] = $d->hasTrucks->trucks_info ? $d->hasTrucks->trucks_info->plate_number : '';
         }
-        $trucks = Vehicle::whereNotIn('plate_number',$platenum)
+        
+        $trucks = Vehicle::whereNotIn('plate_number',$platenum)->whereDate('validity_end_date','>=', date('Y-m-d'))
         ->update([
             'driver_name' => null,
             'driver_validity_start_date' => null,
