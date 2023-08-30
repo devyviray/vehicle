@@ -327,12 +327,22 @@ class DriverUpdate extends Command
         foreach ($data as $d) {
             $platenum[] = $d->hasTrucks->trucks_info ? $d->hasTrucks->trucks_info->plate_number : '';
         }
-        $trucks = Vehicle::whereNotIn('plate_number',$platenum)
-        ->update([
-            'driver_name' => null,
-            'driver_validity_start_date' => null,
-            'driver_validity_end_date' => null,
-        ]);
+
+        $trucks = Vehicle::whereNotIn('plate_number',$platenum)->whereDate('validity_end_date','>=', date('Y-m-d'))->get();
+
+        foreach ($trucks as $truck) {
+            $tr = Vehicle::where('plate_number',$truck)->first();
+
+            if ($tr->driver_name == '' || $tr->driver_name == null || empty($tr->driver_name)) {
+            } else {
+                $tr->driver_name = null;
+                $tr->driver_validity_start_date = null;
+                $tr->driver_validity_end_date = null;
+                $tr->save();
+            }
+                
+        }
+        
     }
 
     public function trucksJson() {
