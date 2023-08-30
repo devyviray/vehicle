@@ -145,7 +145,7 @@ class DriverUpdate extends Command
     }
 
     public function driversJson() {
-        $this->getDeactivatedDrivers();
+        // $this->getDeactivatedDrivers();
         
         $data =  Driver::with('hasTrucks.trucks_info')
         ->has('hasTrucks')
@@ -333,7 +333,7 @@ class DriverUpdate extends Command
         foreach ($trucks as $truck) {
             $tr = Vehicle::where('plate_number',$truck)->first();
 
-            if ($tr->driver_name == '' || $tr->driver_name == null || empty($tr->driver_name)) {
+            if (isset($tr->driver_name) || $tr->driver_name == '' || $tr->driver_name == null || empty($tr->driver_name)) {
             } else {
                 $tr->driver_name = null;
                 $tr->driver_validity_start_date = null;
