@@ -15,56 +15,48 @@
                             <div class="row align-items-center">
                                 <div class="col">
                                     <h3 class="mb-0">Vehicle List</h3>
-                                </div> 
-                                <div class="col text-right" >
-                                    <a v-if="this.userLevel > 4" href="javascript.void(0)" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#addVehicleModal" style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
-                                    <button v-if="this.role == 'ALC DOM' || this.role == 'Vehicle Custodian'" :disabled="!readyListbutton" class="btn btn-sm btn-primary" style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download Excel</button>
+                                </div>
+                                <div class="col text-right">
+                                    <a v-if="this.userLevel > 4" href="javascript.void(0)" class="btn btn-sm btn-primary"
+                                        data-toggle="modal" data-target="#addVehicleModal"
+                                        style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
+                                    <button
+                                        v-if="this.role == 'ALC DOM' || this.role == 'Vehicle Custodian' || this.role == 'GPS Custodian Export'"
+                                        :disabled="!readyListbutton" class="btn btn-sm btn-primary"
+                                        style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download
+                                        Excel</button>
                                 </div>
                             </div>
                             <div class="row align-items-center">
                                 <div class="col-xl-4 mb-3 mt-3 float-right">
-                                    <input type="text" class="form-control" placeholder="Search (Plate Number)" v-model="keywords" id="name">
-                                </div> 
+                                    <input type="text" class="form-control" placeholder="Search (Plate Number)"
+                                        v-model="keywords" id="name">
+                                </div>
                                 <div class="col-xl-2 mb-2 mt-3 float-right">
-                                    <multiselect
-                                        v-model="filterStatus"
-                                        :options="statuses"
-                                        :multiple="false"
-                                        placeholder="Select Status"
-                                        id="selected_filter_status"
-                                    >
+                                    <multiselect v-model="filterStatus" :options="statuses" :multiple="false"
+                                        placeholder="Select Status" id="selected_filter_status">
                                     </multiselect>
                                 </div>
                                 <div class="col-xl-2 mb-2 mt-3 float-right">
-                                    <multiselect
-                                        v-model="filterGps"
-                                        :options="gpsStatuses"
-                                        :multiple="false"
-                                        placeholder="With GPS"
-                                        id="selected_filter_status"
-                                    >
+                                    <multiselect v-model="filterGps" :options="gpsStatuses" :multiple="false"
+                                        placeholder="With GPS" id="selected_filter_status">
                                     </multiselect>
-                                </div> 
+                                </div>
                                 <div class="col-xl-3 mb-2 mt-3 float-right">
-                                    <multiselect
-                                        v-model="filterBasedTruck"
-                                        :options="based_trucks"
-                                        :multiple="true"
-                                        track-by="id"
-                                        :custom-label="customLabelfilterBaseTruck"
-                                        placeholder="Select Based Trucks"
-                                        id="selected_filter_base_trucks"
-                                    >
+                                    <multiselect v-model="filterBasedTruck" :options="based_trucks" :multiple="true"
+                                        track-by="id" :custom-label="customLabelfilterBaseTruck"
+                                        placeholder="Select Based Trucks" id="selected_filter_base_trucks">
                                     </multiselect>
                                 </div>
                                 <div class="col-xl-1 mb-2 mt-3 float-right">
-                                    <button :disabled="!readyListbutton" class="btn btn-sm btn-primary" @click="fetchFilterVehicle"> Apply Filter</button>
+                                    <button :disabled="!readyListbutton" class="btn btn-sm btn-primary"
+                                        @click="fetchFilterVehicle"> Apply Filter</button>
                                 </div>
                             </div>
                         </div>
                         <div class="table-responsive">
                             <!-- Projects table -->
-                           
+
                             <table class="table align-items-center table-flush">
                                 <thead class="thead-light">
                                     <tr>
@@ -100,26 +92,36 @@
                                         <td class="text-right">
                                             <div class="dropdown" v-if="userLevel > 2">
                                                 <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </a>
                                                 <div class="dropdown-menu dropdown-menu-right dropdown-menu-arrow">
-                                                    <a class="dropdown-item" style="cursor: pointer" data-toggle="modal" data-target="#assignGPSModal" @click="viewAssignGPS(vehicle,vehicle.gpsdevice)" v-if="btn_assign">Assign GPS</a>
+                                                    <a class="dropdown-item" style="cursor: pointer" data-toggle="modal"
+                                                        data-target="#assignGPSModal"
+                                                        @click="viewAssignGPS(vehicle, vehicle.gpsdevice)"
+                                                        v-if="btn_assign">Assign GPS</a>
                                                     <div v-if="!vehicle.gpsdevice">
-                                                        <a class="dropdown-item" style="cursor: pointer" data-toggle="modal" data-target="#checkGPSModal" @click="checkAssignGPS(vehicle)" v-if="btn_assign">Check GPS</a>
+                                                        <a class="dropdown-item" style="cursor: pointer" data-toggle="modal"
+                                                            data-target="#checkGPSModal" @click="checkAssignGPS(vehicle)"
+                                                            v-if="btn_assign">Check GPS</a>
                                                     </div>
 
-                                                    <a class="dropdown-item" style="cursor: pointer" @click="getVehicle(vehicle.id)" v-if="btn_edit">Edit</a>
-                                                    <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal" data-target="#viewDocumentsModal" @click="copyObject(vehicle)" v-if="btn_view">View Document</a>
+                                                    <a class="dropdown-item" style="cursor: pointer"
+                                                        @click="getVehicle(vehicle.id)" v-if="btn_edit">Edit</a>
+                                                    <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal"
+                                                        data-target="#viewDocumentsModal" @click="copyObject(vehicle)"
+                                                        v-if="btn_view">View Document</a>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td><i class="fas fa-location-arrow" title = "GPS Device: Yes" v-if="vehicle.gpsdevice"></i></td>
+                                        <td><i class="fas fa-location-arrow" title="GPS Device: Yes"
+                                                v-if="vehicle.gpsdevice"></i></td>
                                         <td>{{ vehicle.category.description }}</td>
                                         <td>{{ vehicle.plate_number }}</td>
                                         <td>{{ vehicle.indicator.description }}</td>
                                         <td>{{ vehicle.vendor.vendor_description_lfug }}</td>
-                                        <td v-if="vehicle.subcon_vendor">{{ vehicle.subcon_vendor.vendor_description_lfug }}</td>
+                                        <td v-if="vehicle.subcon_vendor">{{ vehicle.subcon_vendor.vendor_description_lfug }}
+                                        </td>
                                         <td v-else></td>
                                         <td>{{ vehicle.capacity.description }}</td>
                                         <td v-if="vehicle.good">{{ vehicle.good.description }}</td>
@@ -138,11 +140,13 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row mb-3 mt-3 ml-1" v-if="filteredQueues.length ">
+                        <div class="row mb-3 mt-3 ml-1" v-if="filteredQueues.length">
                             <div class="col-6">
-                                <button :disabled="!showPreviousLink()" class="btn btn-default btn-sm btn-fill" v-on:click="setPage(currentPage - 1)"> Previous </button>
-                                    <span class="text-dark">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
-                                <button :disabled="!showNextLink()" class="btn btn-default btn-sm btn-fill" v-on:click="setPage(currentPage + 1)"> Next </button>
+                                <button :disabled="!showPreviousLink()" class="btn btn-default btn-sm btn-fill"
+                                    v-on:click="setPage(currentPage - 1)"> Previous </button>
+                                <span class="text-dark">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+                                <button :disabled="!showNextLink()" class="btn btn-default btn-sm btn-fill"
+                                    v-on:click="setPage(currentPage + 1)"> Next </button>
                             </div>
                             <div class="col-6 text-right">
                                 <span>{{ filteredQueues.length }} Filtered Vehicle(s)</span><br>
@@ -154,7 +158,8 @@
             </div>
         </div>
         <!-- Add Vehicle Modal -->
-        <div class="modal fade" id="addVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal fade" id="addVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true" data-backdrop="static">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
                 <div class="modal-content">
@@ -173,25 +178,30 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Category*</label> 
+                                    <label for="role">Category*</label>
                                     <select class="form-control" v-model="vehicle.category_id">
-                                        <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
+                                        <option v-for="(category, c) in categories" v-bind:key="c" :value="category.id">
+                                            {{ category.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger" v-if="errors.category_id">{{ errors.category_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Plate Number*</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle.plate_number" style="text-transform:uppercase">
+                                    <label for="role">Plate Number*</label>
+                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle.plate_number"
+                                        style="text-transform:uppercase">
                                     <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Plant Indicator*</label> 
+                                    <label for="role">Plant Indicator*</label>
                                     <select class="form-control" v-model="vehicle.indicator_id" @change="plantChange">
-                                        <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
+                                        <option v-for="(indicator, i) in indicators" v-bind:key="i" :value="indicator.id">
+                                            {{ indicator.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger" v-if="errors.indicator_id">{{ errors.indicator_id[0] }}</span>
                                 </div>
@@ -200,106 +210,102 @@
                         <div class="row" v-if="show_plant_add">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="role">Plant</label> 
-                                    <multiselect
-                                        v-model="vehicle.plant"
-                                        :options="plants"
-                                        :multiple="true"
-                                        track-by="id"
-                                        :custom-label="customLabelPlant"
-                                        placeholder="Select Plant"
-                                        id="selected_plant"
-                                    >
+                                    <label for="role">Plant</label>
+                                    <multiselect v-model="vehicle.plant" :options="plants" :multiple="true" track-by="id"
+                                        :custom-label="customLabelPlant" placeholder="Select Plant" id="selected_plant">
                                     </multiselect>
                                     <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
-                                </div>  
+                                </div>
                             </div>
-                        </div> 
+                        </div>
                         <div class="row">
                             <div class="col-md-4">
-                                <label for="role">Vendor*</label> 
-                                <v-select
-                                    style="width: 100%" 
-                                    v-model="vehicle.vendor"
-                                    label="vendor_description_lfug"
-                                    :options="truckers"
-                                    track-by="id"
-                                >      
+                                <label for="role">Vendor*</label>
+                                <v-select style="width: 100%" v-model="vehicle.vendor" label="vendor_description_lfug"
+                                    :options="truckers" track-by="id">
                                 </v-select>
                                 <span class="text-danger" v-if="errors.vendor_id">{{ errors.vendor_id[0] }}</span>
                             </div>
                             <div class="col-md-4">
-                                <label for="role">Subcon Vendor</label> 
-                                <v-select 
-                                    style="width: 100%"
-                                    v-model="vehicle.subcon_vendor"
-                                    label="vendor_description_lfug"
-                                    :options="truckers"
-                                    track-by="id"
-                                >
+                                <label for="role">Subcon Vendor</label>
+                                <v-select style="width: 100%" v-model="vehicle.subcon_vendor"
+                                    label="vendor_description_lfug" :options="truckers" track-by="id">
                                 </v-select>
-                                <span class="text-danger" v-if="errors.subcon_vendor_id">{{ errors.subcon_vendor_id[0] }}</span>
+                                <span class="text-danger"
+                                    v-if="errors.subcon_vendor_id">{{ errors.subcon_vendor_id[0] }}</span>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Capacity*</label>
                                     <select class="form-control" v-model="vehicle.capacity_id">
-                                        <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
+                                        <option v-for="(capacity, c) in capacities" v-bind:key="c" :value="capacity.id">
+                                            {{ capacity.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger" v-if="errors.capacity_id">{{ errors.capacity_id[0] }}</span>
-                                </div>
-                            </div>
-                        </div> 
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Goods</label> 
-                                    <select class="form-control" v-model="vehicle.good_id">
-                                        <option></option>
-                                        <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.good_id">{{ errors.good_id[0] }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Allowed Total Weight (KG)</label> 
-                                    <input type="text" id="allowed_total_weight" class="form-control" v-model="vehicle.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
-                                    <span class="text-danger" v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-group">
-                                    <label for="role">Based Trucks*</label> 
-                                    <select class="form-control" v-model="vehicle.based_truck_id" id="based_truck">
-                                        <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
-                                    </select>
-                                    <span class="text-danger" v-if="errors.based_truck_id">{{ errors.based_truck_id[0] }}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Contract</label> 
+                                    <label for="role">Goods</label>
+                                    <select class="form-control" v-model="vehicle.good_id">
+                                        <option></option>
+                                        <option v-for="(good, g) in goods" v-bind:key="g" :value="good.id">
+                                            {{ good.description }}
+                                        </option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.good_id">{{ errors.good_id[0] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Allowed Total Weight (KG)</label>
+                                    <input type="text" id="allowed_total_weight" class="form-control"
+                                        v-model="vehicle.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
+                                    <span class="text-danger"
+                                        v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Based Trucks*</label>
+                                    <select class="form-control" v-model="vehicle.based_truck_id" id="based_truck">
+                                        <option v-for="(based_truck, b) in based_trucks" v-bind:key="b"
+                                            :value="based_truck.id"> {{ based_truck.description }}</option>
+                                    </select>
+                                    <span class="text-danger"
+                                        v-if="errors.based_truck_id">{{ errors.based_truck_id[0] }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label for="role">Contract</label>
                                     <select class="form-control" v-model="vehicle.contract_id" id="contract">
                                         <option></option>
-                                        <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.code + ' - ' + contract.description }}</option>
+                                        <option v-for="(contract, c) in contracts" v-bind:key="c" :value="contract.id">
+                                            {{ contract.code + ' - ' + contract.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger" v-if="errors.contract_id">{{ errors.contract_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Remarks</label> 
-                                    <input type="text" id="remarks" class="form-control" v-model="vehicle.remarks" maxlength="40">
+                                    <label for="role">Remarks</label>
+                                    <input type="text" id="remarks" class="form-control" v-model="vehicle.remarks"
+                                        maxlength="40">
                                     <span class="text-danger" v-if="errors.remarks">{{ errors.remarks[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Document*</label>
-                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file" @change="uploadFileChange"><br>
+                                    <input type="file" multiple="multiple" id="attachments" placeholder="Attach file"
+                                        @change="uploadFileChange"><br>
                                     <span class="text-danger" v-if="errors.attachments">{{ errors.attachments[0] }}</span>
                                 </div>
                             </div>
@@ -307,28 +313,34 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Validity Start Date*</label> 
-                                    <input type="date" id="validity_start_date" class="form-control" v-model="vehicle.validity_start_date">
-                                    <span class="text-danger" v-if="errors.validity_start_date">{{ errors.validity_start_date[0] }}</span>
+                                    <label for="role">Validity Start Date*</label>
+                                    <input type="date" id="validity_start_date" class="form-control"
+                                        v-model="vehicle.validity_start_date">
+                                    <span class="text-danger"
+                                        v-if="errors.validity_start_date">{{ errors.validity_start_date[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Validity End Date*</label> 
-                                    <input type="date" id="validity_end_date" class="form-control" v-model="vehicle.validity_end_date">
-                                    <span class="text-danger" v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
+                                    <label for="role">Validity End Date*</label>
+                                    <input type="date" id="validity_end_date" class="form-control"
+                                        v-model="vehicle.validity_end_date">
+                                    <span class="text-danger"
+                                        v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="check_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="addVehicle(vehicle)">Save</button>
-                    </div>
+                        <button id="check_btn" type="button" class="btn btn-primary btn-round btn-fill"
+                            @click="addVehicle(vehicle)">Save</button>
                     </div>
                 </div>
+            </div>
         </div>
 
-        <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal fade" id="editVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true" data-backdrop="static">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 1110px;">
                 <div class="modal-content">
@@ -336,7 +348,7 @@
                         <button type="button" class="close mt-2 mr-2" data-dismiss="modal" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                    </div> 
+                    </div>
                     <div class="modal-header">
                         <h2 class="col-12 modal-title text-center" id="addCompanyLabel">Edit Vehicle</h2>
                     </div>
@@ -347,25 +359,30 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Category*</label> 
+                                    <label for="role">Category*</label>
                                     <select class="form-control" v-model="vehicle_fetch.category_id" disabled>
-                                        <option v-for="(category,c) in categories" v-bind:key="c" :value="category.id"> {{ category.description }}</option>
+                                        <option v-for="(category, c) in categories" v-bind:key="c" :value="category.id">
+                                            {{ category.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger" v-if="errors.category_id">{{ errors.category_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Plate Number*</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_fetch.plate_number" disabled>
+                                    <label for="role">Plate Number*</label>
+                                    <input type="text" id="plate_number" class="form-control"
+                                        v-model="vehicle_fetch.plate_number" disabled>
                                     <span class="text-danger" v-if="errors.plate_number">{{ errors.plate_number[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Plant Indicator*</label> 
+                                    <label for="role">Plant Indicator*</label>
                                     <select class="form-control" v-model="vehicle_fetch.indicator_id" @change="plantChange">
-                                        <option v-for="(indicator,i) in indicators" v-bind:key="i" :value="indicator.id"> {{ indicator.description }}</option>
+                                        <option v-for="(indicator, i) in indicators" v-bind:key="i" :value="indicator.id">
+                                            {{ indicator.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger" v-if="errors.indicator_id">{{ errors.indicator_id[0] }}</span>
                                 </div>
@@ -374,53 +391,38 @@
                         <div class="row" v-if="show_plant">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="role">Plant</label> 
-                                    <multiselect
-                                        v-model="vehicle_fetch.plants"
-                                        :options="plants"
-                                        :multiple="true"
-                                        track-by="id"
-                                        :custom-label="customLabelPlant"
-                                        placeholder="Select Plant"
-                                        id="selected_plant"
-                                    >
+                                    <label for="role">Plant</label>
+                                    <multiselect v-model="vehicle_fetch.plants" :options="plants" :multiple="true"
+                                        track-by="id" :custom-label="customLabelPlant" placeholder="Select Plant"
+                                        id="selected_plant">
                                     </multiselect>
                                     <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
-                                </div>  
+                                </div>
                             </div>
-                        </div> 
+                        </div>
                         <div class="row">
                             <div class="col-md-4">
-                                <label for="role">Vendor*</label> 
-                                <v-select
-                                    style="width: 100%" 
-                                    v-model="vehicle_fetch.vendor"
-                                    label="vendor_description_lfug"
-                                    :options="truckers"
-                                    track-by="id"
-                                    disabled
-                                >      
+                                <label for="role">Vendor*</label>
+                                <v-select style="width: 100%" v-model="vehicle_fetch.vendor" label="vendor_description_lfug"
+                                    :options="truckers" track-by="id" disabled>
                                 </v-select>
                                 <span class="text-danger" v-if="errors.vendor_id">{{ errors.vendor_id[0] }}</span>
                             </div>
                             <div class="col-md-4">
-                                <label for="role">Subcon Vendor</label> 
-                                <v-select 
-                                    style="width: 100%"
-                                    v-model="vehicle_fetch.subcon_vendor"
-                                    label="vendor_description_lfug"
-                                    :options="truckers"
-                                    track-by="id"
-                                    disabled
-                                >
+                                <label for="role">Subcon Vendor</label>
+                                <v-select style="width: 100%" v-model="vehicle_fetch.subcon_vendor"
+                                    label="vendor_description_lfug" :options="truckers" track-by="id" disabled>
                                 </v-select>
-                                <span class="text-danger" v-if="errors.subcon_vendor_id">{{ errors.subcon_vendor_id[0] }}</span>
+                                <span class="text-danger"
+                                    v-if="errors.subcon_vendor_id">{{ errors.subcon_vendor_id[0] }}</span>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Capacity*</label> 
+                                    <label for="role">Capacity*</label>
                                     <select class="form-control" v-model="vehicle_fetch.capacity_id" id="capacity-edit">
-                                        <option v-for="(capacity,c) in capacities" v-bind:key="c" :value="capacity.id"> {{ capacity.description }}</option>
+                                        <option v-for="(capacity, c) in capacities" v-bind:key="c" :value="capacity.id">
+                                            {{ capacity.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger" v-if="errors.capacity_id">{{ errors.capacity_id[0] }}</span>
                                 </div>
@@ -429,53 +431,64 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Goods</label> 
+                                    <label for="role">Goods</label>
                                     <select class="form-control" v-model="vehicle_fetch.good_id" id="good-edit">
                                         <option></option>
-                                        <option v-for="(good,g) in goods" v-bind:key="g" :value="good.id"> {{ good.description }}</option>
+                                        <option v-for="(good, g) in goods" v-bind:key="g" :value="good.id">
+                                            {{ good.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger" v-if="errors.good_id">{{ errors.good_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Allowed Total Weight (KG)</label> 
-                                    <input type="text" id="allowed_total_weight-edit" class="form-control" v-model="vehicle_fetch.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
-                                    <span class="text-danger" v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
+                                    <label for="role">Allowed Total Weight (KG)</label>
+                                    <input type="text" id="allowed_total_weight-edit" class="form-control"
+                                        v-model="vehicle_fetch.allowed_total_weight" @keypress="onlyNumber" maxlength="20">
+                                    <span class="text-danger"
+                                        v-if="errors.allowed_total_weight">{{ errors.allowed_total_weight[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Based Trucks*</label> 
-                                    <select class="form-control" v-model="vehicle_fetch.based_truck_id" id="based_truck-edit">
-                                        <option v-for="(based_truck,b) in based_trucks" v-bind:key="b" :value="based_truck.id"> {{ based_truck.description }}</option>
+                                    <label for="role">Based Trucks*</label>
+                                    <select class="form-control" v-model="vehicle_fetch.based_truck_id"
+                                        id="based_truck-edit">
+                                        <option v-for="(based_truck, b) in based_trucks" v-bind:key="b"
+                                            :value="based_truck.id"> {{ based_truck.description }}</option>
                                     </select>
-                                    <span class="text-danger" v-if="errors.based_truck_id">{{ errors.based_truck_id[0] }}</span>
+                                    <span class="text-danger"
+                                        v-if="errors.based_truck_id">{{ errors.based_truck_id[0] }}</span>
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Contract</label> 
-                                    <select class="form-control" v-model="vehicle_fetch.contract_id"  id="contract-edit">
+                                    <label for="role">Contract</label>
+                                    <select class="form-control" v-model="vehicle_fetch.contract_id" id="contract-edit">
                                         <option></option>
-                                        <option v-for="(contract,c) in contracts" v-bind:key="c" :value="contract.id"> {{ contract.description }}</option>
+                                        <option v-for="(contract, c) in contracts" v-bind:key="c" :value="contract.id">
+                                            {{ contract.description }}
+                                        </option>
                                     </select>
                                     <span class="text-danger" v-if="errors.contract_id">{{ errors.contract_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Remarks</label> 
-                                    <input type="text" id="remarks-edit" class="form-control" v-model="vehicle_fetch.remarks" maxlength="40">
+                                    <label for="role">Remarks</label>
+                                    <input type="text" id="remarks-edit" class="form-control"
+                                        v-model="vehicle_fetch.remarks" maxlength="40">
                                     <span class="text-danger" v-if="errors.good_id">{{ errors.good_id[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Document</label> 
-                                    <input type="file" multiple="multiple" id="attachments-edit" class="attachments-edit" placeholder="Attach file" @change="uploadFileChange"><br>
+                                    <label for="role">Document</label>
+                                    <input type="file" multiple="multiple" id="attachments-edit" class="attachments-edit"
+                                        placeholder="Attach file" @change="uploadFileChange"><br>
                                     <span class="text-danger" v-if="errors.attachments">{{ errors.attachments[0] }}</span>
                                 </div>
                             </div>
@@ -483,90 +496,100 @@
                         <div class="row">
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Validity Start Date*</label> 
-                                    <input type="date" id="validity_start_date-edit" class="form-control" v-model="vehicle_fetch.validity_start_date" disabled>
-                                    <span class="text-danger" v-if="errors.validity_start_date">{{ errors.validity_start_date[0] }}</span>
+                                    <label for="role">Validity Start Date*</label>
+                                    <input type="date" id="validity_start_date-edit" class="form-control"
+                                        v-model="vehicle_fetch.validity_start_date" disabled>
+                                    <span class="text-danger"
+                                        v-if="errors.validity_start_date">{{ errors.validity_start_date[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Validity End Date*</label> 
-                                    <input type="date" id="validity_end_date-edit" class="form-control" v-model="vehicle_fetch.validity_end_date">
-                                    <span class="text-danger" v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
+                                    <label for="role">Validity End Date*</label>
+                                    <input type="date" id="validity_end_date-edit" class="form-control"
+                                        v-model="vehicle_fetch.validity_end_date">
+                                    <span class="text-danger"
+                                        v-if="errors.validity_end_date">{{ errors.validity_end_date[0] }}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="edit_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="editVehicle(vehicle_fetch)">Save</button>
+                        <button id="edit_btn" type="button" class="btn btn-primary btn-round btn-fill"
+                            @click="editVehicle(vehicle_fetch)">Save</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Delete Vehicle Modal -->
-        <div class="modal fade" id="deleteVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal fade" id="deleteVehicleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true" data-backdrop="static">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCompanyLabel">Delete Vehicle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                   <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                Are you sure you want to delete this Vehicle?
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCompanyLabel">Delete Vehicle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    Are you sure you want to delete this Vehicle?
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
-                    <button class="btn btn-warning" @click="deleteVehicle">Delete</button>
-                </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
+                        <button class="btn btn-warning" @click="deleteVehicle">Delete</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- View Documents Modal -->
-        <div class="modal fade" id="viewDocumentsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="viewDocumentsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCompanyLabel">Documents</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <table class="table align-items-center table-flush">
-                        <thead class="thead-light">
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">File name</th>
-                                <th scope="col">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="(document, d) in this.vehicle_copied.documents" v-bind:key="d">
-                                <td>{{ d + 1 }}</td>
-                                <td>{{ document.file_name }}</td>
-                                <td><span style="text-decoration: none; color: #5e72e4; background-color: transparent; cursor: pointer;" @click="downloadAttachment(document.id)">Download Document</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCompanyLabel">Documents</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table align-items-center table-flush">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">File name</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="(document, d) in this.vehicle_copied.documents" v-bind:key="d">
+                                    <td>{{ d + 1 }}</td>
+                                    <td>{{ document.file_name }}</td>
+                                    <td><span
+                                            style="text-decoration: none; color: #5e72e4; background-color: transparent; cursor: pointer;"
+                                            @click="downloadAttachment(document.id)">Download Document</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Assign GPS Modal -->
-        <div class="modal fade" id="assignGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal fade" id="assignGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
             <!-- <span class="closed" data-dismiss="modal">&times;</span> -->
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
@@ -577,37 +600,43 @@
                         </button>
                     </div>
                     <div class="modal-body">
-                         <div class="alert alert-success" v-if="assigned_gps">
+                        <div class="alert alert-success" v-if="assigned_gps">
                             <strong>Success!</strong> GPS device succesfully assigned
                         </div>
                         <div class="row">
-                             <div class="col-md-12">
+                            <div class="col-md-12">
                                 <div class="form-group">
-                                    <label for="role">PLATE NUMBER</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="gps_device.plate_number" disabled>
+                                    <label for="role">PLATE NUMBER</label>
+                                    <input type="text" id="plate_number" class="form-control"
+                                        v-model="gps_device.plate_number" disabled>
                                 </div>
                             </div>
 
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="role">IMEI NUMBER</label> 
-                                    <input type="text" id="imei" class="form-control" v-model="gps_device.imei" @keypress="gpsNumber" maxlength="15" placeholder="XXXXXXXXXXXXXXX" required>
+                                    <label for="role">IMEI NUMBER</label>
+                                    <input type="text" id="imei" class="form-control" v-model="gps_device.imei"
+                                        @keypress="gpsNumber" maxlength="15" placeholder="XXXXXXXXXXXXXXX" required>
                                     <span class="text-danger" v-if="errors.imei">{{ errors.imei[0] }}</span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="role">SIM NUMBER</label> 
-                                    <input type="text" id="sim_number" class="form-control" v-model="gps_device.sim_number" @keypress="gpsNumber" maxlength="11" placeholder="09XXXXXXXXX" required>
+                                    <label for="role">SIM NUMBER</label>
+                                    <input type="text" id="sim_number" class="form-control" v-model="gps_device.sim_number"
+                                        @keypress="gpsNumber" maxlength="11" placeholder="09XXXXXXXXX" required>
                                     <span class="text-danger" v-if="errors.sim_number">{{ errors.sim_number[0] }}</span>
                                 </div>
                             </div>
 
-                             <div class="col-md-6">
+                            <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="role">Attachment(s)</label> 
-                                    <input type="file" multiple="multiple" id="gps_attachments" class="gps-attachments-edit" placeholder="Attach file" @change="uploadGPSFileChange" v-if="isUploadGPSAttachment"><br>
-                                    <span class="text-danger" v-if="errors.gps_attachments">The attachment field is required</span>
+                                    <label for="role">Attachment(s)</label>
+                                    <input type="file" multiple="multiple" id="gps_attachments" class="gps-attachments-edit"
+                                        placeholder="Attach file" @change="uploadGPSFileChange"
+                                        v-if="isUploadGPSAttachment"><br>
+                                    <span class="text-danger" v-if="errors.gps_attachments">The attachment field is
+                                        required</span>
                                 </div>
                             </div>
 
@@ -624,9 +653,14 @@
                                         <td>{{ d + 1 }}</td>
                                         <td>{{ attachment.file_name }}</td>
                                         <td>
-                                            <span style="text-decoration: none; color: #5e72e4; background-color: transparent; cursor: pointer;"  title="Download" @click="downloadGPSAttachment(attachment.id)">Download</span>
+                                            <span
+                                                style="text-decoration: none; color: #5e72e4; background-color: transparent; cursor: pointer;"
+                                                title="Download"
+                                                @click="downloadGPSAttachment(attachment.id)">Download</span>
                                             <span> | </span>
-                                            <span style="text-decoration: none; color: red; background-color: transparent; cursor: pointer;" title="Delete" @click="deleteGPSAttachment(attachment.id)">Delete</span>
+                                            <span
+                                                style="text-decoration: none; color: red; background-color: transparent; cursor: pointer;"
+                                                title="Delete" @click="deleteGPSAttachment(attachment.id)">Delete</span>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -634,136 +668,144 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button id="assign_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="assignGPS(gps_device)">Assign</button>
-                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#reassignGPSModal" class="btn btn-warning btn-round btn-fill" @click="viewreassignGPS(gps_device)" v-if="gps_device_id">Re-Assign</button>
-                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#deleteGPSModal" class="btn btn-danger btn-round btn-fill" v-if="gps_device_id">Remove</button>
+                        <button id="assign_btn" type="button" class="btn btn-primary btn-round btn-fill"
+                            @click="assignGPS(gps_device)">Assign</button>
+                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#reassignGPSModal"
+                            class="btn btn-warning btn-round btn-fill" @click="viewreassignGPS(gps_device)"
+                            v-if="gps_device_id">Re-Assign</button>
+                        <button id="assign_btn" type="button" data-toggle="modal" data-target="#deleteGPSModal"
+                            class="btn btn-danger btn-round btn-fill" v-if="gps_device_id">Remove</button>
                     </div>
                 </div>
-            </div>  
+            </div>
         </div>
 
         <!-- Reassign GPS Modal   -->
 
-        <div class="modal fade" id="reassignGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+        <div class="modal fade" id="reassignGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true" data-backdrop="static">
             <!-- <span class="closed" data-dismiss="modal">&times;</span> -->
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCompanyLabel">RE-ASSIGN GPS DEVICE</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                   <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                
-                                <label for="role">Select Vehicle to Re-assign GPS Device</label> 
-                                <multiselect
-                                    v-model="reassign_vehicle"
-                                    :options="reassign_vehicles"
-                                    :multiple="false"
-                                    track-by="id"
-                                    :custom-label="customLabelReassignVehicle"
-                                    placeholder="Select Vehicle"
-                                    id="selected_reassign_vehicle"
-                                >
-                                </multiselect>
-                                <span class="text-danger" v-if="errors.reassign_vehicles">{{ errors.reassign_vehicles[0] }}</span>
-                               
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCompanyLabel">RE-ASSIGN GPS DEVICE</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+
+                                    <label for="role">Select Vehicle to Re-assign GPS Device</label>
+                                    <multiselect v-model="reassign_vehicle" :options="reassign_vehicles" :multiple="false"
+                                        track-by="id" :custom-label="customLabelReassignVehicle"
+                                        placeholder="Select Vehicle" id="selected_reassign_vehicle">
+                                    </multiselect>
+                                    <span class="text-danger"
+                                        v-if="errors.reassign_vehicles">{{ errors.reassign_vehicles[0] }}</span>
+
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-success" @click="reassignGPS">Re-Assign</button>
-                    <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
-                  
-                </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-success" @click="reassignGPS">Re-Assign</button>
+                        <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
+
+                    </div>
                 </div>
             </div>
         </div>
 
-         <!-- Delete GPS Device Modal -->
-        <div class="modal fade" id="deleteGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+        <!-- Delete GPS Device Modal -->
+        <div class="modal fade" id="deleteGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true" data-backdrop="static">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCompanyLabel">Remove GPS Device</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                   <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                Are you sure you want to remove this GPS Device?
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCompanyLabel">Remove GPS Device</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    Are you sure you want to remove this GPS Device?
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
-                    <button class="btn btn-warning" @click="deleteGPSDevice">Remove</button>
-                </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
+                        <button class="btn btn-warning" @click="deleteGPSDevice">Remove</button>
+                    </div>
                 </div>
             </div>
         </div>
 
 
-         <!-- Check Vehicle GPS Modal -->
-        <div class="modal fade" id="checkGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+        <!-- Check Vehicle GPS Modal -->
+        <div class="modal fade" id="checkGPSModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true" data-backdrop="static">
             <span class="closed" data-dismiss="modal">&times;</span>
             <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
                 <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addCompanyLabel">Check GPS Vehicle</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                   <div class="row">
-                        <div class="col-md-12">
-                            <button class="btn btn-primary" :disabled="vehicle_check_gps_loading" @click="getVehicleGPSPortal">{{vehicle_check_gps.plate_number + " - " + vehicle_check_gps_loading_label}}</button>
-                        </div>
-                        <div class="col-md-12 mt-3">
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="role">ID</label> 
-                                    <input type="text" id="id" class="form-control" v-model="vehicle_check_gps_data.id" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label for="role">PLATE NUMBER</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_check_gps_data.name" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="role">IMEI</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_check_gps_data.imei" readonly>
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group">
-                                    <label for="role">SIM NUMBER</label> 
-                                    <input type="text" id="plate_number" class="form-control" v-model="vehicle_check_gps_data.sim_number" readonly>
-                                </div>
-                            </div>
-                       
-                        </div>
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCompanyLabel">Check GPS Vehicle</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <div v-if="vehicle_check_gps_data.id">
-                        <button class="btn btn-success" :disabled="vehicle_check_gps_loading" @click="vehicleCheckAssignGPS">Assign GPS</button>
-                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button class="btn btn-primary" :disabled="vehicle_check_gps_loading"
+                                    @click="getVehicleGPSPortal">{{ vehicle_check_gps.plate_number + " - " + vehicle_check_gps_loading_label }}</button>
+                            </div>
+                            <div class="col-md-12 mt-3">
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="role">ID</label>
+                                        <input type="text" id="id" class="form-control" v-model="vehicle_check_gps_data.id"
+                                            readonly>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="role">PLATE NUMBER</label>
+                                        <input type="text" id="plate_number" class="form-control"
+                                            v-model="vehicle_check_gps_data.name" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="role">IMEI</label>
+                                        <input type="text" id="plate_number" class="form-control"
+                                            v-model="vehicle_check_gps_data.imei" readonly>
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="form-group">
+                                        <label for="role">SIM NUMBER</label>
+                                        <input type="text" id="plate_number" class="form-control"
+                                            v-model="vehicle_check_gps_data.sim_number" readonly>
+                                    </div>
+                                </div>
 
-                    <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
-                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <div v-if="vehicle_check_gps_data.id">
+                            <button class="btn btn-success" :disabled="vehicle_check_gps_loading"
+                                @click="vehicleCheckAssignGPS">Assign GPS</button>
+                        </div>
+
+                        <button class="btn btn-secondary" data-dismiss='modal'>Close</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -781,14 +823,14 @@ import VueContentPlaceholders from 'vue-content-placeholders'
 import XLSX from 'xlsx'
 
 export default {
-    props:['userLevel','role'],
+    props: ['userLevel', 'role'],
     components: {
         vSelect,
         Multiselect,
         loader,
         VueContentPlaceholders
     },
-    data(){
+    data() {
         return {
             vehicles: [],
             vehicle: [],
@@ -801,7 +843,7 @@ export default {
             based_trucks: [],
             contracts: [],
             documents: [],
-            capacities:[],
+            capacities: [],
             attachments: [],
             truckers: [],
             plants: [],
@@ -815,41 +857,41 @@ export default {
             filterBasedTruck: '',
             filterGps: '',
             filterStatus: '',
-            gpsStatuses: ['Yes','No'],
-            statuses: ['Active','Expired'],
+            gpsStatuses: ['Yes', 'No'],
+            statuses: ['Active', 'Expired'],
             show_plant: false,
             show_plant_add: false,
-            reassign_vehicle : '',
-            reassign_vehicles : [],
+            reassign_vehicle: '',
+            reassign_vehicles: [],
             vehicle_added: false,
             vehicle_updated: false,
             loading: false,
             table_loading: false,
             old_plants: [],
-            readyListbutton:false,
+            readyListbutton: false,
             formGPSData: new FormData(),
-            assigned_gps:false,
+            assigned_gps: false,
             gps_device: [],
             gps_device_id: '',
             gps_device_attachments: [],
             gps_device_files: [],
-            isUploadGPSAttachment : true,
+            isUploadGPSAttachment: true,
             btn_assign: false,
             btn_edit: false,
             btn_view: false,
-            vehicle_check_gps_loading : false,
-            vehicle_check_gps_loading_label : "Check",
-            vehicle_check_gps : [],
-            vehicle_check_gps_data : {
-                id:'',
-                name:'',
-                imei:'',
-                sim_number:'',
+            vehicle_check_gps_loading: false,
+            vehicle_check_gps_loading_label: "Check",
+            vehicle_check_gps: [],
+            vehicle_check_gps_data: {
+                id: '',
+                name: '',
+                imei: '',
+                sim_number: '',
             }
 
         }
     },
-    created(){
+    created() {
         this.fetchVehicles();
         this.fetchCategories();
         this.fetchCapacities();
@@ -862,57 +904,57 @@ export default {
         this.fetchPlants();
         this.buttonAuth();
     },
-    methods:{
-        vehicleCheckAssignGPS(){
+    methods: {
+        vehicleCheckAssignGPS() {
             let v = this;
-            axios.post('/vehicle-check-assign-gps',{
+            axios.post('/vehicle-check-assign-gps', {
                 vehicle_id: v.vehicle_check_gps.id,
                 device_id: v.vehicle_check_gps_data.id,
                 imei: v.vehicle_check_gps_data.imei,
                 sim_number: v.vehicle_check_gps_data.sim_number
             })
-            .then(response => {
-                if(response.data == 'saved'){
-                    alert('Successfully assigned gps.');
-                    $('#checkGPSModal').modal('hide');
-                    this.fetchVehicles();
-                }else if(response.data == 'exist'){
-                    alert('Warning: GPS exist and cannot assigned.');
-                }else{
+                .then(response => {
+                    if (response.data == 'saved') {
+                        alert('Successfully assigned gps.');
+                        $('#checkGPSModal').modal('hide');
+                        this.fetchVehicles();
+                    } else if (response.data == 'exist') {
+                        alert('Warning: GPS exist and cannot assigned.');
+                    } else {
+                        alert('Error: GPS cannot assigned.');
+                    }
+                })
+                .catch(error => {
+                    if (error.response) {
+                        this.errors = error.response.data.errors;
+                    }
                     alert('Error: GPS cannot assigned.');
-                }
-            })
-            .catch(error => {
-                 if(error.response){
-                    this.errors = error.response.data.errors;
-                }
-                alert('Error: GPS cannot assigned.');
-            });
+                });
         },
-        getVehicleGPSPortal(){
+        getVehicleGPSPortal() {
             let v = this;
             v.vehicle_check_gps_loading = true;
             v.vehicle_check_gps_loading_label = "Checking... Please Wait...";
-            axios.get(`/get-vehicle-gps?plate_number=`+ v.vehicle_check_gps.plate_number)
-            .then(response => {
-                v.vehicle_check_gps_data.id = response.data.id;
-                v.vehicle_check_gps_data.name = response.data.name;
-                v.vehicle_check_gps_data.imei = response.data.device_data.imei;
-                v.vehicle_check_gps_data.sim_number = response.data.device_data.sim_number;  
-                v.vehicle_check_gps_loading_label = "Check";
-                v.vehicle_check_gps_loading = false;  
-            })
-            .catch(error => {
-                if(error.response){
-                    this.errors = error.response.data.errors;
-                     alert('No GPS Found!');
-                }
-                v.vehicle_check_gps_loading_label = "Check";
-                v.vehicle_check_gps_loading = false;  
-            })
+            axios.get(`/get-vehicle-gps?plate_number=` + v.vehicle_check_gps.plate_number)
+                .then(response => {
+                    v.vehicle_check_gps_data.id = response.data.id;
+                    v.vehicle_check_gps_data.name = response.data.name;
+                    v.vehicle_check_gps_data.imei = response.data.device_data.imei;
+                    v.vehicle_check_gps_data.sim_number = response.data.device_data.sim_number;
+                    v.vehicle_check_gps_loading_label = "Check";
+                    v.vehicle_check_gps_loading = false;
+                })
+                .catch(error => {
+                    if (error.response) {
+                        this.errors = error.response.data.errors;
+                        alert('No GPS Found!');
+                    }
+                    v.vehicle_check_gps_loading_label = "Check";
+                    v.vehicle_check_gps_loading = false;
+                })
 
         },
-        checkAssignGPS(vehicle){
+        checkAssignGPS(vehicle) {
             let v = this;
             v.vehicle_check_gps = vehicle;
             v.vehicle_check_gps_data.id = "";
@@ -920,18 +962,18 @@ export default {
             v.vehicle_check_gps_data.imei = "";
             v.vehicle_check_gps_data.sim_number = "";
         },
-        exportVehicle(){
+        exportVehicle() {
             let v = this;
             var vehicleData = [];
             Object.entries(v.vehicles).forEach(([key, data]) => {
                 var has_gps = "";
                 var imei = "";
                 var sim_number = "";
-                if(data.gpsdevice){
+                if (data.gpsdevice) {
                     has_gps = "Yes";
                     imei = data.gpsdevice.imei ? data.gpsdevice.imei : "";
                     sim_number = data.gpsdevice.sim_number ? data.gpsdevice.sim_number : "";
-                }else{
+                } else {
                     has_gps = "No";
                     imei = "";
                     sim_number = "";
@@ -948,19 +990,19 @@ export default {
                     "CAPACITY": data.capacity.description,
                     "GOODS": data.good ? data.good.description : '',
                     "ALLOWED TOTAL WEIGHT (KG)": data.allowed_total_weight ? data.allowed_total_weight : '',
-                    "BASED TRUCKS":data.based_truck.description,
+                    "BASED TRUCKS": data.based_truck.description,
                     "REMARKS": data.remarks,
                     "VALIDITY START DATE": data.validity_start_date,
                     "VALIDITY END DATE": data.validity_end_date,
                 });
             });
 
-            var exportedData  = XLSX.utils.json_to_sheet(vehicleData)
+            var exportedData = XLSX.utils.json_to_sheet(vehicleData)
             var wb = XLSX.utils.book_new()
-            XLSX.utils.book_append_sheet(wb, exportedData,'Vehicle List') 
+            XLSX.utils.book_append_sheet(wb, exportedData, 'Vehicle List')
             XLSX.writeFile(wb, 'Vechicle List.xlsx')
         },
-        disabledEdit(){
+        disabledEdit() {
             document.getElementById('capacity-edit').disabled = true;
             document.getElementById('good-edit').disabled = true;
             document.getElementById('based_truck-edit').disabled = true;
@@ -969,180 +1011,180 @@ export default {
             document.getElementById('validity_end_date-edit').disabled = true;
             document.getElementById('allowed_total_weight-edit').readOnly = true;
             document.getElementById('remarks-edit').readOnly = true;
-            $('.attachments-edit').attr('disabled','disabled');
+            $('.attachments-edit').attr('disabled', 'disabled');
         },
-        getVehicle(id){
+        getVehicle(id) {
             axios.get(`/vehicle-specific/${id}`)
-            .then(response => {
-                this.vehicle_fetch = response.data;
-                this.old_plants = response.data.plants;
-                $('#editVehicleModal').modal('show');
-                this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
-                this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
-                if(this.userLevel < 5){
-                    this.disabledEdit();
-                }
-            })
-            .catch(error => {
-                this.errors = error.response.data.errors
-            })
+                .then(response => {
+                    this.vehicle_fetch = response.data;
+                    this.old_plants = response.data.plants;
+                    $('#editVehicleModal').modal('show');
+                    this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+                    this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+                    if (this.userLevel < 5) {
+                        this.disabledEdit();
+                    }
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors
+                })
         },
-        downloadAttachment(id){
+        downloadAttachment(id) {
             var base_url = window.location.origin;
-            window.location = base_url+`/download-attachment/${id}`;
+            window.location = base_url + `/download-attachment/${id}`;
         },
-        downloadGPSAttachment(id){
+        downloadGPSAttachment(id) {
             var base_url = window.location.origin;
-            window.location = base_url+`/download-gps-attachment/${id}`;
+            window.location = base_url + `/download-gps-attachment/${id}`;
         },
-        onlyNumber ($event) {
+        onlyNumber($event) {
             let keyCode = ($event.keyCode ? $event.keyCode : $event.which);
             if ((keyCode < 48 || keyCode > 57) && keyCode !== 46) { // 46 is dot
                 $event.preventDefault();
             }
         },
-        gpsNumber ($event) {
+        gpsNumber($event) {
             let keyCode = ($event.keyCode ? $event.keyCode : $event.which);
             if ((keyCode < 48 || keyCode > 57)) { // 46 is dot
                 $event.preventDefault();
             }
         },
-        plantChange(){
+        plantChange() {
             this.vehicle.indicator_id == 2 ? this.show_plant_add = false : this.show_plant_add = true;
             this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
             this.vehicle_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
-        customLabelfilterBaseTruck (filterBasedTruck) {
-            return `${filterBasedTruck.description }`
+        customLabelfilterBaseTruck(filterBasedTruck) {
+            return `${filterBasedTruck.description}`
         },
-        customLabelPlant (plant) {
-            return `${plant.name }`
+        customLabelPlant(plant) {
+            return `${plant.name}`
         },
-        customLabelReassignVehicle (reassign) {
-            return `${reassign.plate_number }`
+        customLabelReassignVehicle(reassign) {
+            return `${reassign.plate_number}`
         },
-        getVehicleId(id){
+        getVehicleId(id) {
             this.errors = [];
             this.vehicle_id = id;
         },
-        copyObject(vehicle){
+        copyObject(vehicle) {
             this.errors = [];
             this.vehicle_updated = false;
             this.vehicle_copied = Object.assign({}, vehicle)
             this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
-        fetchVehicles(){
+        fetchVehicles() {
             this.table_loading = true;
             axios.get('/vehicle')
-            .then(response => { 
-                this.vehicles = response.data;
-                this.table_loading = false;
-                this.readyListbutton = true;
-            })
-            .catch(error => { 
-                this.errors = error.response.data.error;
-            })
+                .then(response => {
+                    this.vehicles = response.data;
+                    this.table_loading = false;
+                    this.readyListbutton = true;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.error;
+                })
         },
-        fetchCategories(){
+        fetchCategories() {
             axios.get('/categories')
-            .then(response => { 
-                this.categories = response.data;
-            })
-            .catch(error => { 
-                this.errors = error.response.data.error;
-            })
+                .then(response => {
+                    this.categories = response.data;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.error;
+                })
         },
-        fetchCapacities(){
-             axios.get('/capacities')
-            .then(response => { 
-                this.capacities = response.data;
-            })
-            .catch(error => { 
-                this.errors = error.response.data.error;
-            })
+        fetchCapacities() {
+            axios.get('/capacities')
+                .then(response => {
+                    this.capacities = response.data;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.error;
+                })
         },
-        fetchIndicators(){
+        fetchIndicators() {
             axios.get('/indicators')
-            .then(response => { 
-                this.indicators = response.data;
-            })
-            .catch(error => { 
-                this.errors = error.response.data.error;
-            })
+                .then(response => {
+                    this.indicators = response.data;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.error;
+                })
         },
-        fetchGoods(){
+        fetchGoods() {
             axios.get('/goods')
-            .then(response => { 
-                this.goods = response.data;
-            })
-            .catch(error => { 
-                this.errors = error.response.data.error;
-            })
+                .then(response => {
+                    this.goods = response.data;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.error;
+                })
         },
-        fetchBasedTrucks(){
+        fetchBasedTrucks() {
             axios.get('/based-trucks')
-            .then(response => { 
-                this.based_trucks = response.data;
-            })
-            .catch(error => { 
-                this.errors = error.response.data.error;
-            })
+                .then(response => {
+                    this.based_trucks = response.data;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.error;
+                })
         },
-        fetchContracts(){
+        fetchContracts() {
             axios.get('/contracts')
-            .then(response => { 
-                this.contracts = response.data;
-            })
-            .catch(error => { 
-                this.errors = error.response.data.error;
-            })
+                .then(response => {
+                    this.contracts = response.data;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.error;
+                })
         },
-        fetchDocuments(){
+        fetchDocuments() {
             axios.get('/documents')
-            .then(response => { 
-                this.documents = response.data;
-            })
-            .catch(error => { 
-                this.errors = error.response.data.error;
-            })
+                .then(response => {
+                    this.documents = response.data;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.error;
+                })
         },
-        fetchTruckers(){
+        fetchTruckers() {
             axios.get('/truckers')
-            .then(response => { 
-                this.truckers = response.data
-            })
-            .catch(error => {
-                this.errors = error.response.data.errors;
-            })
+                .then(response => {
+                    this.truckers = response.data
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                })
         },
-        fetchPlants(){
+        fetchPlants() {
             axios.get('/plants')
-            .then(response => { 
-                this.plants = response.data
-            })
-            .catch(error => {
-                this.errors = error.response.data.errors;
-            })
+                .then(response => {
+                    this.plants = response.data
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                })
         },
-        prepareFields(){
-            if(this.attachments.length > 0){
-                for(var i = 0; i < this.attachments.length; i++){
+        prepareFields() {
+            if (this.attachments.length > 0) {
+                for (var i = 0; i < this.attachments.length; i++) {
                     let attachment = this.attachments[i];
                     this.formData.append('attachments[]', attachment);
                 }
-            } 
+            }
         },
-        uploadFileChange(e){
+        uploadFileChange(e) {
             var files = e.target.files || e.dataTransfer.files;
 
-            if(!files.length)
+            if (!files.length)
                 return;
-            
-            for (var i = files.length - 1; i >= 0; i--){
+
+            for (var i = files.length - 1; i >= 0; i--) {
                 this.attachments.push(files[i]);
-                this.fileSize = this.fileSize+files[i].size / 1024 / 1024;
+                this.fileSize = this.fileSize + files[i].size / 1024 / 1024;
             }
-            if(this.fileSize > 5){
+            if (this.fileSize > 5) {
                 alert('File size exceeds 5 MB');
                 document.getElementById('attachments').value = "";
                 this.attachments = [];
@@ -1150,7 +1192,7 @@ export default {
             }
 
         },
-        resetData(){
+        resetData() {
             this.formData = new FormData();
             this.attachments = [];
             this.errors = [];
@@ -1158,9 +1200,9 @@ export default {
             this.show_plant = false;
             document.getElementById('attachments').value = '';
             this.vehicle_added = false;
-            
+
         },
-        resetForm(){
+        resetForm() {
             this.formData = new FormData();
             this.attachments = [];
             this.errors = [];
@@ -1168,15 +1210,15 @@ export default {
             this.show_plant = false;
             document.getElementById('attachments').value = "";
         },
-        addVehicle(vehicle){
+        addVehicle(vehicle) {
             this.vehicle_added = false;
             this.loading = true;
             document.getElementById('check_btn').disabled = true;
             var final_plant = [];
             vehicle.indicator_id == 2 ? final_plant = this.plants : final_plant = vehicle.plant;
             var plantIds = [];
-            if(final_plant){
-               final_plant.forEach((plant) => {
+            if (final_plant) {
+                final_plant.forEach((plant) => {
                     plantIds.push(plant.id);
                 });
             }
@@ -1191,36 +1233,36 @@ export default {
             this.formData.append('good_id', vehicle.good_id ? vehicle.good_id : '');
             this.formData.append('allowed_total_weight', vehicle.allowed_total_weight ? vehicle.allowed_total_weight : '');
             this.formData.append('remarks', vehicle.remarks ? vehicle.remarks : '');
-            this.formData.append('based_truck_id', vehicle.based_truck_id ? vehicle.based_truck_id : '');         
-            this.formData.append('contract_id', vehicle.contract_id ? vehicle.contract_id : '');   
+            this.formData.append('based_truck_id', vehicle.based_truck_id ? vehicle.based_truck_id : '');
+            this.formData.append('contract_id', vehicle.contract_id ? vehicle.contract_id : '');
             this.formData.append('validity_start_date', vehicle.validity_start_date ? vehicle.validity_start_date : '');
             this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
             this.formData.append('plants', plantIds ? plantIds : '');
 
             axios.post('/vehicle', this.formData)
-            .then(response =>{
-                this.vehicle_added = true;
-                this.vehicles.unshift(response.data);
-                this.resetForm();
-                document.getElementById('check_btn').disabled = false;
-                this.loading = false;
-            })
-            .catch(error => {   
-                this.errors = error.response.data.errors;
-                this.attachments = [];
-                document.getElementById('check_btn').disabled = false;
-                this.loading = false;
-            })
+                .then(response => {
+                    this.vehicle_added = true;
+                    this.vehicles.unshift(response.data);
+                    this.resetForm();
+                    document.getElementById('check_btn').disabled = false;
+                    this.loading = false;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                    this.attachments = [];
+                    document.getElementById('check_btn').disabled = false;
+                    this.loading = false;
+                })
         },
-        editVehicle(vehicle){
+        editVehicle(vehicle) {
             this.vehicle_updated = false;
             this.loading = true;
             document.getElementById('edit_btn').disabled = true;
             var final_plant = [];
             vehicle.indicator_id == 2 ? final_plant = this.plants : final_plant = vehicle.plants;
             var plantIds = [];
-            if(final_plant){
-               final_plant.forEach((plant) => {
+            if (final_plant) {
+                final_plant.forEach((plant) => {
                     plantIds.push(plant.id);
                 });
             }
@@ -1228,7 +1270,7 @@ export default {
             this.old_plants.forEach((fetch) => {
                 oldPlants.push(fetch.id);
             });
-           
+
             var index = this.vehicles.findIndex(item => item.id == vehicle.id);
             this.errors = [];
             this.prepareFields();
@@ -1241,8 +1283,8 @@ export default {
             this.formData.append('good_id', vehicle.good_id ? vehicle.good_id : '');
             this.formData.append('allowed_total_weight', vehicle.allowed_total_weight ? vehicle.allowed_total_weight : '');
             this.formData.append('remarks', vehicle.remarks ? vehicle.remarks : '');
-            this.formData.append('based_truck_id', vehicle.based_truck_id ? vehicle.based_truck_id : '');         
-            this.formData.append('contract_id', vehicle.contract_id ? vehicle.contract_id : '');   
+            this.formData.append('based_truck_id', vehicle.based_truck_id ? vehicle.based_truck_id : '');
+            this.formData.append('contract_id', vehicle.contract_id ? vehicle.contract_id : '');
             this.formData.append('validity_start_date', vehicle.validity_start_date ? vehicle.validity_start_date : '');
             this.formData.append('validity_end_date', vehicle.validity_end_date ? vehicle.validity_end_date : '');
             this.formData.append('plants', plantIds ? plantIds : '');
@@ -1250,102 +1292,102 @@ export default {
             this.formData.append('_method', 'PATCH');
 
             axios.post(`/vehicle/${vehicle.id}`, this.formData)
-            .then(response => {
-                this.vehicle_updated = true;
-                this.vehicles.splice(index,1,response.data);
-                document.getElementById('edit_btn').disabled = false;
-                this.loading = false;
+                .then(response => {
+                    this.vehicle_updated = true;
+                    this.vehicles.splice(index, 1, response.data);
+                    document.getElementById('edit_btn').disabled = false;
+                    this.loading = false;
 
-                this.attachments = [];
-                document.getElementById('attachments-edit').value = '';
-            })
-            .catch(error => {
-                this.vehicle_updated = false;
-                this.errors = error.response.data.errors;
-                this.attachments = [];
-                document.getElementById('edit_btn').disabled = false;
-                this.loading = false;
-            })
+                    this.attachments = [];
+                    document.getElementById('attachments-edit').value = '';
+                })
+                .catch(error => {
+                    this.vehicle_updated = false;
+                    this.errors = error.response.data.errors;
+                    this.attachments = [];
+                    document.getElementById('edit_btn').disabled = false;
+                    this.loading = false;
+                })
         },
-        deleteVehicle(){
+        deleteVehicle() {
             var index = this.vehicles.findIndex(item => item.id == this.vehicle_id);
             axios.delete(`/vehicle/${this.vehicle_id}`)
-            .then(response => {
-                $('#deleteVehicleModal').modal('hide');
-                alert('Vehicle successfully deleted');
-                this.vehicles.splice(index,1);
-            })
-            .catch(error => {
-                this.errors = error.response.data.errors;
-            })
+                .then(response => {
+                    $('#deleteVehicleModal').modal('hide');
+                    alert('Vehicle successfully deleted');
+                    this.vehicles.splice(index, 1);
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                })
         },
-        fetchReassignVehicle(){
+        fetchReassignVehicle() {
             let v = this;
             v.reassign_vehicles = [];
             this.vehicles.forEach(e => {
-                if(e.gpsdevice == null){
+                if (e.gpsdevice == null) {
                     v.reassign_vehicles.push(e);
                 }
             });
         },
-        viewAssignGPS(vehicle,gps_device){
+        viewAssignGPS(vehicle, gps_device) {
             this.formGPSData = new FormData();
             this.loading = false;
             this.assigned_gps = false;
             this.resetAssignGPS();
             this.vehicle_copied = Object.assign({}, vehicle);
             this.gpsDeviceAttachmentButton();
-            if(gps_device){
+            if (gps_device) {
                 this.gps_device_id = gps_device.id;
                 this.gps_device.imei = gps_device.imei;
                 this.gps_device.sim_number = gps_device.sim_number;
-            }else{
+            } else {
                 this.gps_device_id = null;
                 this.gps_device.imei = null;
                 this.gps_device.sim_number = null;
                 this.gps_device_attachments = [];
             }
 
-            this.gps_device.plate_number = this.vehicle_copied.plate_number; 
+            this.gps_device.plate_number = this.vehicle_copied.plate_number;
         },
-        buttonAuth(){
-            if(this.role == "GPS Custodian"){
+        buttonAuth() {
+            if (this.role == "GPS Custodian") {
                 this.btn_assign = true;
                 this.btn_edit = false;
                 this.btn_view = false;
-            }else{
+            } else {
                 this.btn_assign = false;
                 this.btn_edit = true;
                 this.btn_view = true;
 
             }
         },
-        gpsDeviceAttachmentButton(){
-            if(this.vehicle_copied.gpsdeviceattachments.length < 5){
+        gpsDeviceAttachmentButton() {
+            if (this.vehicle_copied.gpsdeviceattachments.length < 5) {
                 this.isUploadGPSAttachment = true;
-            }else{
+            } else {
                 this.isUploadGPSAttachment = false;
             }
         },
-        prepareGPSAttachmentFields(){
-            if(this.gps_device_attachments.length > 0){
-                for(var i = 0; i < this.gps_device_attachments.length; i++){
+        prepareGPSAttachmentFields() {
+            if (this.gps_device_attachments.length > 0) {
+                for (var i = 0; i < this.gps_device_attachments.length; i++) {
                     let gps_device_attachments = this.gps_device_attachments[i];
                     this.formGPSData.append('attachments[]', gps_device_attachments);
                 }
-            } 
+            }
         },
-        uploadGPSFileChange(e){
+        uploadGPSFileChange(e) {
             var files = e.target.files || e.dataTransfer.files;
 
-            if(!files.length)
+            if (!files.length)
                 return;
-            
-            for (var i = files.length - 1; i >= 0; i--){
+
+            for (var i = files.length - 1; i >= 0; i--) {
                 this.gps_device_attachments.push(files[i]);
-                this.fileSize = this.fileSize+files[i].size / 1024 / 1024;
+                this.fileSize = this.fileSize + files[i].size / 1024 / 1024;
             }
-            if(this.fileSize > 5){
+            if (this.fileSize > 5) {
                 alert('File size exceeds 5 MB');
                 document.getElementById('gps_attachments').value = "";
                 this.gps_device_attachments = [];
@@ -1353,58 +1395,58 @@ export default {
             }
 
         },
-        viewreassignGPS(){
-           this.reassign_vehicle = '';
-           this.fetchReassignVehicle();
+        viewreassignGPS() {
+            this.reassign_vehicle = '';
+            this.fetchReassignVehicle();
         },
-        reassignGPS(){
+        reassignGPS() {
             let v = this;
             this.loading = true;
             this.formGPSData = new FormData();
             this.errors = [];
 
-            if(this.gps_device_id){
-                
-                this.formGPSData.append('vehicle_id', this.vehicle_copied.id);    
+            if (this.gps_device_id) {
+
+                this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
                 this.formGPSData.append('reassign_vehicle_id', this.reassign_vehicle.id);
                 this.formGPSData.append('gps_device_id', this.gps_device_id);
                 this.formGPSData.append('plate_number', this.reassign_vehicle.plate_number);
                 this.formGPSData.append('_method', 'PATCH');
 
-                 axios.post(`/reassign_gps_device/${this.gps_device_id}`, this.formGPSData)
-                .then(response =>{
-                    var orginal_vehicle_index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
-                    var reassigned_vehicle_index = this.vehicles.findIndex(item => item.id == this.reassign_vehicle.id);
-                    response.data.forEach((data) => {
-                        if(v.vehicle_copied.id == data.id){
-                            v.vehicles.splice(orginal_vehicle_index,1,data);
-                        }
-                        if(this.reassign_vehicle.id == data.id){
-                            this.vehicles.splice(reassigned_vehicle_index,1,data);
-                        }
-                    });
-                    this.loading = false;
-                    $('#reassignGPSModal').modal('hide');
-                    $('#assignGPSModal').modal('hide');
-                    alert('GPS Device successfully reassigned');
-                    
-                    
-                })
-                .catch(error => {
-                    this.loading = false;
-                    this.errors = error.response.data.errors;
-                })
+                axios.post(`/reassign_gps_device/${this.gps_device_id}`, this.formGPSData)
+                    .then(response => {
+                        var orginal_vehicle_index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
+                        var reassigned_vehicle_index = this.vehicles.findIndex(item => item.id == this.reassign_vehicle.id);
+                        response.data.forEach((data) => {
+                            if (v.vehicle_copied.id == data.id) {
+                                v.vehicles.splice(orginal_vehicle_index, 1, data);
+                            }
+                            if (this.reassign_vehicle.id == data.id) {
+                                this.vehicles.splice(reassigned_vehicle_index, 1, data);
+                            }
+                        });
+                        this.loading = false;
+                        $('#reassignGPSModal').modal('hide');
+                        $('#assignGPSModal').modal('hide');
+                        alert('GPS Device successfully reassigned');
+
+
+                    })
+                    .catch(error => {
+                        this.loading = false;
+                        this.errors = error.response.data.errors;
+                    })
             }
         },
-        assignGPS(gps_device){
+        assignGPS(gps_device) {
             this.formGPSData = new FormData();
             var index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
             this.loading = true;
             this.assigned_gps = false;
             this.errors = [];
 
-          
-            if(this.gps_device_id){
+
+            if (this.gps_device_id) {
 
                 this.prepareGPSAttachmentFields();
                 this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
@@ -1413,22 +1455,22 @@ export default {
                 this.formGPSData.append('_method', 'PATCH');
 
                 axios.post(`/gps_device/${this.gps_device_id}`, this.formGPSData)
-                .then(response =>{
-                    document.getElementById('gps_attachments').value = "";
-                    this.gps_device_attachments = [];
-                    this.loading = false;
-                    this.assigned_gps = true;
-                    this.vehicles.splice(index,1,response.data);
-                    this.vehicle_copied = Object.assign({}, response.data);
-                    this.gpsDeviceAttachmentButton();
-                })
-                .catch(error => {
-                    this.loading = false;
-                    this.assigned_gps = false;
-                    this.errors = error.response.data.errors;
-                })
+                    .then(response => {
+                        document.getElementById('gps_attachments').value = "";
+                        this.gps_device_attachments = [];
+                        this.loading = false;
+                        this.assigned_gps = true;
+                        this.vehicles.splice(index, 1, response.data);
+                        this.vehicle_copied = Object.assign({}, response.data);
+                        this.gpsDeviceAttachmentButton();
+                    })
+                    .catch(error => {
+                        this.loading = false;
+                        this.assigned_gps = false;
+                        this.errors = error.response.data.errors;
+                    })
 
-            }else{
+            } else {
 
                 this.prepareGPSAttachmentFields();
                 this.formGPSData.append('vehicle_id', this.vehicle_copied.id);
@@ -1436,98 +1478,98 @@ export default {
                 this.formGPSData.append('sim_number', gps_device.sim_number);
                 this.formGPSData.append('_method', 'POST');
 
-                axios.post('/gps_device', this.formGPSData)    
-                .then(response =>{
-                    document.getElementById('gps_attachments').value = "";
-                    this.gps_device_attachments = [];
-                    this.loading = false;
-                    this.assigned_gps = true;
-                    this.gps_device_id = response.data.gps_device_id;
-                    this.vehicles.splice(index,1,response.data);
-                    this.vehicle_copied = Object.assign({}, response.data);
-                    this.gpsDeviceAttachmentButton();
-                })
-                .catch(error => {
-                    this.loading = false;
-                    this.assigned_gps = false;
-                    this.errors = error.response.data.errors;
-                })
+                axios.post('/gps_device', this.formGPSData)
+                    .then(response => {
+                        document.getElementById('gps_attachments').value = "";
+                        this.gps_device_attachments = [];
+                        this.loading = false;
+                        this.assigned_gps = true;
+                        this.gps_device_id = response.data.gps_device_id;
+                        this.vehicles.splice(index, 1, response.data);
+                        this.vehicle_copied = Object.assign({}, response.data);
+                        this.gpsDeviceAttachmentButton();
+                    })
+                    .catch(error => {
+                        this.loading = false;
+                        this.assigned_gps = false;
+                        this.errors = error.response.data.errors;
+                    })
             }
         },
-        deleteGPSDevice(){
+        deleteGPSDevice() {
             this.loading = true;
             var index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
             axios.delete(`/gps_device/${this.gps_device_id}`)
-            .then(response => {
-                $('#deleteGPSModal').modal('hide');
-                $('#assignGPSModal').modal('hide');
-                this.vehicles.splice(index,1,response.data);
-                this.loading = false;
-                 alert('GPS Device successfully removed');
-            })
-            .catch(error => {
-                this.errors = error.response.data.errors;
-            })
-        },
-        deleteGPSAttachment($id){
-            var index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
-            if(confirm("Do you really want to delete this GPS Device Attachment?")){
-                axios.delete(`/delete-gps-attachment/${$id}`)
                 .then(response => {
-                     this.vehicles.splice(index,1,response.data);
-                     this.vehicle_copied = Object.assign({}, response.data);
-                     this.gpsDeviceAttachmentButton();
-                     alert('GPS Device Attachment successfully deleted');
+                    $('#deleteGPSModal').modal('hide');
+                    $('#assignGPSModal').modal('hide');
+                    this.vehicles.splice(index, 1, response.data);
+                    this.loading = false;
+                    alert('GPS Device successfully removed');
                 })
                 .catch(error => {
                     this.errors = error.response.data.errors;
                 })
+        },
+        deleteGPSAttachment($id) {
+            var index = this.vehicles.findIndex(item => item.id == this.vehicle_copied.id);
+            if (confirm("Do you really want to delete this GPS Device Attachment?")) {
+                axios.delete(`/delete-gps-attachment/${$id}`)
+                    .then(response => {
+                        this.vehicles.splice(index, 1, response.data);
+                        this.vehicle_copied = Object.assign({}, response.data);
+                        this.gpsDeviceAttachmentButton();
+                        alert('GPS Device Attachment successfully deleted');
+                    })
+                    .catch(error => {
+                        this.errors = error.response.data.errors;
+                    })
             }
         },
-        resetAssignGPS(){
+        resetAssignGPS() {
             this.errors = [];
             this.gps_device = [];
             this.gps_device_attachments = [];
         },
-        fetchFilterVehicle(){
+        fetchFilterVehicle() {
             this.formFilterData = new FormData();
             this.vehicles = [];
             this.loading = true;
 
-            if(this.filterGps){
-               this.formFilterData.append('filter_gps', this.filterGps);
+            if (this.filterGps) {
+                this.formFilterData.append('filter_gps', this.filterGps);
             }
 
-            if(this.filterStatus){
-             
-                if(this.filterStatus == "Active"){
+            if (this.filterStatus) {
+
+                if (this.filterStatus == "Active") {
                     this.formFilterData.append('operator', '>');
                 }
-                if(this.filterStatus == "Expired"){
-                    this.formFilterData.append('operator', '<' );
+                if (this.filterStatus == "Expired") {
+                    this.formFilterData.append('operator', '<');
                 }
             }
 
-            if(this.filterBasedTruck){
+            if (this.filterBasedTruck) {
                 var filteredTrucks = [];
                 this.filterBasedTruck.forEach(element => {
                     filteredTrucks.push(element.id);
                 });
                 this.formFilterData.append('filter_based_trucks', filteredTrucks);
             }
-            
+
             this.formFilterData.append('_method', 'POST');
 
             axios.post('/filter-vehicle', this.formFilterData)
-            .then(response => {
-                this.vehicles =  response.data;
-                this.errors = [];
-                this.loading = false;
-            })
-            .catch(error => {
-                this.errors = error.response.data.errors;
-                this.loading = false;
-            })
+                .then(response => {
+                    this.vehicles = response.data;
+                    this.errors = [];
+                    this.loading = false;
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                    this.loading = false;
+                })
         },
         setPage(pageNumber) {
             this.currentPage = pageNumber;
@@ -1543,10 +1585,10 @@ export default {
 
         showNextLink() {
             return this.currentPage == (this.totalPages - 1) ? false : true;
-        }   
+        }
     },
-    computed:{
-        filteredVehicles(){
+    computed: {
+        filteredVehicles() {
             let self = this;
             return Object.values(self.vehicles).filter(vehicle => {
                 return vehicle.plate_number.toLowerCase().includes(this.keywords.toLowerCase())
@@ -1559,11 +1601,11 @@ export default {
             var index = this.currentPage * this.itemsPerPage;
             var queues_array = this.filteredVehicles.slice(index, index + this.itemsPerPage);
 
-            if(this.currentPage >= this.totalPages) {
+            if (this.currentPage >= this.totalPages) {
                 this.currentPage = this.totalPages - 1
             }
 
-            if(this.currentPage == -1) {
+            if (this.currentPage == -1) {
                 this.currentPage = 0;
             }
 
