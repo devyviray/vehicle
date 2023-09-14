@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Driver extends Model
 {
-    protected $dateFormat = 'Y-m-d H:i:s';
+    protected $dateFormat = 'Y-m-d H:i:s'; 
     protected $connection = "sqlsrv2";
     protected $table = "drivers";
 
@@ -16,5 +16,9 @@ class Driver extends Model
 
     public function hasTrucks(){
         return $this->hasOne(DriverTruck::class, 'driver_id','id');
+    }
+
+    public function driverversions(){
+        return $this->hasOne(Driverversions::class, 'driver_id','id');
     }
 }
