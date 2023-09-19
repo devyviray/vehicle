@@ -192,9 +192,8 @@ class DriverUpdate extends Command
                                 $previousData = $explode_driver[$i];
                             }
 
-                            if ($explode_driver[$i] == 'STA' || $explode_driver[$i] == 'DE' || $explode_driver[$i] == 'DEL' || $explode_driver[$i] == 'DELOS' || $explode_driver[$i] == 'DE LOS' || $explode_driver[$i] == 'DELA' || $explode_driver[$i] == 'DELAS' || $explode_driver[$i] == 'DE LAS') {
+                            if ($explode_driver[$i] == 'STA' || $explode_driver[$i] == 'DE' || $explode_driver[$i] == 'DEL' || $explode_driver[$i] == 'DELOS' || $explode_driver[$i] == 'DE LOS' || $explode_driver[$i] == 'DELA' || $explode_driver[$i] == 'DELAS' || $explode_driver[$i] == 'DE LAS' || $explode_driver[$i] == 'DELO') {
                                 $multipleLastName = $explode_driver[$i] . ' ';
-                                
                             }
 
                             $lastname = $multipleLastName . $previousData . $suffix;
