@@ -145,7 +145,7 @@ class DriverUpdate extends Command
     }
 
     public function driversJson() {
-        // $this->getDeactivatedDrivers();
+        $this->getDeactivatedDrivers();
         
         $data =  Driver::with('hasTrucks.trucks_info')
         ->has('hasTrucks')
@@ -192,9 +192,8 @@ class DriverUpdate extends Command
                                 $previousData = $explode_driver[$i];
                             }
 
-                            if ($explode_driver[$i] == 'STA' || $explode_driver[$i] == 'DE' || $explode_driver[$i] == 'DEL' || $explode_driver[$i] == 'DELOS' || $explode_driver[$i] == 'DE LOS' || $explode_driver[$i] == 'DELA' || $explode_driver[$i] == 'DELAS' || $explode_driver[$i] == 'DE LAS') {
+                            if ($explode_driver[$i] == 'STA' || $explode_driver[$i] == 'DE' || $explode_driver[$i] == 'DEL' || $explode_driver[$i] == 'DELOS' || $explode_driver[$i] == 'DE LOS' || $explode_driver[$i] == 'DELA' || $explode_driver[$i] == 'DELAS' || $explode_driver[$i] == 'DE LAS' || $explode_driver[$i] == 'DELO') {
                                 $multipleLastName = $explode_driver[$i] . ' ';
-                                
                             }
 
                             $lastname = $multipleLastName . $previousData . $suffix;
@@ -331,13 +330,13 @@ class DriverUpdate extends Command
         $trucks = Vehicle::whereNotIn('plate_number',$platenum)->whereDate('validity_end_date','>=', date('Y-m-d'))->get();
 
         foreach ($trucks as $truck) {
-            $tr = Vehicle::where('plate_number',$truck)->first();
+            $tr = Vehicle::where('plate_number',$truck->plate_number)->first();
 
-            if (isset($tr->driver_name) || $tr->driver_name == '' || $tr->driver_name == null || empty($tr->driver_name)) {
+            if (isset($tr->driver_name) && ($tr->driver_name == '' || $tr->driver_name == null || empty($tr->driver_name))) {
             } else {
-                $tr->driver_name = null;
-                $tr->driver_validity_start_date = null;
-                $tr->driver_validity_end_date = null;
+                $tr->driver_name = '';
+                $tr->driver_validity_start_date = '';
+                $tr->driver_validity_end_date = '';
                 $tr->save();
             }
                 
