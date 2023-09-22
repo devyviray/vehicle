@@ -146,6 +146,32 @@ class DriverUpdate extends Command
 
     public function driversJson() {
         $this->getDeactivatedDrivers();
+
+        $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+        if (is_null($getBGJobs)) {
+            BackgroundJobLogs::create([
+                'name' => 'update:driver',
+                'start_time' => date('Y-m-d H:i:s'),
+            ]);
+            $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+            $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
+            
+        } elseif (!is_null($getBGJobs->end_time)) {
+            $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+            $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
+
+            BackgroundJobLogs::where('name','update:driver')->create([
+                'name' => 'update:driver',
+                'start_time' => date('Y-m-d H:i:s'),
+            ]);
+        } else {
+            $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+
+            $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
+        }
         
         $data =  Driver::with('hasTrucks.trucks_info')
         ->has('hasTrucks')
@@ -165,7 +191,7 @@ class DriverUpdate extends Command
                 foreach ($trucksAssigned as $ad) {
                     $lastDriverAssignedToTruck = $ad->driver_id;
                 } */
-
+                 
                 $driver_name = $driver->name;
                 $final_driver_name = str_replace('.','',$driver_name);
 
@@ -217,6 +243,9 @@ class DriverUpdate extends Command
                 
             }
         }
+
+        $getBGJobs->end_time = date('Y-m-d H:i:s');
+        $getBGJobs->save();
     } 
 
     public function driversJson3() {
