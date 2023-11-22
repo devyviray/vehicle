@@ -217,23 +217,21 @@ class GpsDevicesController extends Controller
     {
         // DB::beginTransaction();
         try{
-            
-            $vehicle = Vehicle::where('id',$gps_device->vehicle_id)->first();
-            $vehicle->update(['gps_device_id' => ""]);
-
-            $destroy_api = $this->destroy_api_gps($gps_device->device_id);
-            $destroy_gps_attachments = GpsDeviceAttachment::where('vehicle_id', $gps_device->vehicle_id)->delete();
-            if($destroy_api == "Success"){
-                GpsDevice::where('id',$gps_device->id)->delete();
-                $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $gps_device->vehicle_id)->first();
-                return $vehicle;
-            }else{
-                // DB::rollBack();
-                $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $gps_device->vehicle_id)->first();
-                return $vehicle;
+            $vehicle = Vehicle::where('gps_device_id',$gps_device->id)->first();
+            if($vehicle){
+                $vehicle->update(['gps_device_id' => ""]);
+                $destroy_api = $this->destroy_api_gps($gps_device->device_id);
+                $destroy_gps_attachments = GpsDeviceAttachment::where('vehicle_id', $gps_device->vehicle_id)->delete();
+                if($destroy_api == "Success"){
+                    GpsDevice::where('id',$gps_device->id)->delete();
+                    $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $gps_device->vehicle_id)->first();
+                    return $vehicle;
+                }else{
+                    $vehicle = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user', 'vendor', 'subconVendor', 'plants','gpsdevice','gpsdeviceattachments')->where('id', $gps_device->vehicle_id)->first();
+                    return $vehicle;
+                }
             }
         }catch (NotFoundHttpException $e) {
-            // DB::rollBack();
             $response = $e->getResponse();
             return $response;
         }
