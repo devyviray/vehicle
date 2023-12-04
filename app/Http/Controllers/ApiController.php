@@ -7,7 +7,13 @@ use App\Vehicle;
 
 class ApiController extends Controller
 {
-   public function plateNumberVendorCode(){
-    return Vehicle::with('vendor')->orderBy('id', 'desc')->get();
+   public function plateNumberVendorCode(Request $request){
+    $vehicle = Vehicle::with('vendor')
+                    ->orderBy('id', 'desc');
+    if($request->plate_number){
+        $vehicle->where('plate_number',$request->plate_number);
+    }
+
+    return $vehicle->get();
    }
 }
