@@ -9,6 +9,7 @@ class BackgroundJobLogs extends Model
 {
     use SoftDeletes;
 
+    protected $table = "background_job_logs";
     protected $dateFormat = 'Y-m-d H:i:s'; 
 
     protected $fillable = [

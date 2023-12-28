@@ -76,6 +76,8 @@
                                         <th scope="col">User</th>
                                         <th scope="col">Validity start date</th>
                                         <th scope="col">Validity end date</th>
+                                        <th scope="col">Created at</th>
+                                        <th scope="col">Updated at</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -136,6 +138,8 @@
                                         <td>{{ vehicle.user.name }}</td>
                                         <td>{{ vehicle.validity_start_date }}</td>
                                         <td>{{ vehicle.validity_end_date }}</td>
+                                        <td>{{ vehicle.created_at }}</td>
+                                         <td>{{ vehicle.updated_at }}</td>
                                     </tr>
                                 </tbody>
                             </table>

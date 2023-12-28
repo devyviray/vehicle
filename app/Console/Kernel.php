@@ -13,7 +13,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        Commands\GetExpiredPlateNumbers::class,
     ];
 
     /**
@@ -25,6 +25,9 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->command('update:driver')->everyFifteenMinutes();
+
+        $schedule->command('expired:plate-numbers')
+            ->dailyAt('00:01');
     }
 
     /**
