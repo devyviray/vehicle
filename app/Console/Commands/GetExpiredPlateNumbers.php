@@ -47,6 +47,12 @@ class GetExpiredPlateNumbers extends Command
         $start_time = microtime(true);
         $expiration_date = Carbon::now()->subDays(1);
 
+        // Store logs
+        $logs = BackgroundJobLogs::create([
+                'name' => 'expired:plate-numbers',
+                'start_time' => $start_time
+            ]);
+
         $vehicles = Vehicle::whereDate('validity_end_date',$expiration_date)
             ->get();
         
@@ -54,11 +60,18 @@ class GetExpiredPlateNumbers extends Command
             ->get();
 
         foreach($plant_vehicles as $plant_vehicle){
-            PlantVehicleDeleted::create(['plant_vehicle_id' => $plant_vehicle['id'], 
-                    'plant_id' => $plant_vehicle['plant_id'], 
-                    'vehicle_id'=> $plant_vehicle['vehicle_id'],
-                    'user_id' => 43
-                ]);
+            $is_deleted = PlantVehicleDeleted::where('plant_vehicle_id',$plant_vehicle['id'])
+                ->where('plant_id', $plant_vehicle['plant_id'])
+                ->where('vehicle_id', $plant_vehicle['vehicle_id'])
+                ->first();
+            
+            if(!$is_deleted){
+                PlantVehicleDeleted::create(['plant_vehicle_id' => $plant_vehicle['id'], 
+                        'plant_id' => $plant_vehicle['plant_id'], 
+                        'vehicle_id' => $plant_vehicle['vehicle_id'],
+                        'user_id' => 43
+                    ]);
+            }
         }
 
         /** 
@@ -72,11 +85,7 @@ class GetExpiredPlateNumbers extends Command
 
         $time_elapsed_in_secs = microtime(true) - $start_time;
         $time_elapsed_in_mins = $time_elapsed_in_secs / 60;
-        // Store logs
-        BackgroundJobLogs::create([
-                'name' => 'expired:plate-numbers',
-                'start_time' => $start_time,
-                'end_time' => microtime(true)
-            ]);
+        // Update logs
+        $logs->update([ 'end_time' => microtime(true) ]);
     }
 }
