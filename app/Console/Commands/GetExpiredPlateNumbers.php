@@ -50,7 +50,7 @@ class GetExpiredPlateNumbers extends Command
         // Store logs
         $logs = BackgroundJobLogs::create([
                 'name' => 'expired:plate-numbers',
-                'start_time' => $start_time
+                'start_time' => Carbon::now()
             ]);
 
         $vehicles = Vehicle::whereDate('validity_end_date',$expiration_date)
@@ -86,6 +86,6 @@ class GetExpiredPlateNumbers extends Command
         $time_elapsed_in_secs = microtime(true) - $start_time;
         $time_elapsed_in_mins = $time_elapsed_in_secs / 60;
         // Update logs
-        $logs->update([ 'end_time' => microtime(true) ]);
+        $logs->update([ 'end_time' => Carbon::now() ]);
     }
 }
