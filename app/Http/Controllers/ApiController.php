@@ -34,13 +34,13 @@ class ApiController extends Controller
     if($vehicle){
         $date_today = date('Y-m-d');
 
-        $validity_end_date = Carbon::createFromFormat('Y-m-d', $vehicle->validity_end_date);
-        $formatted_validity_end_date = $validity_end_date->format('Y-m-d');
+        $validity_end_date = Carbon::parse('Y-m-d', $vehicle->validity_end_date)->format('Y-m-d');
+        // $formatted_validity_end_date = $validity_end_date->format('Y-m-d');
 
         dump($date_today);
-        dump($formatted_validity_end_date);
+        dump($validity_end_date);
         
-        if($formatted_validity_end_date < $date_today) {
+        if($validity_end_date < $date_today) {
             return 'Expired';
         }else{
             return "Valid";
