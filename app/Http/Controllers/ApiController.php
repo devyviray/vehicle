@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Vehicle;
 
+use Carbon\Carbon;
+
 class ApiController extends Controller
 {
    public function plateNumberVendorCode(Request $request){
@@ -31,9 +33,14 @@ class ApiController extends Controller
 
     if($vehicle){
         $date_today = date('Y-m-d');
+
+        $validity_end_date = Carbon::createFromFormat('Y-m-d', $vehicle->validity_end_date);
+        $formatted_validity_end_date = $validity_end_date->format('Y-m-d');
+
         dump($date_today);
-        dump(date('Y-m-d',strtotime($vehicle->validity_end_date)));
-        if(date('Y-m-d',strtotime($vehicle->validity_end_date)) < $date_today) {
+        dump($formatted_validity_end_date);
+        
+        if($formatted_validity_end_date < $date_today) {
             return 'Expired';
         }else{
             return "Valid";
