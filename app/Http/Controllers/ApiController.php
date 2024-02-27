@@ -28,10 +28,11 @@ class ApiController extends Controller
     }
 
     $vehicle = $vehicle->first();
-    $vehicle->validity_end_date;
 
     if($vehicle){
         $date_today = date('Y-m-d');
+        dump($date_today);
+        dump(date('Y-m-d',strtotime($vehicle->validity_end_date)));
         if(date('Y-m-d',strtotime($vehicle->validity_end_date)) < $date_today) {
             return 'Expired';
         }else{
