@@ -80,6 +80,7 @@ class DriverUpdate extends Command
         
         $data =  Driver::with('hasTrucks.trucks_info')
         ->has('hasTrucks')
+        // ->where('id',2161)
         ->where('availability',1)
         ->orderBy('updated_at','ASC')
         ->get();
@@ -110,7 +111,7 @@ class DriverUpdate extends Command
                             }
                             break;
                         } else {
-                            if (str_contains($explode_driver[$i], 'JR.') || str_contains($explode_driver[$i], 'SR.') || str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III') || str_contains($explode_driver[$i], 'IV') || str_contains($explode_driver[$i], 'V')) { // Fetch if name has a suffix
+                            if ( !str_contains($explode_driver[$i], 'V.') || str_contains($explode_driver[$i], 'JR.') || str_contains($explode_driver[$i], 'SR.') || str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III') || str_contains($explode_driver[$i], 'IV') || str_contains($explode_driver[$i], 'V')) { // Fetch if name has a suffix
                                 $suffix = ' ' . $explode_driver[$i]; 
                             } elseif ($previousData != $explode_driver[$i]) { // If previous array data is not equal to current array index
                                 $previousData = $explode_driver[$i];
@@ -124,9 +125,9 @@ class DriverUpdate extends Command
                         }
                     }
                 }
-
-                $name = $firstname . '. ' . $lastname;
                 
+                $name = $firstname . '. ' . $lastname;
+
                 if ($checkVehicle) {
                     if ($checkVehicle->driver_name !== $name) {
                         $checkVehicle->driver_name = $name;
