@@ -44,7 +44,8 @@ class DriverUpdate extends Command
      */
     public function handle()
     {
-        $this->driversJson();
+        // $this->driversJson();
+        $this->new2024();
     }
 
     public function driversJson() {
@@ -382,51 +383,12 @@ class DriverUpdate extends Command
                 $vehicles = Vehicle::where('plate_number', $driver->hasTrucks->trucks_info->plate_number)->whereDate('validity_end_date','>=', date('Y-m-d'));
                 $checkVehicle = $vehicles->first();
 
-                if ($driver->first_name && $driver->last_name) {
+                if ($checkVehicle && $driver->first_name && $driver->last_name) {
                     $firstname = substr($driver->first_name, 0, 1);
                     $lastname = $driver->last_name;
 
                     $name = $firstname . '. ' . $lastname;
-                } else {
-                    $driver_name = $driver->name;
-                    $final_driver_name = str_replace('.','',$driver_name);
 
-                    $explode_driver = explode(' ', $final_driver_name);
-                    if (count($explode_driver) == 2) {
-                        $firstname = substr($explode_driver[0], 0, 1);
-                        $lastname = $explode_driver[1];
-                    } else {
-                        $firstname = substr($explode_driver[0], 0, 1);
-                        $suffix = '';
-                        $previousData = '';
-                        $multipleLastName = '';
-                        
-                        for ($i=0; $i < count($explode_driver); $i++) {
-                            if ($explode_driver[$i] == '' || $explode_driver[$i] == ' ') { // For checking if Suffix is the first word of the name
-                                if (str_contains($explode_driver[$i], 'JR.') || str_contains($explode_driver[$i], 'SR.') || str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III') || str_contains($explode_driver[$i], 'IV') || str_contains($explode_driver[$i], 'V')) {
-                                    $suffix = ' ' . $explode_driver[$i];
-                                }
-                                break;
-                            } else {
-                                if (str_contains($explode_driver[$i], 'JR.') || str_contains($explode_driver[$i], 'SR.') || str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III') || str_contains($explode_driver[$i], 'IV') || str_contains($explode_driver[$i], 'V')) { // Fetch if name has a suffix
-                                    $suffix = ' ' . $explode_driver[$i]; 
-                                } elseif ($previousData != $explode_driver[$i]) { // If previous array data is not equal to current array index
-                                    $previousData = $explode_driver[$i];
-                                }
-
-                                if ($explode_driver[$i] == 'STA' || $explode_driver[$i] == 'DE' || $explode_driver[$i] == 'DEL' || $explode_driver[$i] == 'DELOS' || $explode_driver[$i] == 'DE LOS' || $explode_driver[$i] == 'DELA' || $explode_driver[$i] == 'DELAS' || $explode_driver[$i] == 'DE LAS' || $explode_driver[$i] == 'DELO') {
-                                    $multipleLastName = $explode_driver[$i] . ' ';
-                                }
-
-                                $lastname = $multipleLastName . $previousData . $suffix;
-                            }
-                        }
-                    }
-
-                    $name = $firstname . '. ' . $lastname;
-                }
-
-                if ($checkVehicle) {
                     if ($checkVehicle->driver_name !== $name) {
                         $checkVehicle->driver_name = $name;
                         $checkVehicle->driver_validity_start_date = date('Y-m-d', strtotime($driver->start_validity_date));
