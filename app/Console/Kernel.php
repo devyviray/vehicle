@@ -26,7 +26,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('expired:plate-numbers')
             ->dailyAt('00:01');
-        // $schedule->command('update:driver')->everyFifteenMinutes();
+        $schedule->command('update:driver')->everyFifteenMinutes();
     }
 
     /**
