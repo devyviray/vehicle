@@ -52,7 +52,7 @@ class DriverUpdate extends Command
 
         DB::beginTransaction();
 
-        $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
+        /* $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
 
         if (is_null($getBGJobs)) {
             BackgroundJobLogs::create([
@@ -76,11 +76,12 @@ class DriverUpdate extends Command
             $getBGJobs = BackgroundJobLogs::where('name','update:driver')->orderBy('id','desc')->first();
 
             $dateFilter = !is_null($getBGJobs->end_time) ? $getBGJobs->end_time : $getBGJobs->start_time;
-        }
+        } */
         
         $data =  Driver::with('hasTrucks.trucks_info')
         ->has('hasTrucks')
-        // ->where('id',2161)
+        ->where('id',1859)
+        // ->where('id',133)
         ->where('availability',1)
         ->orderBy('updated_at','ASC')
         ->get();
@@ -95,6 +96,7 @@ class DriverUpdate extends Command
                 $final_driver_name = str_replace('.','',$driver_name);
 
                 $explode_driver = explode(' ', $final_driver_name);
+                
                 if (count($explode_driver) == 2) {
                     $firstname = substr($explode_driver[0], 0, 1);
                     $lastname = $explode_driver[1];
@@ -103,17 +105,17 @@ class DriverUpdate extends Command
                     $suffix = '';
                     $previousData = '';
                     $multipleLastName = '';
-                    
+                    echo count($explode_driver);
                     for ($i=0; $i < count($explode_driver); $i++) {
                         if ($explode_driver[$i] == '' || $explode_driver[$i] == ' ') { // For checking if Suffix is the first word of the name
-                            if (str_contains($explode_driver[$i], 'JR.') || str_contains($explode_driver[$i], 'SR.') || str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III') || str_contains($explode_driver[$i], 'IV') || str_contains($explode_driver[$i], 'V')) {
+                            if (str_contains($explode_driver[$i], 'JR.') || str_contains($explode_driver[$i], 'SR.') || str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III') || str_contains($explode_driver[$i], 'IV') || (!str_contains($explode_driver[$i], 'V.') || str_contains($explode_driver[$i], 'V'))) {
                                 $suffix = ' ' . $explode_driver[$i];
                             }
                             break;
                         } else {
-                            if ( !str_contains($explode_driver[$i], 'V.') || str_contains($explode_driver[$i], 'JR.') || str_contains($explode_driver[$i], 'SR.') || str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III') || str_contains($explode_driver[$i], 'IV') || str_contains($explode_driver[$i], 'V')) { // Fetch if name has a suffix
+                            if ( str_contains($explode_driver[$i], 'JR.') || str_contains($explode_driver[$i], 'SR.') || str_contains($explode_driver[$i], 'JR') || str_contains($explode_driver[$i], 'SR') || str_contains($explode_driver[$i], 'III') || str_contains($explode_driver[$i], 'IV') || (!str_contains($explode_driver[$i], 'V.') || str_contains($explode_driver[$i], 'V'))) { // Fetch if name has a suffix
                                 $suffix = ' ' . $explode_driver[$i]; 
-                            } elseif ($previousData != $explode_driver[$i]) { // If previous array data is not equal to current array index
+                            } elseif ($previousData !== $explode_driver[$i]) { // If previous array data is not equal to current array index
                                 $previousData = $explode_driver[$i];
                             }
 
@@ -122,25 +124,26 @@ class DriverUpdate extends Command
                             }
 
                             $lastname = $multipleLastName . $previousData . $suffix;
+                            // echo "Multiple Last Name: " . $multipleLastName . " || Previous Data: ". $previousData . " || Suffix: " . $suffix;
                         }
                     }
                 }
                 
                 $name = $firstname . '. ' . $lastname;
-
-                if ($checkVehicle) {
+                // echo $name;
+                /* if ($checkVehicle) {
                     if ($checkVehicle->driver_name !== $name) {
                         $checkVehicle->driver_name = $name;
                         $checkVehicle->driver_validity_start_date = date('Y-m-d', strtotime($driver->start_validity_date));
                         $checkVehicle->driver_validity_end_date = date('Y-m-d', strtotime($driver->end_validity_date));
                         $checkVehicle->save();
                     }
-                }
+                } */
             }
         }
 
-        $getBGJobs->end_time = date('Y-m-d H:i:s');
-        $getBGJobs->save();
+        /* $getBGJobs->end_time = date('Y-m-d H:i:s');
+        $getBGJobs->save(); */
 
         DB::commit();
     } 

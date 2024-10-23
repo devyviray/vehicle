@@ -24,10 +24,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('update:driver')->everyFifteenMinutes();
-
         $schedule->command('expired:plate-numbers')
             ->dailyAt('00:01');
+        // $schedule->command('update:driver')->everyFifteenMinutes();
     }
 
     /**
