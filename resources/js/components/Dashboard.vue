@@ -17,9 +17,9 @@
                                     <h3 class="mb-0">Vehicle List</h3>
                                 </div>
                                 <div class="col text-right">
-                                    <!-- <a v-if="this.userLevel > 4" href="javascript.void(0)" class="btn btn-sm btn-primary"
+                                    <a v-if="this.userLevel > 4" href="javascript.void(0)" class="btn btn-sm btn-primary"
                                         data-toggle="modal" data-target="#addVehicleModal"
-                                        style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a> -->
+                                        style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
                                     <button
                                         v-if="this.role == 'ALC DOM' || this.role == 'Vehicle Custodian' || this.role == 'GPS Custodian Export'"
                                         :disabled="!readyListbutton" class="btn btn-sm btn-primary"
@@ -108,8 +108,8 @@
                                                             v-if="btn_assign">Check GPS</a>
                                                     </div>
 
-                                                    <!-- <a class="dropdown-item" style="cursor: pointer"
-                                                        @click="getVehicle(vehicle.id)" v-if="btn_edit">Edit</a> -->
+                                                    <a class="dropdown-item" style="cursor: pointer"
+                                                        @click="getVehicle(vehicle.id)" v-if="btn_edit">Edit</a>
                                                     <a class="dropdown-item" href="javascript.void(0)" data-toggle="modal"
                                                         data-target="#viewDocumentsModal" @click="copyObject(vehicle)"
                                                         v-if="btn_view">View Document</a>
