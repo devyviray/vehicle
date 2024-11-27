@@ -40,4 +40,26 @@ class ApiController extends Controller
         return 'Expired';
     }
    }
+
+   public function getPlateNumbers($plateNumber){
+    return Vehicle::with('vendor','capacity')
+            ->where('plate_number',$plateNumber)
+            ->orderBy('validity_end_date','desc')
+            ->limit(1)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'plate_number' => $item->plate_number,
+                    'validity_start_date' => $item->validity_start_date,
+                    'validity_end_date' => $item->validity_end_date,
+                    'capacity_id' => $item->capacity_id,
+                    'capacity' => $item->capacity->description,
+                    'vendor_codes' => [
+                        'LFUG' => $item->vendor->vendor_code_lfug,
+                        'CSCI' => $item->vendor->vendor_code_pfmc,
+                        'HANA' => $item->vendor->vendor_code_hana,
+                    ]
+                ];
+            });
+    }
 }
