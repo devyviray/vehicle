@@ -42,7 +42,7 @@ class ApiController extends Controller
    }
 
    public function getPlateNumbers($plateNumber){
-    return Vehicle::with('vendor','capacity')
+    return Vehicle::with('vendor','capacity','gpsdevice')
             ->where('plate_number',$plateNumber)
             ->orderBy('validity_end_date','desc')
             ->limit(1)
@@ -58,8 +58,14 @@ class ApiController extends Controller
                         'LFUG' => $item->vendor->vendor_code_lfug,
                         'CSCI' => $item->vendor->vendor_code_pfmc,
                         'HANA' => $item->vendor->vendor_code_hana,
+                    ],
+                    'gps_device' => [
+                        'imei' => $item->gpsDevice->imei,
+                        'mobile_number' => $item->gpsDevice->mobile_number,
+                        'gps_tracker_id' => $item->gpsDevice->device_id,
                     ]
                 ];
-            });
+            })
+            ;
     }
 }
