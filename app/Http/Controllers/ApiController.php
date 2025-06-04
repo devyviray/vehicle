@@ -61,8 +61,8 @@ class ApiController extends Controller
                     ],
                     'gps_device' => $item->gpsDevice
                     ? [
-                        'imei' => $item->gpsDevice->imei,
-                        'mobile_number' => $item->gpsDevice->sim_number,
+                        'imei' => $item->gpsDevice->imei ?? null,
+                        'mobile_number' => $item->gpsDevice->sim_number ?? null,
                         'gps_tracker_id' => $item->gpsDevice->device_id,
                     ]
                     : []
