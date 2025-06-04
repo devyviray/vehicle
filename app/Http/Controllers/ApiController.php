@@ -59,11 +59,13 @@ class ApiController extends Controller
                         'CSCI' => $item->vendor->vendor_code_pfmc,
                         'HANA' => $item->vendor->vendor_code_hana,
                     ],
-                    'gps_device' => [
+                    'gps_device' => $item->gpsDevice
+                    ? [
                         'imei' => $item->gpsDevice->imei,
                         'mobile_number' => $item->gpsDevice->sim_number,
                         'gps_tracker_id' => $item->gpsDevice->device_id,
                     ]
+                    : []
                 ];
             })
             ;
