@@ -31,7 +31,18 @@ class VehicleController extends Controller
      */
     public function index()
     {   
+        $sales = Auth::user()->roles->first()->id == '10'; //check role if sales
+
         return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
+            ->when($sales, function ($query){
+                $query->whereHas('vendor', function ($vendorQuery) {
+                    $vendorQuery->whereNotNull('vendor_code_bu_managed');
+                });
+            }, function ($query) {
+                $query->whereHas('vendor', function ($vendorQuery) {
+                    $vendorQuery->whereNull('vendor_code_bu_managed');
+                });
+            })
             ->when(Auth::user()->level() < 4, function ($query){
                 $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
             })->orderBy('id', 'desc')->get();
@@ -205,8 +216,18 @@ class VehicleController extends Controller
         $operator = $request->operator;
         $gps = $request->filter_gps;
         $base_truck_ids = $request->filter_based_trucks;
+        $sales = Auth::user()->roles->first()->id == '10'; //check role if sales
 
         return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
+                            ->when($sales, function ($query){
+                                $query->whereHas('vendor', function ($vendorQuery) {
+                                    $vendorQuery->whereNotNull('vendor_code_bu_managed');
+                                });
+                            }, function ($query) {
+                                $query->whereHas('vendor', function ($vendorQuery) {
+                                    $vendorQuery->whereNull('vendor_code_bu_managed');
+                                });
+                            })
                             ->when(!empty($operator), function ($query) use($operator,$date_today) {
                                 $query->where('validity_end_date',$operator,$date_today);
                             })
