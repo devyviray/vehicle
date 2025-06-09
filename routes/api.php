@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 Route::get('/plate-number-vendor-code', 'ApiController@plateNumberVendorCode');
 Route::get('/plate-number-status', 'ApiController@plateNumberStatus');
 Route::get('/plate-number-details/{plateNumber}', 'ApiController@getPlateNumbers');
+Route::get('/get-vendor-plate-numbers/{S4vendorCode}', 'ApiController@getVendorPlateNumbers');
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
