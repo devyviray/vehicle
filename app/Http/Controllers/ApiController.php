@@ -102,14 +102,16 @@ class ApiController extends Controller
                             'gps_tracker_id' => $item->gpsDevice->device_id,
                         ]
                         : [],
-                        'plants_assigned' => $item->plants->map(function ($plant) {
-                            return [
-                                'id' => $plant->id,
-                                'name' => $plant->name, 
-                                'code' => $plant->code, 
-                                'server' => $plant->company_server, 
-                            ];
-                        })
+                        'plants_assigned' => $item->plants ? [
+                            $item->plants->map(function ($plant) {
+                                return [
+                                    'id' => $plant->id,
+                                    'name' => $plant->name, 
+                                    'code' => $plant->code, 
+                                    'server' => $plant->company_server, 
+                                ];
+                            })
+                        ] : [],
                     ];
                 });
         } else {
