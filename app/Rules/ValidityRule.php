@@ -14,6 +14,9 @@ class ValidityRule implements Rule
 
     protected $validityStartDate;
     protected $action;
+    protected $id;
+    protected $sales;
+    protected $message;
     /**
      * Create a new rule instance.
      *
@@ -41,18 +44,24 @@ class ValidityRule implements Rule
         if($vehicles && $this->validityStartDate){
             foreach($vehicles as $vehicle){ 
                 /* Begin: Work around to format validiy end date */
-                $date_string = $vehicle->validity_end_date;
-                $date = trim($date_string, "12:00:00:AM");
-                $end_date = date('Y-m-d',strtotime($date));
+                $end_date = $vehicle->validity_end_date;
+                // $date = trim($date_string, "12:00:00:AM");
+                // $end_date = date('Y-m-d',strtotime($date_string));
                 /* End: Work around to format validiy end date */
 
                 // check existing vehicle if bu managed
                 $vendor = Trucker::find($vehicle->vendor_id);
-                if(($this->sales && $vendor->vendor_code_bu_managed == null) || (!$this->sales && $vendor->vendor_code_bu_managed !== null)){
+                if(($this->sales && $vendor->vendor_code_bu_managed == null)){
+                    $this->message = 'Previous plate number is existing';
+                    $error = $error + 1;
+                }
+                if((!$this->sales && $vendor->vendor_code_bu_managed !== null)){
+                    $this->message = 'Previous plate number is BU Managed';
                     $error = $error + 1;
                 }
 
-                if($end_date >=  $this->validityStartDate){
+                if($end_date >= $this->validityStartDate){
+                    $this->message = 'Previous plate number is not yet ended';
                     $error = $error + 1;
                 }
             }
@@ -71,6 +80,6 @@ class ValidityRule implements Rule
      */
     public function message()
     {
-        return 'Previous plate number is not yet ended';
+        return $this->message;
     }
 }
