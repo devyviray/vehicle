@@ -4,8 +4,10 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use App\{
+    Trucker,
     Vehicle
 };
+use Illuminate\Support\Facades\Log;
 
 class ValidityRule implements Rule
 {
@@ -17,11 +19,12 @@ class ValidityRule implements Rule
      *
      * @return void
      */
-    public function __construct($validityStartDate, $action, $id = null)
+    public function __construct($validityStartDate, $action, $id = null, $sales)
     {
         $this->validityStartDate = $validityStartDate;
         $this->action = $action;
         $this->id = $id;
+        $this->sales = $sales;
     }
 
     /**
@@ -35,7 +38,6 @@ class ValidityRule implements Rule
     {
         $vehicles = $this->action == 'Add' ? Vehicle::where('plate_number', $value)->get() : Vehicle::where('plate_number', $value)->where('id','!=',$this->id)->get();
         $error = 0;
-        
         if($vehicles && $this->validityStartDate){
             foreach($vehicles as $vehicle){ 
                 /* Begin: Work around to format validiy end date */
@@ -43,6 +45,12 @@ class ValidityRule implements Rule
                 $date = trim($date_string, "12:00:00:AM");
                 $end_date = date('Y-m-d',strtotime($date));
                 /* End: Work around to format validiy end date */
+
+                // check existing vehicle if bu managed
+                $vendor = Trucker::find($vehicle->vendor_id);
+                if(($this->sales && $vendor->vendor_code_bu_managed == null) || (!$this->sales && $vendor->vendor_code_bu_managed !== null)){
+                    $error = $error + 1;
+                }
 
                 if($end_date >=  $this->validityStartDate){
                     $error = $error + 1;
