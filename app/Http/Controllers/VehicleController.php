@@ -56,9 +56,8 @@ class VehicleController extends Controller
      */
     public function store(Request $request)
     {
-        $sales = Auth::user()->roles->first()->id == '10';
         $request->validate([
-            'plate_number' => ['required', ($request->category_id == 2) ? 'max:20' : 'max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date,'Add',null,$sales)],
+            'plate_number' => ['required', ($request->category_id == 2) ? 'max:20' : 'max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date,'Add')],
             'category_id' => 'required',
             'capacity_id' => 'required',
             'vendor_id' => ['required', new PlantCheckingRule($request->plants)],
@@ -144,9 +143,8 @@ class VehicleController extends Controller
      */
     public function update(Request $request, Vehicle $vehicle)
     {
-        $sales = Auth::user()->roles->first()->id == '10';
         $request->validate([
-            'plate_number' => ['required', ($request->category_id == 2) ? 'max:20' : 'max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_start_date,'Edit',$vehicle->id,$sales)],
+            'plate_number' => ['required', ($request->category_id == 2) ? 'max:20' : 'max:8','regex:/^[\s0-9A-Za-z]+$/', new ValidityRule($request->validity_end_date,'Edit',$vehicle->id)],
             'category_id' => 'required',
             'capacity_id' => 'required',
             'vendor_id' => ['required', new PlantCheckingRule($request->plants)],
