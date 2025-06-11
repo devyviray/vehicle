@@ -41,19 +41,19 @@ class ValidityRule implements Rule
         $error = 0;
         if($vehicles && $this->formDate){
             foreach($vehicles as $vehicle){ 
+                $date_end = $vehicle->validity_end_date;
+                $date = trim($date_end, "12:00:00:AM");
+                $end_date = date('Y-m-d',strtotime($date));
                 if($this->action == 'Add'){
-                    $date_string = $vehicle->validity_end_date;
-                    $date = trim($date_string, "12:00:00:AM");
-                    $end_date = date('Y-m-d',strtotime($date));
                     if($end_date >= $this->formDate){
                         $this->message = 'Previous plate number is not yet ended';
                         $error = $error + 1;
                     }
                 } else { // for edit
-                    $date_string = $vehicle->validity_start_date;
-                    $date = trim($date_string, "12:00:00:AM");
+                    $date_start = $vehicle->validity_start_date;
+                    $date = trim($date_start, "12:00:00:AM");
                     $start_date = date('Y-m-d',strtotime($date));
-                    if($start_date <= $this->formDate){
+                    if($this->formDate >= $start_date && $this->formDate <= $end_date){
                         $this->message = 'Plate number already exists with overlapping validity dates';
                         $error = $error + 1;
                     }
