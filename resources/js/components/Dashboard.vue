@@ -1062,7 +1062,7 @@ export default {
             return `${filterBasedTruck.description}`
         },
         customLabelPlant(plant) {
-            return `${plant.name}`
+            return `${plant.code} ${plant.name} - ${plant.company_server}`
         },
         customLabelReassignVehicle(reassign) {
             return `${reassign.plate_number}`
