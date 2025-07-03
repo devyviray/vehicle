@@ -230,7 +230,7 @@
                                 </v-select>
                                 <span class="text-danger" v-if="errors.vendor_id">{{ errors.vendor_id[0] }}</span>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4" v-if="this.role !== 'Sales'">
                                 <label for="role">Subcon Vendor</label>
                                 <v-select style="width: 100%" v-model="vehicle.subcon_vendor"
                                     label="vendor_description_lfug" :options="truckers" track-by="id">
@@ -285,7 +285,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-4" v-if="this.role !== 'Sales'">
                                 <div class="form-group">
                                     <label for="role">Contract</label>
                                     <select class="form-control" v-model="vehicle.contract_id" id="contract">
@@ -307,7 +307,8 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Document*</label>
+                                    <label for="role" v-if="this.role !== 'Sales'">Document*</label>
+                                    <label for="role" v-else>Attach VARF*</label>
                                     <input type="file" multiple="multiple" id="attachments" placeholder="Attach file"
                                         @change="uploadFileChange"><br>
                                     <span class="text-danger" v-if="errors.attachments">{{ errors.attachments[0] }}</span>
@@ -412,7 +413,7 @@
                                 </v-select>
                                 <span class="text-danger" v-if="errors.vendor_id">{{ errors.vendor_id[0] }}</span>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-4" v-if="this.role !== 'Sales'">
                                 <label for="role">Subcon Vendor</label>
                                 <v-select style="width: 100%" v-model="vehicle_fetch.subcon_vendor"
                                     label="vendor_description_lfug" :options="truckers" track-by="id" disabled>
@@ -468,7 +469,7 @@
                             </div>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-4" v-if="this.role !== 'Sales'">
                                 <div class="form-group">
                                     <label for="role">Contract</label>
                                     <select class="form-control" v-model="vehicle_fetch.contract_id" id="contract-edit">
@@ -490,7 +491,8 @@
                             </div>
                             <div class="col-md-4">
                                 <div class="form-group">
-                                    <label for="role">Document</label>
+                                    <label for="role" v-if="this.role !== 'Sales'">Document</label>
+                                    <label for="role" v-else>Attach VARF*</label>
                                     <input type="file" multiple="multiple" id="attachments-edit" class="attachments-edit"
                                         placeholder="Attach file" @change="uploadFileChange"><br>
                                     <span class="text-danger" v-if="errors.attachments">{{ errors.attachments[0] }}</span>
@@ -1062,7 +1064,7 @@ export default {
             return `${filterBasedTruck.description}`
         },
         customLabelPlant(plant) {
-            return `${plant.name}`
+            return `${plant.code} ${plant.name} - ${plant.company_server}`
         },
         customLabelReassignVehicle(reassign) {
             return `${reassign.plate_number}`

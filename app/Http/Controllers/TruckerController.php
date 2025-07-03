@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\{
     Trucker
 };
+use Auth;
 
 class TruckerController extends Controller
 {
@@ -16,7 +17,16 @@ class TruckerController extends Controller
      */
     public function index()
     {
-        return Trucker::orderBy('id', 'desc')->get();
+        $sales = Auth::user()->roles->first()->id == '10'; //check role if sales
+
+        return Trucker::when($sales, function ($query) {
+        // When the user is Sales, filter where vendor_code_bu_managed is NOT null
+            $query->whereNotNull('vendor_code_bu_managed');
+        }, function ($query) {
+            $query->whereNull('vendor_code_bu_managed');
+        })
+        ->orderBy('id', 'desc')
+        ->get();
     }
 
     /**

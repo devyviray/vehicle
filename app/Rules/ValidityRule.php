@@ -4,24 +4,30 @@ namespace App\Rules;
 
 use Illuminate\Contracts\Validation\Rule;
 use App\{
+    Trucker,
     Vehicle
 };
+use Illuminate\Support\Facades\Log;
 
 class ValidityRule implements Rule
 {
 
-    protected $validityStartDate;
+    protected $formStartDate;
+    protected $formEndDate;
     protected $action;
+    protected $id;
+    protected $message;
     /**
      * Create a new rule instance.
      *
      * @return void
      */
-    public function __construct($validityStartDate, $action, $id = null)
+    public function __construct($validityStartDate, $action, $id = null, $validityEndDate)
     {
-        $this->validityStartDate = $validityStartDate;
+        $this->formStartDate = $validityStartDate;
         $this->action = $action;
         $this->id = $id;
+        $this->formEndDate = $validityEndDate;
     }
 
     /**
@@ -35,17 +41,25 @@ class ValidityRule implements Rule
     {
         $vehicles = $this->action == 'Add' ? Vehicle::where('plate_number', $value)->get() : Vehicle::where('plate_number', $value)->where('id','!=',$this->id)->get();
         $error = 0;
-        
-        if($vehicles && $this->validityStartDate){
+        if($vehicles && $this->formStartDate){
             foreach($vehicles as $vehicle){ 
-                /* Begin: Work around to format validiy end date */
-                $date_string = $vehicle->validity_end_date;
-                $date = trim($date_string, "12:00:00:AM");
-                $end_date = date('Y-m-d',strtotime($date));
-                /* End: Work around to format validiy end date */
-
-                if($end_date >=  $this->validityStartDate){
-                    $error = $error + 1;
+                if($this->action == 'Add'){
+                    $date_end = $vehicle->validity_end_date;
+                    $date = trim($date_end, "12:00:00:AM");
+                    $end_date = date('Y-m-d',strtotime($date));
+                    if($end_date >= $this->formStartDate){
+                        $this->message = 'Previous plate number is not yet ended';
+                        $error = $error + 1;
+                    }
+                } else { // for edit
+                    $date_end = $vehicle->validity_end_date;
+                    $end_date = date('Y-m-d',strtotime($date_end));
+                    $date_start = $vehicle->validity_start_date;
+                    $start_date = date('Y-m-d',strtotime($date_start));
+                    if($this->formStartDate <= $start_date && $this->formEndDate >= $start_date){
+                        $this->message = 'Plate number already exists with overlapping validity dates';
+                        $error = $error + 1;
+                    }
                 }
             }
         }
@@ -63,6 +77,6 @@ class ValidityRule implements Rule
      */
     public function message()
     {
-        return 'Previous plate number is not yet ended';
+        return $this->message;
     }
 }
