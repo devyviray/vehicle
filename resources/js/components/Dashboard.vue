@@ -1357,7 +1357,7 @@ export default {
             this.gps_device.plate_number = this.vehicle_copied.plate_number;
         },
         buttonAuth() {
-            if (this.role == "GPS Custodian" || this.role == "GPS Custodian Export") {
+            if (this.role == "GPS Custodian" || this.role == "GPS Custodian Export" ||  this.role == "Sales" ) {
                 this.btn_assign = true;
                 this.btn_edit = false;
                 this.btn_view = false;
