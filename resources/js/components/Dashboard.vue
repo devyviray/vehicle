@@ -17,7 +17,7 @@
                                     <h3 class="mb-0">Vehicle List</h3>
                                 </div>
                                 <div class="col text-right">
-                                    <a v-if="this.userLevel > 4" href="javascript.void(0)" class="btn btn-sm btn-primary"
+                                    <a v-if="this.userLevel > 4 && this.ready_add_button"  href="javascript.void(0)" class="btn btn-sm btn-primary"
                                         data-toggle="modal" data-target="#addVehicleModal"
                                         style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
                                     <button
@@ -223,7 +223,7 @@
                                     <label for="role">Plant</label>
                                     <multiselect v-model="vehicle.plant" :options="availablePlants" :multiple="true" track-by="id"
                                         :custom-label="customLabelPlant" placeholder="Select Plant" id="selected_plant"
-                                        :disabled="sales_specific_plants">
+                                        :close-on-select="false" :clear-on-select="false">
                                     </multiselect>
                                     <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
                                 </div>
@@ -902,7 +902,8 @@ export default {
                 sim_number: '',
             },
             user_plants: [],
-            sales_specific_plants: false
+            sales_specific_plants: false,
+            ready_add_button: false,
 
         }
     },
@@ -1186,6 +1187,7 @@ export default {
             axios.get('/user-plants')
                 .then(response => {
                     this.user_plants = response.data
+                    this.ready_add_button = true;
                 })
                 .catch(error => {
                     this.errors = error.response.data.errors;
@@ -1232,8 +1234,7 @@ export default {
                 this.show_plant_add = true;
 
                 this.vehicle.indicator_id = 1;
-                // filter plants based on user_plants.plants array of IDs - for sales user with selected plants
-                this.vehicle.plant = this.plants.filter(plant => this.user_plants.plants.includes(plant.id));
+                // this.vehicle.plant = this.plants.filter(plant => this.user_plants.plants.includes(plant.id));
             }
 
         },
@@ -1648,6 +1649,7 @@ export default {
         },
         availablePlants() {
             // If sales role with specific plants, filter plants by user_plants.plants array of IDs
+            // multiselect editable, can remove plants from selection
             if (this.sales_specific_plants && this.user_plants.plants && this.user_plants.plants.length > 0) {
                 return this.plants.filter(plant => this.user_plants.plants.includes(plant.id));
             }
