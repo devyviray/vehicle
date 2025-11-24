@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\{
+    Plant,
     User
 };
 class UserController extends Controller
@@ -27,7 +28,7 @@ class UserController extends Controller
      */
     public function indexData()
     {
-        return User::with('roles','basedTrucks')->orderBy('id', 'desc')->get();
+        return User::with('roles','basedTrucks','plants')->orderBy('id', 'desc')->get();
     }
 
     /**
@@ -43,8 +44,8 @@ class UserController extends Controller
             'email' => 'required|unique:users,email',
             'password' => 'required',
             'role' => 'required',
-            'based_trucks' => 'required_if:role,4|required_if:role,5|required_if:role,6'
-
+            'based_trucks' => 'required_if:role,4|required_if:role,5|required_if:role,6',
+            'indicator_id' => 'required_if:role,10'
         ]);
 
         if($user = User::create($request->all())){
@@ -52,6 +53,14 @@ class UserController extends Controller
             $user->syncRoles($request->role);
             // Assigning of based trucks
             $user->basedTrucks()->sync( (array) $request->based_trucks);
+            // Assigining of plants
+            if($request->plants)
+                // add timestamps to pivot
+                $user->plants()->sync( (array) $request->plants);
+            else{
+                $plants = Plant::pluck('id')->toArray();
+                $user->plants()->sync($plants);
+            }
             return User::with('roles','basedTrucks')->where('id', $user->id)->first();   
         }
         return false;
@@ -79,8 +88,18 @@ class UserController extends Controller
             $user->syncRoles($request->role);
             // Assigning of based trucks
             $user->basedTrucks()->sync( (array) $request->based_trucks);
+            // Assigining of plants
+            if($request->indicator_id){
+                if($request->indicator_id == 1){
+                    $user->plants()->sync( (array) $request->plants);
+                }
+                else{
+                    $plants = Plant::pluck('id')->toArray();
+                    $user->plants()->sync($plants);
+                }
+            }
 
-            return User::with('roles', 'basedTrucks')->where('id', $user->id)->first();   
+            return User::with('roles', 'basedTrucks', 'plants')->where('id', $user->id)->first();   
         }
         return false;
     }

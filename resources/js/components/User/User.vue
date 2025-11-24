@@ -54,7 +54,7 @@
                                             </div>
                                         </td>
                                         <td scope="row">{{ user.id }}</td>
-                                        <td>{{ user.name }}</td>
+                                        <td>{{ user.name ? user.name : 'n/a' }}</td>
                                         <td>{{ user.email }}</td>
                                         <td>{{ user.roles[0].name }}</td>
                                     </tr>
@@ -147,6 +147,29 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="row" v-if="show_plants">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="role">Plant Indicator*</label>
+                                    <select class="form-control" v-model="user.indicator_id" @change="plantChange">
+                                        <option v-for="(indicator, i) in indicators" v-bind:key="i" :value="indicator.id">
+                                            {{ indicator.description }}
+                                        </option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.indicator_id">{{ errors.indicator_id[0] }}</span>
+                                </div>
+                            </div>
+                            <div v-if="show_plant_add" class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="role">Plant</label>
+                                    <!-- add a select all option in multiselect -->
+                                    <multiselect v-model="user.plant" :options="plants" :multiple="true" track-by="id"
+                                        :custom-label="customLabelPlant" placeholder="Select Plant" id="selected_plant">
+                                    </multiselect>
+                                    <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button id="add_btn" type="button" class="btn btn-primary btn-round btn-fill" @click="addUser(user)">Save</button>
@@ -215,6 +238,29 @@
                                         >
                                     </multiselect>
                                     <span class="text-danger" v-if="errors.based_trucks">The based trucks field is required</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" v-if="show_plants">
+                            <div class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="role">Plant Indicator*</label>
+                                    <select class="form-control" v-model="user_copied.indicator_id" @change="plantChange">
+                                        <option v-for="(indicator, i) in indicators" v-bind:key="i" :value="indicator.id">
+                                            {{ indicator.description }}
+                                        </option>
+                                    </select>
+                                    <span class="text-danger" v-if="errors.indicator_id">{{ errors.indicator_id[0] }}</span>
+                                </div>
+                            </div>
+                            <div v-if="show_plant_add" class="col-lg-12">
+                                <div class="form-group">
+                                    <label for="role">Plant</label>
+                                    <!-- add a select all option in multiselect -->
+                                    <multiselect v-model="user_copied.plants" :options="plants" :multiple="true" track-by="id"
+                                        :custom-label="customLabelPlant" placeholder="Select Plant" id="selected_plant">
+                                    </multiselect>
+                                    <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
                                 </div>
                             </div>
                         </div>
@@ -320,6 +366,8 @@ export default {
             copied_role: [],
             roles: [],
             based_trucks: [],
+            plants: [],
+            indicators: [],
             errors: [],
             currentPage: 0,
             itemsPerPage: 50,
@@ -328,17 +376,22 @@ export default {
             user_added: false,
             user_updated: false,
             user_id: '',
-            show_based_trucks: false
+            show_based_trucks: false,
+            show_plants: false,
+            show_plant_add: false,
         }
     },
     created(){
         this.fetchUsers();
         this.fetchRoles();
         this.fetchBasedTrucks();
+        this.fetchPlants();
+        this.fetchIndicators();
     },
     methods:{
         changeRole(role){
             role > 3 ? this.show_based_trucks = true : this.show_based_trucks = false;
+            role == 10 ? this.show_plants = true : this.show_plants = false;
         },
         changePassword(user){
             axios.post('/change-password', {
@@ -359,10 +412,12 @@ export default {
             return `${based_truck.description  }`
         },
         copyObject(user){
+            this.resetForm();
             this.user_copied = Object.assign({}, user);
             this.copied_role = this.user_copied.roles[0].id;
             this.user_id = user.id;
             user.roles[0].level < 4 ? this.show_based_trucks = true : this.show_based_trucks = false;
+            user.roles[0].id == 10 ? this.show_plants = true : this.show_plants = false;
             this.user_updated = false;
         },
         fetchBasedTrucks(){
@@ -373,6 +428,32 @@ export default {
             .catch(error => { 
                 this.errors = error.response.data.error;
             })
+        },
+        fetchPlants(){
+            axios.get('/plants')
+            .then(response => { 
+                this.plants = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        fetchIndicators(){
+            axios.get('/indicators')
+            .then(response => { 
+                this.indicators = response.data;
+            })
+            .catch(error => { 
+                this.errors = error.response.data.error;
+            })
+        },
+        customLabelPlant(plant) {
+            return `${plant.code} ${plant.name} - ${plant.company_server}`
+        },
+        plantChange() {
+            this.user.indicator_id == 2 ? this.show_plant_add = false : this.show_plant_add = true;
+            this.user_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+            // this.user_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
         fetchRoles(){
             axios.get('/roles')
@@ -395,6 +476,9 @@ export default {
         resetForm(){
             this.errors = [];
             this.user = [];
+            this.show_based_trucks = false;
+            this.show_plants = false;
+            this.show_plant_add = false;
         },
         addUser(user){
             var based_trucks_ids = [];
@@ -403,17 +487,28 @@ export default {
                     based_trucks_ids.push(based_truck.id);
                 });
             }
+            var plant_ids = [];
+            if(user.plant){
+                user.plant.forEach((plant) => {
+                    plant_ids.push(plant.id);
+                });
+            }
         
             this.user_added = false;
             this.loading = true;
             document.getElementById('add_btn').disabled = true;
-
+            if (user.role != 10) {
+                user.indicator_id = '';
+                plant_ids = [];
+            }
             axios.post('/user', {
                 name: user.name,
                 email: user.email,
                 password: user.default_password,
                 role: user.role,
-                based_trucks: based_trucks_ids
+                based_trucks: based_trucks_ids,
+                indicator_id: user.indicator_id,
+                plants: plant_ids
             })
             .then(response =>{
                 this.user_added = true;
@@ -434,18 +529,29 @@ export default {
             user_copied.based_trucks.forEach((based_truck) => {
                 based_trucks_ids.push(based_truck.id);
             });
+            var plant_ids = [];
+            if(user_copied.plants){
+                user_copied.plants.forEach((plant) => {
+                    plant_ids.push(plant.id);
+                });
+            }
 
             this.edit_updated = false;
             this.loading = true;
             document.getElementById('edit_btn').disabled = true;
             var index = this.users.findIndex(item => item.id == user_copied.id);
-
+            if (copied_role != 10) {
+                user_copied.indicator_id = '';
+                plant_ids = [];
+            }
             axios.post(`/user/${user_copied.id}`, {
                 name: user_copied.name,
                 email: user_copied.email,
                 password: user_copied.default_password,
                 role: copied_role,
                 based_trucks: based_trucks_ids,
+                indicator_id: user_copied.indicator_id,
+                plants: plant_ids,
                 _method: 'PATCH'
             })
             .then(response => {
