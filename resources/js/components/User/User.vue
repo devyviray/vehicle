@@ -253,7 +253,7 @@
                                     <span class="text-danger" v-if="errors.indicator_id">{{ errors.indicator_id[0] }}</span>
                                 </div>
                             </div>
-                            <div v-if="show_plant_add" class="col-lg-12">
+                            <div v-if="show_plant_edit" class="col-lg-12">
                                 <div class="form-group">
                                     <label for="role">Plant</label>
                                     <!-- add a select all option in multiselect -->
@@ -418,6 +418,7 @@ export default {
             this.user_id = user.id;
             user.roles[0].level < 4 ? this.show_based_trucks = true : this.show_based_trucks = false;
             user.roles[0].id == 10 ? this.show_plants = true : this.show_plants = false;
+            user.indicator_id == 2 ? this.show_plant_edit = false : this.show_plant_edit = true;
             this.user_updated = false;
         },
         fetchBasedTrucks(){
@@ -453,7 +454,7 @@ export default {
         plantChange() {
             this.user.indicator_id == 2 ? this.show_plant_add = false : this.show_plant_add = true;
             this.user_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
-            // this.user_fetch.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
+            this.user_copied.indicator_id == 2 ? this.show_plant_edit = false : this.show_plant_edit = true;
         },
         fetchRoles(){
             axios.get('/roles')

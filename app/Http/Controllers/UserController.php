@@ -45,7 +45,7 @@ class UserController extends Controller
             'password' => 'required',
             'role' => 'required',
             'based_trucks' => 'required_if:role,4|required_if:role,5|required_if:role,6',
-            'indicator_id' => 'required_if:role,10'
+            
         ]);
 
         if($user = User::create($request->all())){
@@ -79,11 +79,13 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|unique:users,email,' .$user->id,
             'role' => 'required',
-            'based_trucks' => 'required_if:role,4|required_if:role,5|required_if:role,6'
-
+            'based_trucks' => 'required_if:role,4|required_if:role,5|required_if:role,6',
+            'indicator_id' => 'required_if:role,10'
         ]);
 
         if($user->update($request->all())){
+            $user->indicator_id = $request->indicator_id;
+            $user->update();
             // Assigning of role
             $user->syncRoles($request->role);
             // Assigning of based trucks
@@ -136,5 +138,18 @@ class UserController extends Controller
         $user->save();
 
         return $user;
+    }
+
+    public function getUserPlants()
+    {
+        $user = auth()->user();
+        $user->plants->pluck('id')->toArray();
+        // convert plants to flat json array
+        $plants = $user->plants->pluck('id')->toArray();
+        return [
+            'indicator' => $user->indicator_id,
+            'role' => $user->roles->first(),
+            'plants' => $plants
+        ];
     }
 }
