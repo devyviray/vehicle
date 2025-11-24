@@ -103,6 +103,7 @@ Route::group(['middleware' => 'auth'], function(){
 
     // Plants
     Route::get('/plants', 'PlantController@index');
+    Route::get('/user-plants', 'UserController@getUserPlants');
 
     // GPS Devices
     Route::get('/gps_devices', 'GpsDevicesController@index');

@@ -62,6 +62,7 @@
                                     <tr>
                                         <th></th>
                                         <th scope="col"></th>
+                                        <th v-if="role == 'IT'" scope="col">BU Managed</th>
                                         <th scope="col">Category</th>
                                         <th scope="col">Plate number</th>
                                         <th scope="col">Plant Indicator</th>
@@ -118,6 +119,11 @@
                                         </td>
                                         <td><i class="fas fa-location-arrow" title="GPS Device: Yes"
                                                 v-if="vehicle.gpsdevice"></i></td>
+                                        <td v-if="role == 'IT'">
+                                            <span :class="vehicle.vendor.vendor_code_bu_managed ? 'badge badge-success' : 'badge badge-primary'">
+                                            {{ vehicle.vendor.vendor_code_bu_managed ? 'Yes' : 'No' }}
+                                            </span>
+                                        </td>
                                         <td>{{ vehicle.category.description }}</td>
                                         <td>{{ vehicle.plate_number }}</td>
                                         <td>{{ vehicle.indicator.description }}</td>
@@ -202,7 +208,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Plant Indicator*</label>
-                                    <select class="form-control" v-model="vehicle.indicator_id" @change="plantChange">
+                                    <select :disabled="sales_specific_plants" class="form-control" v-model="vehicle.indicator_id" @change="plantChange">
                                         <option v-for="(indicator, i) in indicators" v-bind:key="i" :value="indicator.id">
                                             {{ indicator.description }}
                                         </option>
@@ -215,8 +221,9 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <label for="role">Plant</label>
-                                    <multiselect v-model="vehicle.plant" :options="plants" :multiple="true" track-by="id"
-                                        :custom-label="customLabelPlant" placeholder="Select Plant" id="selected_plant">
+                                    <multiselect v-model="vehicle.plant" :options="availablePlants" :multiple="true" track-by="id"
+                                        :custom-label="customLabelPlant" placeholder="Select Plant" id="selected_plant"
+                                        :disabled="sales_specific_plants">
                                     </multiselect>
                                     <span class="text-danger" v-if="errors.plants">{{ errors.plants[0] }}</span>
                                 </div>
@@ -384,7 +391,7 @@
                             <div class="col-md-4">
                                 <div class="form-group">
                                     <label for="role">Plant Indicator*</label>
-                                    <select class="form-control" v-model="vehicle_fetch.indicator_id" @change="plantChange">
+                                    <select :disabled="sales_specific_plants" class="form-control" v-model="vehicle_fetch.indicator_id" @change="plantChange">
                                         <option v-for="(indicator, i) in indicators" v-bind:key="i" :value="indicator.id">
                                             {{ indicator.description }}
                                         </option>
@@ -893,7 +900,9 @@ export default {
                 name: '',
                 imei: '',
                 sim_number: '',
-            }
+            },
+            user_plants: [],
+            sales_specific_plants: false
 
         }
     },
@@ -909,6 +918,7 @@ export default {
         this.fetchTruckers();
         this.fetchPlants();
         this.buttonAuth();
+        this.fetchUserPlants();
     },
     methods: {
         vehicleCheckAssignGPS() {
@@ -1172,6 +1182,15 @@ export default {
                     this.errors = error.response.data.errors;
                 })
         },
+        fetchUserPlants() {
+            axios.get('/user-plants')
+                .then(response => {
+                    this.user_plants = response.data
+                })
+                .catch(error => {
+                    this.errors = error.response.data.errors;
+                })
+        },
         prepareFields() {
             if (this.attachments.length > 0) {
                 for (var i = 0; i < this.attachments.length; i++) {
@@ -1206,6 +1225,16 @@ export default {
             this.show_plant = false;
             document.getElementById('attachments').value = '';
             this.vehicle_added = false;
+            
+            if(this.user_plants.role.id == '10' && this.user_plants.indicator == '1') {
+                this.sales_specific_plants = true;
+                this.show_plant = true;
+                this.show_plant_add = true;
+
+                this.vehicle.indicator_id = 1;
+                // filter plants based on user_plants.plants array of IDs - for sales user with selected plants
+                this.vehicle.plant = this.plants.filter(plant => this.user_plants.plants.includes(plant.id));
+            }
 
         },
         resetForm() {
@@ -1617,6 +1646,13 @@ export default {
 
             return queues_array;
         },
+        availablePlants() {
+            // If sales role with specific plants, filter plants by user_plants.plants array of IDs
+            if (this.sales_specific_plants && this.user_plants.plants && this.user_plants.plants.length > 0) {
+                return this.plants.filter(plant => this.user_plants.plants.includes(plant.id));
+            }
+            return this.plants;
+        }
     }
 }
 </script>

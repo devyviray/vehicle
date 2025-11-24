@@ -32,20 +32,37 @@ class VehicleController extends Controller
     public function index()
     {   
         $sales = Auth::user()->roles->first()->id == '10'; //check role if sales
-
-        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
-            ->when($sales, function ($query){
+        $it = Auth::user()->roles->first()->id == '1';
+        $user_plants = [];
+        $user_indicator_id = Auth::user()->indicator_id ?? null;
+        if($sales){
+            if($user_indicator_id == 1){
+                $user_plants = Auth::user()->plants->pluck('id')->toArray();
+            }
+        }
+        $vehicles = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
+            ->when($sales, function ($query) use ($user_plants, $user_indicator_id){
                 $query->whereHas('vendor', function ($vendorQuery) {
                     $vendorQuery->whereNotNull('vendor_code_bu_managed');
+                })->with('plants')
+                ->whereHas('plants', function ($plantQuery) use ($user_plants, $user_indicator_id) {
+                    // filter for specific plants users assigned
+                    if($user_indicator_id == 1){
+                    $plantQuery->whereIn('plants.id', $user_plants);
+                        $plantQuery->where('indicator_id', $user_indicator_id);
+                    }
                 });
-            }, function ($query) {
-                $query->whereHas('vendor', function ($vendorQuery) {
-                    $vendorQuery->whereNull('vendor_code_bu_managed');
-                });
+            }, function ($query) use ($it){
+                if(!$it){
+                    $query->whereHas('vendor', function ($vendorQuery) {
+                        $vendorQuery->whereNull('vendor_code_bu_managed');
+                    });
+                }
             })
             ->when(Auth::user()->level() < 4, function ($query){
                 $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
             })->orderBy('id', 'desc')->get();
+        return $vehicles;
     }
 
     /**
