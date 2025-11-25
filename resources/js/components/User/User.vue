@@ -379,6 +379,7 @@ export default {
             show_based_trucks: false,
             show_plants: false,
             show_plant_add: false,
+            show_plant_edit: false
         }
     },
     created(){
