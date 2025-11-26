@@ -45,7 +45,7 @@ class UserController extends Controller
             'password' => 'required',
             'role' => 'required',
             'based_trucks' => 'required_if:role,4|required_if:role,5|required_if:role,6',
-            
+            'indicator_id' => 'required_if:role,10'
         ]);
 
         if($user = User::create($request->all())){
