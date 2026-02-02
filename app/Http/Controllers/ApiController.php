@@ -55,10 +55,12 @@ class ApiController extends Controller
                     'validity_end_date' => $item->validity_end_date,
                     'capacity_id' => $item->capacity_id,
                     'capacity' => $item->capacity->description,
+                    'vendor_code_description' => $item->vendor->vendor_description_hana,
                     'vendor_codes' => [
                         'LFUG' => $item->vendor->vendor_code_lfug,
                         'CSCI' => $item->vendor->vendor_code_pfmc,
                         'HANA' => $item->vendor->vendor_code_hana,
+                        'AMADI' => $item->vendor->vendor_code_amadi,
                     ],
                     'gps_device' => $item->gpsDevice
                     ? [
