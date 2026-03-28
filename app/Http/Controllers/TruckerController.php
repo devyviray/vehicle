@@ -17,15 +17,7 @@ class TruckerController extends Controller
      */
     public function index()
     {
-        $sales = Auth::user()->roles->first()->id == '10'; //check role if sales
-
-        return Trucker::when($sales, function ($query) {
-        // When the user is Sales, filter where vendor_code_bu_managed is NOT null
-            $query->whereNotNull('vendor_code_bu_managed');
-        }, function ($query) {
-            $query->whereNull('vendor_code_bu_managed');
-        })
-        ->orderBy('id', 'desc')
+        return Trucker::orderBy('id', 'desc')
         ->get();
     }
 

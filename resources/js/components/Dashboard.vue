@@ -120,8 +120,8 @@
                                         <td><i class="fas fa-location-arrow" title="GPS Device: Yes"
                                                 v-if="vehicle.gpsdevice"></i></td>
                                         <td v-if="role == 'IT'">
-                                            <span :class="vehicle.vendor.vendor_code_bu_managed ? 'badge badge-success' : 'badge badge-primary'">
-                                            {{ vehicle.vendor.vendor_code_bu_managed ? 'Yes' : 'No' }}
+                                            <span :class="vehicle.is_bu_managed ? 'badge badge-success' : 'badge badge-primary'">
+                                            {{ vehicle.is_bu_managed ? 'Yes' : 'No' }}
                                             </span>
                                         </td>
                                         <td>{{ vehicle.category.description }}</td>

@@ -42,22 +42,29 @@ class VehicleController extends Controller
         }
         $vehicles = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
             ->when($sales, function ($query) use ($user_plants, $user_indicator_id){
-                $query->whereHas('vendor', function ($vendorQuery) {
-                    $vendorQuery->whereNotNull('vendor_code_bu_managed');
-                })->with('plants')
+                $query
+                // ->whereHas('vendor', function ($vendorQuery) {
+                //     $vendorQuery->whereNotNull('vendor_code_bu_managed');
+                // })
+                ->with('plants')
+                ->where('is_bu_managed',1)
                 ->whereHas('plants', function ($plantQuery) use ($user_plants, $user_indicator_id) {
                     // filter for specific plants users assigned
                     if($user_indicator_id == 1){
-                    $plantQuery->whereIn('plants.id', $user_plants);
-                        $plantQuery->where('indicator_id', $user_indicator_id);
+                        $plantQuery->whereIn('plants.id', $user_plants);
+                        // $plantQuery->where('indicator_id', $user_indicator_id);
                     }
                 });
-            }, function ($query) use ($it){
-                if(!$it){
-                    $query->whereHas('vendor', function ($vendorQuery) {
-                        $vendorQuery->whereNull('vendor_code_bu_managed');
-                    });
-                }
+            })
+            // , function ($query) use ($it){
+            //     if(!$it){
+            //         $query->whereHas('vendor', function ($vendorQuery) {
+            //             $vendorQuery->whereNull('vendor_code_bu_managed');
+            //         });
+            //     }
+            // })
+            ->when((!$sales && !$it), function($query){
+                $query->where('is_bu_managed',0);
             })
             ->when(Auth::user()->level() < 4, function ($query){
                 $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
@@ -93,8 +100,11 @@ class VehicleController extends Controller
 
         DB::beginTransaction();
         try {
-
-            if($vehicle = Vehicle::create(['user_id' => Auth::user()->id] + $request->all())){
+            if($vehicle = Vehicle::create([
+                'user_id' => Auth::user()->id, 
+                'is_bu_managed' => (Auth::user()->roles->first()->id == '10') ? 1 : 0 //check role if sales
+                ] + $request->all())){
+                    
                 $attachments = $request->file('attachments');
                 if(!empty($attachments)){   
                     foreach($attachments as $attachment){
