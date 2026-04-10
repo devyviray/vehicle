@@ -63,9 +63,9 @@ class VehicleController extends Controller
             //         });
             //     }
             // })
-            ->when((!$sales && !$it), function($query){
-                $query->where('is_bu_managed',0);
-            })
+            // ->when((!$sales && !$it), function($query){
+            //     $query->where('is_bu_managed',0);
+            // })
             ->when(Auth::user()->level() < 4, function ($query){
                 $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
             })->orderBy('id', 'desc')->get();
