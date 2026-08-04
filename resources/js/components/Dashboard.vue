@@ -21,6 +21,11 @@
                                         data-toggle="modal" data-target="#addVehicleModal"
                                         style="background-color: rgb(4, 112, 62);" @click="resetData()">Add Vehicle</a>
                                     <button
+                                        
+                                        :disabled="!readyListbutton" class="btn btn-sm btn-primary"
+                                        style="background-color: rgb(4, 112, 62);" @click="exportVehicleNoLibrary()">Export
+                                        Excel</button>
+                                    <button
                                         v-if="this.role == 'ALC DOM' || this.role == 'Vehicle Custodian' || this.role == 'GPS Custodian Export'"
                                         :disabled="!readyListbutton" class="btn btn-sm btn-primary"
                                         style="background-color: rgb(4, 112, 62);" @click="exportVehicle()">Download
@@ -1108,6 +1113,159 @@ export default {
             var wb = XLSX.utils.book_new()
             XLSX.utils.book_append_sheet(wb, exportedData, 'Vehicle List')
             XLSX.writeFile(wb, 'Vechicle List.xlsx')
+            v.loading = false;
+        },
+        escapeCsvValue(value) {
+            if (value === null || value === undefined) {
+                return '""';
+            }
+
+            var str = String(value);
+            str = str.replace(/"/g, '""');
+            return '"' + str + '"';
+        },
+        async exportVehicleNoLibrary() {
+            let v = this;
+            let page = 1;
+            let lastPage = 1;
+            let exportRows = [];
+
+            // Ensure Excel treats long numbers as text
+            var escapeCsvValue = function (value) {
+                if (value === null || value === undefined) {
+                    return '';
+                }
+
+                value = String(value);
+
+                // Escape quotes
+                value = value.replace(/"/g, '""');
+
+                // Wrap values containing CSV special characters
+                if (value.includes(',') || value.includes('\n') || value.includes('"')) {
+                    value = '"' + value + '"';
+                }
+
+                return value;
+            };
+
+            // Force Excel text format for IMEI and other long numeric strings
+            var formatExcelText = function (value) {
+                if (!value) {
+                    return '';
+                }
+
+                return '="' + String(value).replace(/"/g, '""') + '"';
+            };
+
+            v.loading = true;
+
+            try {
+                do {
+                    let response = await axios.get('/vehicle-table', {
+                        params: Object.assign({}, v.buildVehicleParams(page), { per_page: 200 })
+                    });
+
+                    if (response.data && response.data.data) {
+                        exportRows = exportRows.concat(response.data.data);
+                        lastPage = response.data.last_page;
+                    } else {
+                        lastPage = 0;
+                    }
+
+                    page++;
+                } while (page <= lastPage);
+
+            } catch (error) {
+                v.loading = false;
+                alert('Unable to export vehicles at the moment.');
+                return;
+            }
+
+            var headers = [
+                'GPS',
+                'IMEI',
+                'SIM NUMBER',
+                'BU MANAGED',
+                'CATEGORY',
+                'PLATE NUMBER',
+                'PLANT INDICATOR',
+                'VENDOR',
+                'SUBCON VENDOR',
+                'CAPACITY',
+                'GOODS',
+                'ALLOWED TOTAL WEIGHT (KG)',
+                'BASED TRUCKS',
+                'REMARKS',
+                'CONTRACT',
+                'USER',
+                'VALIDITY START DATE',
+                'VALIDITY END DATE',
+                'CREATED AT',
+                'UPDATED AT'
+            ];
+
+            var csvLines = [];
+            csvLines.push(headers.map(escapeCsvValue).join(','));
+
+            exportRows.forEach(function (data) {
+                var has_gps = data.gpsdevice ? 'Yes' : 'No';
+
+                // Keep IMEI as Excel text
+                var imei = data.gpsdevice && data.gpsdevice.imei
+                    ? formatExcelText(data.gpsdevice.imei)
+                    : '';
+
+                // Keep SIM number as text too (prevents scientific notation/leading zero loss)
+                var sim_number = data.gpsdevice && data.gpsdevice.sim_number
+                    ? formatExcelText(data.gpsdevice.sim_number)
+                    : '';
+
+                var row = [
+                    has_gps,
+                    imei,
+                    sim_number,
+                    data.is_bu_managed ? 'Yes' : 'No',
+                    data.category ? data.category.description : '',
+                    data.plate_number || '',
+                    data.indicator ? data.indicator.description : '',
+                    data.vendor ? data.vendor.vendor_description_lfug : '',
+                    data.subcon_vendor ? data.subcon_vendor.vendor_description_lfug : '',
+                    data.capacity ? data.capacity.description : '',
+                    data.good ? data.good.description : '',
+                    data.allowed_total_weight || '',
+                    data.based_truck ? data.based_truck.description : '',
+                    data.remarks || '',
+                    data.contract ? data.contract.code : '',
+                    data.user ? data.user.name : '',
+                    data.validity_start_date || '',
+                    data.validity_end_date || '',
+                    data.created_at || '',
+                    data.updated_at || ''
+                ];
+
+                csvLines.push(row.map(escapeCsvValue).join(','));
+            });
+
+            var csvContent = csvLines.join('\r\n');
+
+            // Add BOM so Excel reads UTF-8 correctly
+            var blob = new Blob(["\ufeff" + csvContent], {
+                type: 'text/csv;charset=utf-8;'
+            });
+
+            var link = document.createElement('a');
+            var url = URL.createObjectURL(blob);
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'Vehicle_List.csv');
+
+            document.body.appendChild(link);
+            link.click();
+
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
             v.loading = false;
         },
         disabledEdit() {
