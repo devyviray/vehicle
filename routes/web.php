@@ -32,6 +32,7 @@ Route::get('/home', 'HomeController@index')->name('home');
 Route::group(['middleware' => 'auth'], function(){
     // Vehicle
     Route::get('/vehicle', 'VehicleController@index');
+    Route::get('/vehicle-table', 'VehicleController@tableData');
     Route::post('/vehicle', 'VehicleController@store');
     Route::patch('/vehicle/{vehicle}', 'VehicleController@update');
     Route::delete('/vehicle/{vehicle}', 'VehicleController@destroy');
@@ -93,6 +94,7 @@ Route::group(['middleware' => 'auth'], function(){
     // Users
     Route::get('/users', 'UserController@index')->name('users');
     Route::get('/users-all', 'UserController@indexData');
+    Route::get('/users-table', 'UserController@tableData');
     Route::post('/user', 'UserController@store');
     Route::patch('/user/{user}', 'UserController@update');
     Route::delete('/user/{user}', 'UserController@destroy');

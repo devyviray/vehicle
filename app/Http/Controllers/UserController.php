@@ -32,6 +32,32 @@ class UserController extends Controller
     }
 
     /**
+     * Fetch users table data with server-side search and pagination.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     */
+    public function tableData(Request $request)
+    {
+        $per_page = 10;
+
+        $query = User::with('roles', 'basedTrucks', 'plants')
+            ->when(!empty($request->keywords), function ($builder) use ($request) {
+                $builder->where(function ($inner) use ($request) {
+                    $inner->where('name', 'like', '%' . $request->keywords . '%')
+                        ->orWhere('email', 'like', '%' . $request->keywords . '%');
+                });
+            })
+            ->when(!empty($request->role_id), function ($builder) use ($request) {
+                $builder->whereHas('roles', function ($roleQuery) use ($request) {
+                    $roleQuery->where('roles.id', $request->role_id);
+                });
+            });
+
+        return $query->orderBy('id', 'desc')->paginate($per_page);
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

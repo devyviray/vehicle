@@ -24,6 +24,76 @@ use GuzzleHttp\Exception\BadResponseException;
 
 class VehicleController extends Controller
 {
+    private function baseVehicleQuery()
+    {
+        $sales = Auth::user()->roles->first()->id == '10';
+        $it = Auth::user()->roles->first()->id == '1';
+        $user_plants = [];
+        $user_indicator_id = Auth::user()->indicator_id ?? null;
+
+        if ($sales && $user_indicator_id == 1) {
+            $user_plants = Auth::user()->plants->pluck('id')->toArray();
+        }
+
+        return Vehicle::with(
+            'category',
+            'capacity',
+            'indicator',
+            'good',
+            'basedTruck',
+            'contract',
+            'documents',
+            'user',
+            'vendor',
+            'subconVendor',
+            'gpsdevice',
+            'gpsdeviceattachments'
+        )
+            ->when($sales, function ($query) use ($user_plants, $user_indicator_id) {
+                $query
+                    ->with('plants')
+                    ->where('is_bu_managed', 1)
+                    ->whereHas('plants', function ($plantQuery) use ($user_plants, $user_indicator_id) {
+                        if ($user_indicator_id == 1) {
+                            $plantQuery->whereIn('plants.id', $user_plants);
+                        }
+                    });
+            })
+            ->when(Auth::user()->level() < 4, function ($query) {
+                $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
+            });
+    }
+
+    private function applyVehicleFilters($query, Request $request)
+    {
+        $date_today = Carbon::now()->format('Y-m-d');
+        $operator = $request->filter_status_operator;
+        $gps = $request->filter_gps;
+
+        $base_truck_ids = $request->filter_based_trucks;
+        if (is_string($base_truck_ids)) {
+            $base_truck_ids = array_filter(explode(',', $base_truck_ids));
+        }
+
+        return $query
+            ->when(!empty($request->keywords), function ($builder) use ($request) {
+                $builder->where('plate_number', 'like', '%' . $request->keywords . '%');
+            })
+            ->when(!empty($operator), function ($builder) use ($operator, $date_today) {
+                $builder->where('validity_end_date', $operator, $date_today);
+            })
+            ->when(!empty($gps), function ($builder) use ($gps) {
+                if ($gps == 'Yes') {
+                    $builder->whereHas('gpsdevice');
+                } elseif ($gps == 'No') {
+                    $builder->doesntHave('gpsdevice');
+                }
+            })
+            ->when(!empty($base_truck_ids), function ($builder) use ($base_truck_ids) {
+                $builder->whereIn('based_truck_id', $base_truck_ids);
+            });
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -31,45 +101,23 @@ class VehicleController extends Controller
      */
     public function index()
     {   
-        $sales = Auth::user()->roles->first()->id == '10'; //check role if sales
-        $it = Auth::user()->roles->first()->id == '1';
-        $user_plants = [];
-        $user_indicator_id = Auth::user()->indicator_id ?? null;
-        if($sales){
-            if($user_indicator_id == 1){
-                $user_plants = Auth::user()->plants->pluck('id')->toArray();
-            }
+        return $this->baseVehicleQuery()->orderBy('id', 'desc')->get();
+    }
+
+    public function tableData(Request $request)
+    {
+        $per_page = (int) $request->get('per_page', 50);
+        if ($per_page <= 0) {
+            $per_page = 50;
         }
-        $vehicles = Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
-            ->when($sales, function ($query) use ($user_plants, $user_indicator_id){
-                $query
-                // ->whereHas('vendor', function ($vendorQuery) {
-                //     $vendorQuery->whereNotNull('vendor_code_bu_managed');
-                // })
-                ->with('plants')
-                ->where('is_bu_managed',1)
-                ->whereHas('plants', function ($plantQuery) use ($user_plants, $user_indicator_id) {
-                    // filter for specific plants users assigned
-                    if($user_indicator_id == 1){
-                        $plantQuery->whereIn('plants.id', $user_plants);
-                        // $plantQuery->where('indicator_id', $user_indicator_id);
-                    }
-                });
-            })
-            // , function ($query) use ($it){
-            //     if(!$it){
-            //         $query->whereHas('vendor', function ($vendorQuery) {
-            //             $vendorQuery->whereNull('vendor_code_bu_managed');
-            //         });
-            //     }
-            // })
-            // ->when((!$sales && !$it), function($query){
-            //     $query->where('is_bu_managed',0);
-            // })
-            ->when(Auth::user()->level() < 4, function ($query){
-                $query->whereIn('based_truck_id', Auth::user()->basedTrucks->pluck('id'));
-            })->orderBy('id', 'desc')->get();
-        return $vehicles;
+        if ($per_page > 200) {
+            $per_page = 200;
+        }
+
+        $query = $this->baseVehicleQuery();
+        $query = $this->applyVehicleFilters($query, $request);
+
+        return $query->orderBy('id', 'desc')->paginate($per_page);
     }
 
     /**
@@ -238,42 +286,16 @@ class VehicleController extends Controller
     }
 
     public function filterVehicle(Request $request){
-       
-        $date_today = Carbon::now()->format('Y-m-d');
-        $operator = $request->operator;
-        $gps = $request->filter_gps;
-        $base_truck_ids = $request->filter_based_trucks;
-        $sales = Auth::user()->roles->first()->id == '10'; //check role if sales
+        $request->merge([
+            'filter_status_operator' => $request->operator,
+            'filter_gps' => $request->filter_gps,
+            'filter_based_trucks' => $request->filter_based_trucks,
+        ]);
 
-        return Vehicle::with('category','capacity', 'indicator', 'good', 'basedTruck', 'contract', 'documents', 'user','vendor', 'subconVendor','gpsdevice','gpsdeviceattachments')
-                            ->when($sales, function ($query){
-                                $query->whereHas('vendor', function ($vendorQuery) {
-                                    $vendorQuery->whereNotNull('vendor_code_bu_managed');
-                                });
-                            }, function ($query) {
-                                $query->whereHas('vendor', function ($vendorQuery) {
-                                    $vendorQuery->whereNull('vendor_code_bu_managed');
-                                });
-                            })
-                            ->when(!empty($operator), function ($query) use($operator,$date_today) {
-                                $query->where('validity_end_date',$operator,$date_today);
-                            })
-                            ->when(!empty($gps),function ($query) use ($gps){
-                                if($gps == 'Yes'){
-                                    $query->whereHas('gpsdevice');
-                                    // $query->whereNotNull('gps_device_id');
-                                    // $query->where('gps_device_id' , '!=' , '0');
-                                }elseif($gps == 'No'){
-                                    $query->doesntHave('gpsdevice');
-                                    // $query->whereNull('gps_device_id');
-                                    // $query->where('gps_device_id' , '==' , '0');
-                                }
-                            })
-                            ->when(isset($base_truck_ids), function ($query) use($base_truck_ids){
-                                $base_truck_ids_arr = explode(',',$base_truck_ids);
-                                $query->whereIn('based_truck_id',$base_truck_ids_arr);  
-                            }) 
-                            ->orderBy('id', 'desc')->get();
+        $query = $this->baseVehicleQuery();
+        $query = $this->applyVehicleFilters($query, $request);
+
+        return $query->orderBy('id', 'desc')->get();
     }
 
     /**

@@ -22,8 +22,16 @@
                             </div>
                             <div class="row align-items-center">
                                 <div class="col-xl-4 mb-2 mt-3 float-right">
-                                    <input type="text" class="form-control" placeholder="Search" v-model="keywords" id="keywords">
-                                </div> 
+                                    <input type="text" class="form-control" placeholder="Search" v-model="keywords" id="keywords" name="users-search-filter" autocomplete="off" autocapitalize="off" spellcheck="false" @input="onSearchInput($event)">
+                                </div>
+                                <div class="col-xl-3 mb-2 mt-3 float-right">
+                                    <select class="form-control" v-model="filterRole" @change="onRoleFilterChange">
+                                        <option value="">All Roles</option>
+                                        <option v-for="(role, r) in roles" :key="'filter-role-' + r" :value="role.id">
+                                            {{ role.name }}
+                                        </option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="table-responsive">
@@ -39,7 +47,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(user, u) in filteredQueues" v-bind:key="u">
+                                    <tr v-for="user in users" :key="user.id">
                                         <td class="text-right">
                                             <div class="dropdown">
                                                 <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
@@ -61,14 +69,14 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row mb-3 mt-3 ml-1" v-if="filteredQueues.length ">
+                        <div class="row mb-3 mt-3 ml-1" v-if="pagination.total > 0">
                             <div class="col-6">
-                                <button :disabled="!showPreviousLink()" class="btn btn-default btn-sm btn-fill" v-on:click="setPage(currentPage - 1)"> Previous </button>
-                                    <span class="text-dark">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
-                                <button :disabled="!showNextLink()" class="btn btn-default btn-sm btn-fill" v-on:click="setPage(currentPage + 1)"> Next </button>
+                                <button :disabled="!showPreviousLink()" class="btn btn-default btn-sm btn-fill" v-on:click="setPage(pagination.current_page - 1)"> Previous </button>
+                                    <span class="text-dark">Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
+                                <button :disabled="!showNextLink()" class="btn btn-default btn-sm btn-fill" v-on:click="setPage(pagination.current_page + 1)"> Next </button>
                             </div>
                             <div class="col-6 text-right">
-                                <span>{{ filteredQueues.length }} User(s)</span>
+                                <span>Showing {{ pagination.from || 0 }} - {{ pagination.to || 0 }} of {{ pagination.total }} User(s)</span>
                             </div>
                         </div>
                     </div>
@@ -369,10 +377,21 @@ export default {
             plants: [],
             indicators: [],
             errors: [],
-            currentPage: 0,
-            itemsPerPage: 50,
+            currentPage: 1,
+            itemsPerPage: 10,
             keywords: '',
+            filterRole: '',
             loading: false,
+            searchDebounceTimer: null,
+            isBootstrappingSearch: true,
+            pagination: {
+                current_page: 1,
+                last_page: 1,
+                per_page: 10,
+                total: 0,
+                from: 0,
+                to: 0
+            },
             user_added: false,
             user_updated: false,
             user_id: '',
@@ -383,13 +402,63 @@ export default {
         }
     },
     created(){
-        this.fetchUsers();
         this.fetchRoles();
         this.fetchBasedTrucks();
         this.fetchPlants();
         this.fetchIndicators();
     },
+    mounted() {
+        this.sanitizeSearchField();
+        this.fetchUsers(1);
+        this.$nextTick(() => {
+            setTimeout(() => {
+                this.sanitizeSearchField();
+            }, 300);
+            setTimeout(() => {
+                this.isBootstrappingSearch = false;
+            }, 800);
+        });
+        window.addEventListener('pageshow', this.handlePageShow);
+    },
     methods:{
+        handlePageShow() {
+            this.sanitizeSearchField();
+            this.fetchUsers(1);
+        },
+        sanitizeSearchField() {
+            this.keywords = '';
+            const searchInput = this.$el.querySelector('#keywords');
+            if (searchInput) {
+                searchInput.value = '';
+            }
+        },
+        buildUserParams(page = 1) {
+            let params = {
+                page: page,
+                per_page: this.itemsPerPage,
+                keywords: this.keywords ? this.keywords.trim() : ''
+            };
+
+            if (this.filterRole) {
+                params.role_id = this.filterRole;
+            }
+
+            return params;
+        },
+        onSearchInput(event) {
+            if (this.isBootstrappingSearch && event && document.activeElement !== event.target) {
+                this.sanitizeSearchField();
+                return;
+            }
+
+            clearTimeout(this.searchDebounceTimer);
+            this.searchDebounceTimer = setTimeout(() => {
+                this.fetchUsers(1);
+            }, 400);
+        },
+        onRoleFilterChange() {
+            this.fetchUsers(1);
+        },
         changeRole(role){
             role > 3 ? this.show_based_trucks = true : this.show_based_trucks = false;
             role == 10 ? this.show_plants = true : this.show_plants = false;
@@ -466,13 +535,23 @@ export default {
                 this.errors = error.response.data.error;
             })
         },
-        fetchUsers(){
-            axios.get('/users-all')
+        fetchUsers(page = 1){
+            this.loading = true;
+            axios.get('/users-table', { params: this.buildUserParams(page) })
             .then(response => { 
-                this.users = response.data;
+                this.users = response.data.data;
+                this.currentPage = response.data.current_page;
+                this.pagination.current_page = response.data.current_page;
+                this.pagination.last_page = response.data.last_page;
+                this.pagination.per_page = response.data.per_page;
+                this.pagination.total = response.data.total;
+                this.pagination.from = response.data.from;
+                this.pagination.to = response.data.to;
+                this.loading = false;
             })
             .catch(error => { 
-                this.errors = error.response.data.error;
+                this.errors = error.response && error.response.data ? error.response.data.error : [];
+                this.loading = false;
             })
         },
         resetForm(){
@@ -514,7 +593,7 @@ export default {
             })
             .then(response =>{
                 this.user_added = true;
-                this.users.unshift(response.data);
+                this.fetchUsers(1);
                 this.resetForm();
                 document.getElementById('add_btn').disabled = false;
                 this.loading = false;
@@ -541,7 +620,6 @@ export default {
             this.edit_updated = false;
             this.loading = true;
             document.getElementById('edit_btn').disabled = true;
-            var index = this.users.findIndex(item => item.id == user_copied.id);
             if (copied_role != 10) {
                 user_copied.indicator_id = '';
                 plant_ids = [];
@@ -558,7 +636,7 @@ export default {
             })
             .then(response => {
                 this.user_updated = true;
-                this.users.splice(index,1,response.data);
+                this.fetchUsers(this.pagination.current_page || 1);
                 document.getElementById('edit_btn').disabled = false;
                 this.loading = false;
             })
@@ -570,57 +648,38 @@ export default {
             })
         },
         deleteVehicle(){
-            var index = this.users.findIndex(item => item.id == this.user_id);
             axios.delete(`/user/${this.user_id}`)
             .then(response => {
                 $('#deleteModal').modal('hide');
                 alert('User successfully deleted');
-                this.users.splice(index,1);
+                this.fetchUsers(this.pagination.current_page || 1);
             })
             .catch(error => {
                 this.errors = error.response.data.errors;
             })
         },
         setPage(pageNumber) {
-            this.currentPage = pageNumber;
+            if (pageNumber < 1 || pageNumber > this.pagination.last_page) {
+                return;
+            }
+            this.fetchUsers(pageNumber);
         },
 
         resetStartRow() {
-            this.currentPage = 0;
+            this.currentPage = 1;
         },
 
         showPreviousLink() {
-            return this.currentPage == 0 ? false : true;
+            return this.pagination.current_page > 1;
         },
 
         showNextLink() {
-            return this.currentPage == (this.totalPages - 1) ? false : true;
+            return this.pagination.current_page < this.pagination.last_page;
         }   
     },
-    computed:{
-        filteredUsers(){
-            let self = this;
-            return Object.values(self.users).filter(user => {
-                return user.name.toLowerCase().includes(this.keywords.toLowerCase())
-            });
-        },
-        totalPages() {
-            return Math.ceil(Object.values(this.users).length / this.itemsPerPage)
-        },
-        filteredQueues() {
-            var index = this.currentPage * this.itemsPerPage;
-            var queues_array = this.filteredUsers.slice(index, index + this.itemsPerPage);
-
-            if(this.currentPage >= this.totalPages) {
-                this.currentPage = this.totalPages - 1
-            }
-
-            if(this.currentPage == -1) {
-                this.currentPage = 0;
-            }
-
-            return queues_array;
-        },
+    beforeDestroy() {
+        clearTimeout(this.searchDebounceTimer);
+        window.removeEventListener('pageshow', this.handlePageShow);
     }
 }
 </script>

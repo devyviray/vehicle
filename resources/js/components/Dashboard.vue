@@ -30,7 +30,7 @@
                             <div class="row align-items-center">
                                 <div class="col-xl-4 mb-3 mt-3 float-right">
                                     <input type="text" class="form-control" placeholder="Search (Plate Number)"
-                                        v-model="keywords" id="name">
+                                        v-model="keywords" id="name" @input="onSearchInput">
                                 </div>
                                 <div class="col-xl-2 mb-2 mt-3 float-right">
                                     <multiselect v-model="filterStatus" :options="statuses" :multiple="false"
@@ -62,36 +62,36 @@
                                     <tr>
                                         <th></th>
                                         <th scope="col"></th>
-                                        <th v-if="role == 'IT'" scope="col">BU Managed</th>
+                                        <th scope="col"></th>
+                                        <th v-if="['IT','AP'].includes(role)" scope="col">BU Managed</th>
                                         <th scope="col">Category</th>
                                         <th scope="col">Plate number</th>
                                         <th scope="col">Plant Indicator</th>
                                         <th scope="col">Vendor</th>
-                                        <th scope="col">Subcon vendor</th>
                                         <th scope="col">Capacity</th>
-                                        <th scope="col">Goods</th>
-                                        <th scope="col">Allowed total weight (KG)</th>
                                         <th scope="col">Based trucks</th>
-                                        <th scope="col">Remarks</th>
-                                        <th scope="col">Contract</th>
-                                        <th scope="col">User</th>
-                                        <th scope="col">Validity start date</th>
                                         <th scope="col">Validity end date</th>
-                                        <th scope="col">Created at</th>
-                                        <th scope="col">Updated at</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    <tr v-if="table_loading">
-                                        <td colspan="15">
+                                <tbody v-if="table_loading">
+                                    <tr>
+                                        <td :colspan="tableColumnCount">
                                             <content-placeholders>
                                                 <content-placeholders-heading :img="true" />
                                                 <content-placeholders-text :lines="3" />
                                             </content-placeholders>
                                         </td>
                                     </tr>
-
-                                    <tr v-for="(vehicle, v) in filteredQueues" v-bind:key="v">
+                                </tbody>
+                                <tbody v-else-if="vehicles.length === 0">
+                                    <tr>
+                                        <td :colspan="tableColumnCount" class="text-center text-muted">
+                                            No vehicles found.
+                                        </td>
+                                    </tr>
+                                </tbody>
+                                <tbody v-else v-for="vehicle in vehicles" :key="vehicle.id">
+                                    <tr>
                                         <td class="text-right">
                                             <div class="dropdown" v-if="userLevel > 2">
                                                 <a class="btn btn-sm btn-icon-only text-light" href="#" role="button"
@@ -117,6 +117,11 @@
                                                 </div>
                                             </div>
                                         </td>
+                                        <td>
+                                            <button class="btn btn-sm btn-default" @click="toggleRow(vehicle.id)">
+                                                <i class="fas" :class="isRowExpanded(vehicle.id) ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                                            </button>
+                                        </td>
                                         <td><i class="fas fa-location-arrow" title="GPS Device: Yes"
                                                 v-if="vehicle.gpsdevice"></i></td>
                                         <td v-if="['IT','AP'].includes(role)">
@@ -128,39 +133,38 @@
                                         <td>{{ vehicle.plate_number }}</td>
                                         <td>{{ vehicle.indicator.description }}</td>
                                         <td>{{ vehicle.vendor.vendor_description_lfug }}</td>
-                                        <td v-if="vehicle.subcon_vendor">{{ vehicle.subcon_vendor.vendor_description_lfug }}
-                                        </td>
-                                        <td v-else></td>
                                         <td>{{ vehicle.capacity.description }}</td>
-                                        <td v-if="vehicle.good">{{ vehicle.good.description }}</td>
-                                        <td v-else></td>
-                                        <td v-if="vehicle.allowed_total_weight">{{ vehicle.allowed_total_weight }}</td>
-                                        <td v-else></td>
                                         <td>{{ vehicle.based_truck.description }}</td>
-                                        <td v-if="vehicle.remarks">{{ vehicle.remarks }}</td>
-                                        <td v-else></td>
-                                        <td v-if="vehicle.contract">{{ vehicle.contract.code }}</td>
-                                        <td v-else></td>
-                                        <td>{{ vehicle.user.name }}</td>
-                                        <td>{{ vehicle.validity_start_date }}</td>
                                         <td>{{ vehicle.validity_end_date }}</td>
-                                        <td>{{ vehicle.created_at }}</td>
-                                         <td>{{ vehicle.updated_at }}</td>
+                                    </tr>
+                                    <tr v-if="isRowExpanded(vehicle.id)" class="bg-light">
+                                        <td :colspan="tableColumnCount" class="p-3">
+                                            <div class="row">
+                                                <div class="col-md-4 mb-2"><strong>Subcon Vendor:</strong> {{ vehicle.subcon_vendor ? vehicle.subcon_vendor.vendor_description_lfug : '-' }}</div>
+                                                <div class="col-md-4 mb-2"><strong>Goods:</strong> {{ vehicle.good ? vehicle.good.description : '-' }}</div>
+                                                <div class="col-md-4 mb-2"><strong>Allowed Total Weight (KG):</strong> {{ vehicle.allowed_total_weight ? vehicle.allowed_total_weight : '-' }}</div>
+                                                <div class="col-md-4 mb-2"><strong>Remarks:</strong> {{ vehicle.remarks ? vehicle.remarks : '-' }}</div>
+                                                <div class="col-md-4 mb-2"><strong>Contract:</strong> {{ vehicle.contract ? vehicle.contract.code : '-' }}</div>
+                                                <div class="col-md-4 mb-2"><strong>User:</strong> {{ vehicle.user ? vehicle.user.name : '-' }}</div>
+                                                <div class="col-md-4 mb-2"><strong>Validity Start Date:</strong> {{ vehicle.validity_start_date }}</div>
+                                                <div class="col-md-4 mb-2"><strong>Created At:</strong> {{ vehicle.created_at }}</div>
+                                                <div class="col-md-4 mb-2"><strong>Updated At:</strong> {{ vehicle.updated_at }}</div>
+                                            </div>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-                        <div class="row mb-3 mt-3 ml-1" v-if="filteredQueues.length">
+                        <div class="row mb-3 mt-3 ml-1" v-if="pagination.total > 0">
                             <div class="col-6">
                                 <button :disabled="!showPreviousLink()" class="btn btn-default btn-sm btn-fill"
-                                    v-on:click="setPage(currentPage - 1)"> Previous </button>
-                                <span class="text-dark">Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+                                    v-on:click="setPage(pagination.current_page - 1)"> Previous </button>
+                                <span class="text-dark">Page {{ pagination.current_page }} of {{ pagination.last_page }}</span>
                                 <button :disabled="!showNextLink()" class="btn btn-default btn-sm btn-fill"
-                                    v-on:click="setPage(currentPage + 1)"> Next </button>
+                                    v-on:click="setPage(pagination.current_page + 1)"> Next </button>
                             </div>
                             <div class="col-6 text-right">
-                                <span>{{ filteredQueues.length }} Filtered Vehicle(s)</span><br>
-                                <span>{{ Object.keys(vehicles).length }} Total Vehicle(s)</span>
+                                <span>Showing {{ pagination.from || 0 }} - {{ pagination.to || 0 }} of {{ pagination.total }} Vehicle(s)</span>
                             </div>
                         </div>
                     </div>
@@ -864,12 +868,23 @@ export default {
             formData: new FormData(),
             fileSize: 0,
             errors: [],
-            currentPage: 0,
+            currentPage: 1,
             itemsPerPage: 50,
             keywords: '',
             filterBasedTruck: '',
             filterGps: '',
             filterStatus: '',
+            searchDebounceTimer: null,
+            pagination: {
+                current_page: 1,
+                last_page: 1,
+                per_page: 50,
+                total: 0,
+                from: 0,
+                to: 0
+            },
+            expandedRows: {},
+            isAllRowsExpanded: false,
             gpsStatuses: ['Yes', 'No'],
             statuses: ['Active', 'Expired'],
             show_plant: false,
@@ -908,7 +923,7 @@ export default {
         }
     },
     created() {
-        this.fetchVehicles();
+        this.fetchVehicles(1);
         this.fetchCategories();
         this.fetchCapacities();
         this.fetchIndicators();
@@ -922,6 +937,55 @@ export default {
         this.fetchUserPlants();
     },
     methods: {
+        toggleAllRows() {
+            this.isAllRowsExpanded = !this.isAllRowsExpanded;
+            let nextState = {};
+            if (this.isAllRowsExpanded) {
+                this.vehicles.forEach(vehicle => {
+                    nextState[vehicle.id] = true;
+                });
+            }
+            this.expandedRows = nextState;
+        },
+        toggleRow(id) {
+            this.$set(this.expandedRows, id, !this.expandedRows[id]);
+            this.isAllRowsExpanded = this.vehicles.length > 0 && this.vehicles.every(vehicle => this.expandedRows[vehicle.id]);
+        },
+        isRowExpanded(id) {
+            return !!this.expandedRows[id];
+        },
+        buildVehicleParams(page = 1) {
+            let params = {
+                page: page,
+                per_page: this.itemsPerPage,
+                keywords: this.keywords ? this.keywords.trim() : ''
+            };
+
+            if (this.filterGps) {
+                params.filter_gps = this.filterGps;
+            }
+
+            if (this.filterStatus) {
+                if (this.filterStatus == 'Active') {
+                    params.filter_status_operator = '>';
+                }
+                if (this.filterStatus == 'Expired') {
+                    params.filter_status_operator = '<';
+                }
+            }
+
+            if (this.filterBasedTruck && this.filterBasedTruck.length) {
+                params.filter_based_trucks = this.filterBasedTruck.map((item) => item.id);
+            }
+
+            return params;
+        },
+        onSearchInput() {
+            clearTimeout(this.searchDebounceTimer);
+            this.searchDebounceTimer = setTimeout(() => {
+                this.fetchVehicles(1);
+            }, 400);
+        },
         vehicleCheckAssignGPS() {
             let v = this;
             axios.post('/vehicle-check-assign-gps', {
@@ -979,10 +1043,36 @@ export default {
             v.vehicle_check_gps_data.imei = "";
             v.vehicle_check_gps_data.sim_number = "";
         },
-        exportVehicle() {
+        async exportVehicle() {
             let v = this;
+            let page = 1;
+            let lastPage = 1;
+            let exportRows = [];
+
+            v.loading = true;
+            try {
+                do {
+                    let response = await axios.get('/vehicle-table', {
+                        params: Object.assign({}, v.buildVehicleParams(page), { per_page: 200 })
+                    });
+
+                    if (response.data && response.data.data) {
+                        exportRows = exportRows.concat(response.data.data);
+                        lastPage = response.data.last_page;
+                    } else {
+                        lastPage = 0;
+                    }
+
+                    page++;
+                } while (page <= lastPage);
+            } catch (error) {
+                v.loading = false;
+                alert('Unable to export vehicles at the moment.');
+                return;
+            }
+
             var vehicleData = [];
-            Object.entries(v.vehicles).forEach(([key, data]) => {
+            Object.entries(exportRows).forEach(([key, data]) => {
                 var has_gps = "";
                 var imei = "";
                 var sim_number = "";
@@ -1018,6 +1108,7 @@ export default {
             var wb = XLSX.utils.book_new()
             XLSX.utils.book_append_sheet(wb, exportedData, 'Vehicle List')
             XLSX.writeFile(wb, 'Vechicle List.xlsx')
+            v.loading = false;
         },
         disabledEdit() {
             document.getElementById('capacity-edit').disabled = true;
@@ -1090,16 +1181,29 @@ export default {
             this.vehicle_copied = Object.assign({}, vehicle)
             this.vehicle_copied.indicator_id == 2 ? this.show_plant = false : this.show_plant = true;
         },
-        fetchVehicles() {
+        fetchVehicles(page = 1) {
+            this.loading = true;
             this.table_loading = true;
-            axios.get('/vehicle')
+            axios.get('/vehicle-table', { params: this.buildVehicleParams(page) })
                 .then(response => {
-                    this.vehicles = response.data;
+                    this.vehicles = response.data.data;
+                    this.expandedRows = {};
+                    this.isAllRowsExpanded = false;
+                    this.currentPage = response.data.current_page;
+                    this.pagination.current_page = response.data.current_page;
+                    this.pagination.last_page = response.data.last_page;
+                    this.pagination.per_page = response.data.per_page;
+                    this.pagination.total = response.data.total;
+                    this.pagination.from = response.data.from;
+                    this.pagination.to = response.data.to;
+                    this.loading = false;
                     this.table_loading = false;
                     this.readyListbutton = true;
                 })
                 .catch(error => {
-                    this.errors = error.response.data.error;
+                    this.errors = error.response && error.response.data ? error.response.data.error : [];
+                    this.loading = false;
+                    this.table_loading = false;
                 })
         },
         fetchCategories() {
@@ -1360,11 +1464,17 @@ export default {
         fetchReassignVehicle() {
             let v = this;
             v.reassign_vehicles = [];
-            this.vehicles.forEach(e => {
-                if (e.gpsdevice == null) {
-                    v.reassign_vehicles.push(e);
-                }
-            });
+            axios.get('/vehicle')
+                .then(response => {
+                    response.data.forEach(e => {
+                        if (e.gpsdevice == null) {
+                            v.reassign_vehicles.push(e);
+                        }
+                    });
+                })
+                .catch(error => {
+                    this.errors = error.response && error.response.data ? error.response.data.errors : [];
+                });
         },
         viewAssignGPS(vehicle, gps_device) {
             this.formGPSData = new FormData();
@@ -1575,84 +1685,34 @@ export default {
             this.gps_device_attachments = [];
         },
         fetchFilterVehicle() {
-            this.formFilterData = new FormData();
-            this.vehicles = [];
-            this.loading = true;
-
-            if (this.filterGps) {
-                this.formFilterData.append('filter_gps', this.filterGps);
-            }
-
-            if (this.filterStatus) {
-
-                if (this.filterStatus == "Active") {
-                    this.formFilterData.append('operator', '>');
-                }
-                if (this.filterStatus == "Expired") {
-                    this.formFilterData.append('operator', '<');
-                }
-            }
-
-            if (this.filterBasedTruck) {
-                var filteredTrucks = [];
-                this.filterBasedTruck.forEach(element => {
-                    filteredTrucks.push(element.id);
-                });
-                this.formFilterData.append('filter_based_trucks', filteredTrucks);
-            }
-
-            this.formFilterData.append('_method', 'POST');
-
-            axios.post('/filter-vehicle', this.formFilterData)
-                .then(response => {
-                    this.vehicles = response.data;
-                    this.errors = [];
-                    this.loading = false;
-                })
-                .catch(error => {
-                    this.errors = error.response.data.errors;
-                    this.loading = false;
-                })
+            this.fetchVehicles(1);
         },
         setPage(pageNumber) {
-            this.currentPage = pageNumber;
+            if (pageNumber < 1 || pageNumber > this.pagination.last_page) {
+                return;
+            }
+            this.fetchVehicles(pageNumber);
         },
 
         resetStartRow() {
-            this.currentPage = 0;
+            this.currentPage = 1;
         },
 
         showPreviousLink() {
-            return this.currentPage == 0 ? false : true;
+            return this.pagination.current_page > 1;
         },
 
         showNextLink() {
-            return this.currentPage == (this.totalPages - 1) ? false : true;
+            return this.pagination.current_page < this.pagination.last_page;
         }
     },
     computed: {
-        filteredVehicles() {
-            let self = this;
-            return Object.values(self.vehicles).filter(vehicle => {
-                return vehicle.plate_number.toLowerCase().includes(this.keywords.toLowerCase())
-            });
-        },
-        totalPages() {
-            return Math.ceil(Object.values(this.vehicles).length / this.itemsPerPage)
-        },
-        filteredQueues() {
-            var index = this.currentPage * this.itemsPerPage;
-            var queues_array = this.filteredVehicles.slice(index, index + this.itemsPerPage);
-
-            if (this.currentPage >= this.totalPages) {
-                this.currentPage = this.totalPages - 1
+        tableColumnCount() {
+            let total = 10;
+            if (['IT', 'AP'].includes(this.role)) {
+                total += 1;
             }
-
-            if (this.currentPage == -1) {
-                this.currentPage = 0;
-            }
-
-            return queues_array;
+            return total;
         },
         availablePlants() {
             // If sales role with specific plants, filter plants by user_plants.plants array of IDs
@@ -1662,6 +1722,9 @@ export default {
             }
             return this.plants;
         }
+    },
+    beforeDestroy() {
+        clearTimeout(this.searchDebounceTimer);
     }
 }
 </script>
