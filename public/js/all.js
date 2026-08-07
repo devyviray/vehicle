@@ -8588,7 +8588,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       fileSize: 0,
       errors: [],
       currentPage: 1,
-      itemsPerPage: 50,
+      itemsPerPage: 10,
       keywords: '',
       filterBasedTruck: '',
       filterGps: '',
@@ -8597,7 +8597,7 @@ function _asyncToGenerator(n) { return function () { var t = this, e = arguments
       pagination: {
         current_page: 1,
         last_page: 1,
-        per_page: 50,
+        per_page: 10,
         total: 0,
         from: 0,
         to: 0
