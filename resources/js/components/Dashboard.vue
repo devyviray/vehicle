@@ -874,7 +874,7 @@ export default {
             fileSize: 0,
             errors: [],
             currentPage: 1,
-            itemsPerPage: 50,
+            itemsPerPage: 10,
             keywords: '',
             filterBasedTruck: '',
             filterGps: '',
@@ -883,7 +883,7 @@ export default {
             pagination: {
                 current_page: 1,
                 last_page: 1,
-                per_page: 50,
+                per_page: 10,
                 total: 0,
                 from: 0,
                 to: 0

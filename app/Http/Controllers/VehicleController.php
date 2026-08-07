@@ -106,14 +106,7 @@ class VehicleController extends Controller
 
     public function tableData(Request $request)
     {
-        $per_page = (int) $request->get('per_page', 50);
-        if ($per_page <= 0) {
-            $per_page = 50;
-        }
-        if ($per_page > 200) {
-            $per_page = 200;
-        }
-
+        $per_page = (int) $request->get('per_page', 10);
         $query = $this->baseVehicleQuery();
         $query = $this->applyVehicleFilters($query, $request);
 
